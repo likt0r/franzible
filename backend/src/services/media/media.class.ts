@@ -9,6 +9,8 @@ import { Application } from '../../declarations'
 import * as path from 'path'
 import { getAudioFiles, getImageFiles, getDirectories } from '../../tools/files'
 import * as mongoose from 'mongoose'
+import * as mm from 'music-metadata'
+
 interface Data {}
 
 interface ServiceOptions {}
@@ -36,23 +38,39 @@ export class Media implements ServiceMethods<Data> {
         const audioFiles = await getAudioFiles(
           path.join(mediaPath, author, book)
         )
+        audioFiles.sort() //alphabetical sort
         const imageFiles = await getImageFiles(
           path.join(mediaPath, author, book)
         )
+        // read metadata from files
+        const files = []
+        for (const file of audioFiles) {
+          const filepath = path.join(mediaPath, author, book, file)
+          const metadata = await mm.parseFile(filepath, {
+            duration: true,
+            skipCovers: true,
+          })
+          files.push({
+            filepath: path.join('files', author, book, file),
+            duration: metadata.format.duration,
+          })
+        }
 
-        const books = new Books({
-          author,
-          title: splits[splits.length - 1],
-          series: splits.splice(0, splits.length - 1),
-          files: audioFiles.map((file) =>
-            path.join('files', author, book, file)
-          ),
-          cover:
-            imageFiles.length > 0
-              ? path.join('files', author, book, imageFiles[0])
-              : null,
-        })
-        await books.save()
+        const title = splits[splits.length - 1]
+        await Books.updateOne(
+          { author, title },
+          {
+            author,
+            title,
+            series: splits.splice(0, splits.length - 1),
+            files,
+            cover:
+              imageFiles.length > 0
+                ? path.join('files', author, book, imageFiles[0])
+                : null,
+          },
+          { upsert: true }
+        )
       }
     }
     return []

@@ -1,22 +1,4 @@
 <template>
-  <!-- <v-list subheader two-line>
-    <v-list-item v-for="book in books" :key="book._id">
-      <v-list-item-avatar>
-        <v-img :alt="`${book.title} cover image`"></v-img>
-      </v-list-item-avatar>
-
-      <v-list-item-content>
-        <v-list-item-title v-text="book.title"></v-list-item-title>
-        <v-list-item-subtitle v-text="book.author"></v-list-item-subtitle>
-      </v-list-item-content>
-
-      <v-list-item-action>
-        <v-btn icon @click="doSomething(book)">
-          <v-icon color="grey lighten-1">mdi-play</v-icon>
-        </v-btn>
-      </v-list-item-action>
-    </v-list-item>
-  </v-list> -->
   <FeathersVuexFind
     v-slot="{ items: books }"
     service="books"
@@ -47,7 +29,6 @@
           </v-list-item-action>
         </v-list-item>
       </v-list>
-      -->
     </section>
   </FeathersVuexFind>
 </template>
