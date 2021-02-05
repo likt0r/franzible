@@ -51,6 +51,7 @@ export class Media implements ServiceMethods<Data> {
             skipCovers: true,
           })
           files.push({
+            filename: file,
             filepath: path.join('files', author, book, file),
             duration: metadata.format.duration,
           })

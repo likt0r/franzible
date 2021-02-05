@@ -58,7 +58,7 @@
     ],
     "compounds": [
         {
-            "name": "fullstack: nuxt",
+            "name": "fullstack: franzible",
             "configurations": [
                 "backend: api",
                 "frontend: nuxt",

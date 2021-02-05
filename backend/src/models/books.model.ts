@@ -13,7 +13,7 @@ export default function (app: Application): Model<any> {
       author: { type: String },
       title: { type: String },
       series: [String],
-      files: [{ filepath: String, duration: Number }],
+      files: [{ filepath: String, filename: String, duration: Number }],
       cover: [String],
     },
     {

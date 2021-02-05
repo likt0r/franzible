@@ -47,11 +47,13 @@ export const modules = {
 }
 
 export const state = () => ({
-  // Custom state
+  chapterListState: false,
 })
 
 export const mutations = {
-  // Custom mutations
+  SET_CHAPTER_LIST(state, chapterListState) {
+    state.chapterListState = chapterListState
+  },
 }
 
 export const actions = {
@@ -72,10 +74,16 @@ export const actions = {
       return dispatch('auth/onInitAuth', state.auth.payload)
     }
   },
+  toggleChapterList({ commit, state }) {
+    commit('SET_CHAPTER_LIST', !state.chapterListState)
+  },
 }
 
 export const getters = {
   // Custom getters
+  chapterListState(state) {
+    return state.chapterListState
+  },
 }
 
 export const plugins = [...servicePlugins, auth]

@@ -1,7 +1,7 @@
 <template>
   <v-container fluid fill-height>
     <v-layout align-center justify-center>
-      <v-flex xs12 sm8 md4>
+      <v-flex xs12 sm8 md6>
         <v-card class="elevation-12">
           <v-toolbar dark color="primary">
             <v-toolbar-title>Login to Franzible</v-toolbar-title>
@@ -26,7 +26,9 @@
           </v-card-text>
           <v-card-actions>
             <v-spacer></v-spacer>
-            <v-btn color="primary" @click="login">Login</v-btn>
+            <v-btn color="primary" :loading="authenticating" @click="login"
+              >Login</v-btn
+            >
           </v-card-actions>
         </v-card>
       </v-flex>
@@ -44,12 +46,15 @@ export default {
         email: '',
         password: '',
       },
+      authenticating: false,
     }
   },
   methods: {
-    login() {
+    async login() {
       console.log('loginData', this.loginData)
-      this.$store.dispatch('auth/authenticate', this.loginData)
+      this.authenticating = true
+      await this.$store.dispatch('auth/authenticate', this.loginData)
+      this.authenticating = false
       this.$router.push('/')
     },
   },
