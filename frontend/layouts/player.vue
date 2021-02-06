@@ -38,7 +38,6 @@
 </template>
 
 <script>
-import { mapGetters, mapActions } from 'vuex'
 import Playlist from '../components/Playlist.vue'
 import SideMenue from '../components/SideMenu'
 export default {

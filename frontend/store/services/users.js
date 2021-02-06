@@ -3,7 +3,7 @@ import feathersClient, {
   makeServicePlugin,
   BaseModel,
 } from '~/plugins/feathers'
-
+/* eslint-disable */
 class User extends BaseModel {
   constructor(data, options) {
     super(data, options)

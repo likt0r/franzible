@@ -3,7 +3,7 @@ import feathersClient, {
   makeServicePlugin,
   BaseModel,
 } from '~/plugins/feathers'
-
+/* eslint-disable */
 class Book extends BaseModel {
   constructor(data, options) {
     super(data, options)
@@ -14,9 +14,11 @@ class Book extends BaseModel {
   // Define default properties here
   static instanceDefaults() {
     return {
-      email: '',
-      password: '',
-      permissions: [],
+      author: '',
+      title: '',
+      series: '',
+      files: [],
+      cover: [''],
     }
   }
 }
