@@ -18,17 +18,11 @@
       <nuxt />
     </v-main>
 
-    <v-navigation-drawer
-      v-model="chapterListState"
-      right
-      app
-      :width="425"
-      fixed
-    >
+    <v-navigation-drawer v-model="fileListState" right app :width="425" fixed>
       <playlist />
       <template #append>
         <div class="pa-2">
-          <v-btn block @click.stop="chapterListState = !chapterListState">
+          <v-btn block @click.stop="fileListState = !fileListState">
             Schließen
           </v-btn>
         </div>
@@ -65,12 +59,12 @@ export default {
     }
   },
   computed: {
-    chapterListState: {
+    fileListState: {
       get() {
-        return this.$store.state.chapterListState
+        return this.$store.state.fileListState
       },
       set(value) {
-        this.$store.commit('SET_CHAPTER_LIST', value)
+        this.$store.commit('SET_FILE_LIST', value)
       },
     },
   },

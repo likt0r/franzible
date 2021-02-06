@@ -18,12 +18,12 @@
           <v-list-item-subtitle v-text="book.author"></v-list-item-subtitle>
         </v-list-item-content>
       </v-list-item>
-      <v-list-item-group :value="activeChapterIndex">
+      <v-list-item-group :value="activeFileIndex">
         <v-list-item
           v-for="(file, index) in book.files"
           :key="file.filename"
           :class="'active'"
-          @click.stop="playChapter(index)"
+          @click.stop="playFile(index)"
         >
           <v-list-item-title>{{ file.filename }} </v-list-item-title>
           <v-list-item-action>
@@ -37,6 +37,7 @@
 
 <script>
 import { getFullUrl } from '../tools/url'
+import { toMinutesAndSeconds } from '../tools/formatTime'
 export default {
   data() {
     return {}
@@ -48,32 +49,20 @@ export default {
     activeBookId() {
       return this.$store.getters['player/activeBookId']
     },
-    activeChapterIndex() {
+    activeFileIndex() {
       return this.activeBookId === this.id
-        ? this.$store.getters['player/activeChapterIndex']
+        ? this.$store.getters['player/activeFileIndex']
         : null
     },
   },
   methods: {
-    pad(num, size) {
-      const s = '000000000' + num
-      return s.substr(s.length - size)
-    },
-    playChapter(index) {
-      this.$store.dispatch('player/playChapter', {
+    playFile(index) {
+      this.$store.dispatch('player/playFile', {
         bookId: this.id,
-        chapterIndex: index,
+        fileIndex: index,
       })
     },
-    toMinutesAndSeconds(time) {
-      const all = Math.abs(Math.round(time))
-      const seconds = all % 60
-      const minutes = (all - seconds) / 60
-      return `${Math.sign(time) < 0 ? '-' : ''}${this.pad(
-        minutes,
-        2
-      )}:${this.pad(seconds, 2)}`
-    },
+    toMinutesAndSeconds,
     getFullUrl,
   },
 }

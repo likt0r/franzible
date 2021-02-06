@@ -1,4 +1,5 @@
 // ~/store/index.js
+import { playerInitPlugin } from './player'
 import {
   makeAuthPlugin,
   initAuth,
@@ -47,12 +48,12 @@ export const modules = {
 }
 
 export const state = () => ({
-  chapterListState: false,
+  fileListState: false,
 })
 
 export const mutations = {
-  SET_CHAPTER_LIST(state, chapterListState) {
-    state.chapterListState = chapterListState
+  SET_FILE_LIST(state, fileListState) {
+    state.fileListState = fileListState
   },
 }
 
@@ -74,16 +75,16 @@ export const actions = {
       return dispatch('auth/onInitAuth', state.auth.payload)
     }
   },
-  toggleChapterList({ commit, state }) {
-    commit('SET_CHAPTER_LIST', !state.chapterListState)
+  toggleFileList({ commit, state }) {
+    commit('SET_FILE_LIST', !state.fileListState)
   },
 }
 
 export const getters = {
   // Custom getters
-  chapterListState(state) {
-    return state.chapterListState
+  fileListState(state) {
+    return state.fileListState
   },
 }
 
-export const plugins = [...servicePlugins, auth]
+export const plugins = [...servicePlugins, auth, playerInitPlugin]
