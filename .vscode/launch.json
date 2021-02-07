@@ -10,8 +10,8 @@
             "request": "launch",
             "name": "frontend: chrome",
             "url": "http://localhost:3000",
-            "webRoot": "${workspaceFolder/frontend}",
-            "trace": true
+            "webRoot": "${workspaceFolder}",
+
         },
         {
             "type": "node",
