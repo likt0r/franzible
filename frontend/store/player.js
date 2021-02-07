@@ -8,14 +8,19 @@ export const state = () => ({
   filePosition: 0,
   playerState: PLAYER_STATE_ENUM.stopped,
   fastStep: 30,
+  progressId: null,
 })
 
 export const mutations = {
-  SET_BOOK_FILE(state, { bookId, book, fileIndex, filePosition = 0 }) {
+  SET_BOOK_FILE(
+    state,
+    { bookId, book, fileIndex, filePosition = 0, progressId }
+  ) {
     state.bookId = bookId
     state.fileIndex = fileIndex
     state.book = book
     state.filePosition = filePosition
+    state.progressId = progressId
   },
   SET_FILE(state, { fileIndex, filePosition = 0 }) {
     state.fileIndex = fileIndex
@@ -36,13 +41,25 @@ export const mutations = {
 }
 
 export const actions = {
-  playFile(
+  async playFile(
     { dispatch, commit, getters, state, rootGetters },
     { bookId, fileIndex, filePosition = 0 }
   ) {
     if (state.bookId !== bookId || state.fileIndex !== fileIndex) {
       const book = rootGetters['books/get'](bookId)
-      commit('SET_BOOK_FILE', { bookId, book, fileIndex, filePosition })
+      const { _id: progressId } = rootGetters['progress/find']({
+        query: {
+          bookId,
+        },
+      }).data[0]
+
+      commit('SET_BOOK_FILE', {
+        bookId,
+        book,
+        fileIndex,
+        filePosition,
+        progressId,
+      })
       getInstance().loadAudioBook({
         audioUrl: getFullUrl(book.files[fileIndex].filepath),
         filePosition,
@@ -151,5 +168,21 @@ export const playerInitPlugin = (store) => {
   store.subscribe((mutation, state) => {
     // called after every mutation.
     // The mutation comes in the format of `{ type, payload }`.
+    if (
+      [
+        'player/SET_BOOK_FILE',
+        'player/SET_FILE',
+        'player/SET_FILE_POSTION',
+      ].includes(mutation.type)
+    ) {
+      console.log('update position')
+      store.dispatch('progress/patch', [
+        state.player.progressId,
+        {
+          fileIndex: state.player.fileIndex,
+          filePosition: state.player.filePosition,
+        },
+      ])
+    }
   })
 }

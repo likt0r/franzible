@@ -2,7 +2,7 @@ import colors from 'vuetify/es5/util/colors'
 
 export default {
   // Disable server-side rendering: https://go.nuxtjs.dev/ssr-mode
-  // ssr: true,
+  ssr: false,
 
   // Global page headers: https://go.nuxtjs.dev/config-head
   head: {
@@ -18,12 +18,30 @@ export default {
 
   // Global CSS: https://go.nuxtjs.dev/config-css
   css: [],
+  // Auto import components: https://go.nuxtjs.dev/config-components
+  components: true,
+
+  env: {
+    API_URL: process.env.API_URL || 'http://localhost:3030',
+  },
+  router: {
+    middleware: ['feathers'],
+  },
 
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
   plugins: [{ src: '~/plugins/feathers-vuex.js' }],
 
-  // Auto import components: https://go.nuxtjs.dev/config-components
-  components: true,
+  // Modules: https://go.nuxtjs.dev/config-modules
+  modules: [
+    // https://go.nuxtjs.dev/axios
+    // https://go.nuxtjs.dev/pwa
+    // '@nuxtjs/pwa',
+    'nuxt-client-init-module',
+  ],
+  // Build Configuration: https://go.nuxtjs.dev/config-build
+  build: {
+    transpile: ['feathers-vuex'],
+  },
 
   // Modules for dev and build (recommended): https://go.nuxtjs.dev/config-modules
   buildModules: [
@@ -33,55 +51,12 @@ export default {
     '@nuxtjs/vuetify',
   ],
 
-  // Modules: https://go.nuxtjs.dev/config-modules
-  modules: [
-    // https://go.nuxtjs.dev/axios
-    '@nuxtjs/axios',
-    // https://go.nuxtjs.dev/pwa
-    '@nuxtjs/pwa',
-    'nuxt-client-init-module',
-  ],
-  env: {
-    API_URL: process.env.API_URL || 'http://localhost:3030',
-  },
-
-  router: {
-    middleware: ['feathers'],
-  },
-
-  auth: {
-    strategies: {
-      local: {
-        endpoints: {
-          login: {
-            url: '/authentication',
-            method: 'post',
-            propertyName: 'token',
-          },
-          token: 'accessToken',
-          logout: { url: '/authentication', method: 'delete' },
-          user: false, // { url: '/api/auth/user', method: 'get', propertyName: 'user' }
-          autoFetchUser: false,
-        },
-        // tokenRequired: true,
-        // tokenType: 'bearer',
-        // globalToken: true,
-        // autoFetchUser: true
-      },
-    },
-  },
-
-  // Axios module configuration: https://go.nuxtjs.dev/config-axios
-  axios: {
-    baseURL: 'http://localhost:3030',
-  },
-
   // PWA module configuration: https://go.nuxtjs.dev/pwa
-  pwa: {
-    manifest: {
-      lang: 'en',
-    },
-  },
+  // pwa: {
+  //   manifest: {
+  //     lang: 'en',
+  //   },
+  // },
 
   // Vuetify module configuration: https://go.nuxtjs.dev/config-vuetify
   vuetify: {
@@ -100,10 +75,5 @@ export default {
         },
       },
     },
-  },
-
-  // Build Configuration: https://go.nuxtjs.dev/config-build
-  build: {
-    transpile: ['feathers-vuex'],
   },
 }
