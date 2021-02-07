@@ -1,19 +1,21 @@
-// users-model.ts - A mongoose model
+// progress-model.ts - A mongoose model
 //
 // See http://mongoosejs.com/docs/models.html
 // for more of what you can do here.
 import { Application } from '../declarations'
 import { Model, Mongoose } from 'mongoose'
+
 export default function (app: Application): Model<any> {
   const modelName = 'progress'
   const mongooseClient: Mongoose = app.get('mongooseClient')
-  const schema = new mongooseClient.Schema(
+  const { Schema } = mongooseClient
+  const schema = new Schema(
     {
       userId: { type: mongooseClient.Schema.Types.ObjectId, ref: 'users' },
       bookId: { type: mongooseClient.Schema.Types.ObjectId, ref: 'books' },
-      lastPlayed: { Boolean },
-      fileId: { String },
-      cover: { String },
+      lastPlayed: { type: Boolean },
+      fileIndex: { type: Number },
+      filePosition: { type: Number },
     },
     {
       timestamps: true,
@@ -23,7 +25,7 @@ export default function (app: Application): Model<any> {
   // This is necessary to avoid model compilation errors in watch mode
   // see https://mongoosejs.com/docs/api/connection.html#connection_Connection-deleteModel
   if (mongooseClient.modelNames().includes(modelName)) {
-    mongooseClient.deleteModel(modelName)
+    ;(mongooseClient as any).deleteModel(modelName)
   }
   return mongooseClient.model<any>(modelName, schema)
 }
