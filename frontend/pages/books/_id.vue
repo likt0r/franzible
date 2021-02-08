@@ -1,17 +1,26 @@
 <template>
-  <v-container v-if="book">
-    <v-row justify="center" class="pt-0">
-      <v-col xs="12" sm="10" md="8" lg="6" class="pa-0">
+  <v-container v-if="book" class="fill-height">
+    <v-row justify="center" class="pt-0" align="start">
+      <v-col
+        xs="10"
+        sm="8"
+        md="8"
+        lg="6"
+        class="pa-0 justify-center pl-14 pr-14"
+      >
+        <v-img :src="getFullUrl(book.cover)" contain> </v-img>
+      </v-col>
+    </v-row>
+    <v-row justify="center" class="pt-0" align="end">
+      <v-col xs="12" sm="8" md="8" lg="6" class="pa-0">
         <v-card v-if="book" class="mx-auto">
-          <v-card-text>
-            <v-img :src="getFullUrl(book.cover)" :aspect-ratio="4 / 4"> </v-img>
-          </v-card-text>
-          <v-card-subtitle class="pb-4 text-center">
+          <v-card-subtitle class="pb-0 text-center">
             {{ book.files[activeFileIndex].filename }}
           </v-card-subtitle>
           <v-card-text
             ><v-slider
               v-model="sliderPosition"
+              class="pb-0 pt-0 text-center"
               :max="fileDuration"
               min="0"
               @mousedown="sliederIsTouched = true"
@@ -20,16 +29,16 @@
             ></v-slider>
           </v-card-text>
           <v-card-text class="pt-0">
-            <v-row class="pt-0">
-              <v-col class="text-left" :cols="3">{{
+            <v-row class="pt-0 pr-2 pl-2">
+              <v-col class="text-left pt-0 pb-0" :cols="3">{{
                 toMinutesAndSeconds(filePositionInSecs)
               }}</v-col>
 
-              <v-col class="text-center" :cols="6"
+              <v-col class="text-center pt-0 pb-0" :cols="6"
                 >Restzeit des Hörspiels</v-col
               >
 
-              <v-col class="text-right" :cols="3"
+              <v-col class="text-right pt-0 pb-0" :cols="3"
                 >-{{ toMinutesAndSeconds(fileRemainingTime) }}</v-col
               >
             </v-row>
@@ -37,17 +46,30 @@
           <v-card-actions>
             <v-spacer></v-spacer>
 
-            <v-btn fab medium dark @click.stop="skipPrevious">
+            <v-btn
+              fab
+              :medium="!$vuetify.breakpoint.xs"
+              :small="!!$vuetify.breakpoint.xs"
+              dark
+              @click.stop="skipPrevious"
+            >
               <v-icon medium>mdi-skip-previous-outline</v-icon>
             </v-btn>
 
-            <v-btn fab medium dark @click.stop="fastRewind">
+            <v-btn
+              fab
+              :medium="!$vuetify.breakpoint.xs"
+              :small="!!$vuetify.breakpoint.xs"
+              dark
+              @click.stop="fastRewind"
+            >
               <v-icon medium>mdi-rewind-30</v-icon>
             </v-btn>
 
             <v-btn
               fab
-              x-large
+              :x-large="!$vuetify.breakpoint.xs"
+              :medium="!!$vuetify.breakpoint.xs"
               dark
               :loading="playerIsLoading"
               @click="playButtonClick"
@@ -59,38 +81,53 @@
               }}</v-icon>
             </v-btn>
 
-            <v-btn fab medium dark @click.stop="fastForward">
+            <v-btn
+              fab
+              :medium="!$vuetify.breakpoint.xs"
+              :small="!!$vuetify.breakpoint.xs"
+              dark
+              @click.stop="fastForward"
+            >
               <v-icon medium>mdi-fast-forward-30</v-icon>
             </v-btn>
 
-            <v-btn fab medium dark @click.stop="skipNext">
+            <v-btn
+              fab
+              :medium="!$vuetify.breakpoint.xs"
+              :small="!!$vuetify.breakpoint.xs"
+              dark
+              @click.stop="skipNext"
+            >
               <v-icon medium>mdi-skip-next-outline</v-icon>
             </v-btn>
 
             <v-spacer></v-spacer>
           </v-card-actions>
 
-          <v-toolbar flat class="elevation-0 mt-4">
-            <v-btn>
+          <v-bottom-navigation
+            flat
+            class="elevation-0 mt-4 justify-center"
+            :height="bottomBarHeigth"
+          >
+            <v-btn :width="bottomBarHeigth">
               <span class="pa-2">Speed</span>
               <span class="pa-1">1.00X</span>
             </v-btn>
 
-            <v-btn @click.stop="toggleFileList">
+            <v-btn :width="bottomBarHeigth" @click.stop="toggleFileList">
               <span class="pa-2">File</span>
               <v-icon>mdi-format-list-numbered-rtl</v-icon>
             </v-btn>
 
-            <v-btn>
+            <v-btn :width="bottomBarHeigth">
               <span class="pa-2">Sleep timer</span>
 
               <v-icon>mdi-timer-outline</v-icon>
             </v-btn>
-          </v-toolbar>
+          </v-bottom-navigation>
         </v-card>
       </v-col>
     </v-row>
-    <v-row justify="space-around"> </v-row>
   </v-container>
 </template>
 
@@ -109,7 +146,7 @@ export default {
       await store.dispatch('progress/create', {
         bookId: params.id,
         fileIndex: 0,
-        position: 0,
+        filePosition: 0,
       })
     }
     const progress =
@@ -136,6 +173,9 @@ export default {
   },
   computed: {
     ...mapGetters(['fileListState']),
+    bottomBarHeigth() {
+      return this.$vuetify.breakpoint.xs ? 60 : 80
+    },
     activeBookId() {
       return this.$store.getters['player/activeBookId']
     },
