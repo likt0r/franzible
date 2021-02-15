@@ -1,6 +1,7 @@
 export default async function ({ store, redirect, route }) {
   const { auth } = store.state
-  if (!auth.payload) {
+  console.log(auth)
+  if (!auth.payload && auth.accessToken) {
     await store.dispatch('auth/authenticate')
   }
   if (

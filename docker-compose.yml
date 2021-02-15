@@ -1,6 +1,11 @@
 version: "3"
 
 services:
+  web-service:
+    build: .
+    ports:
+      - "3000:3000"
+      - "3030:3030"
   db:
     image: mongo:latest
     restart: unless-stopped

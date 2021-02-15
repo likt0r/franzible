@@ -22,7 +22,8 @@ export default {
   components: true,
 
   env: {
-    API_URL: process.env.API_URL || 'http://localhost:3030',
+    API_URL: process.env.API_URL || 'http://localhost:3000/api',
+    API_SOCKET: process.env.API_SOCKET || 'http://localhost:3000',
   },
   router: {
     middleware: ['feathers'],
@@ -36,8 +37,26 @@ export default {
     // https://go.nuxtjs.dev/axios
     // https://go.nuxtjs.dev/pwa
     // '@nuxtjs/pwa',
+    '@nuxtjs/proxy',
     'nuxt-client-init-module',
   ],
+
+  proxy: {
+    // Simple proxy
+    '/api.socket.io': {
+      target: 'http://localhost:3030/socket.io',
+      changeOrigin: false, // for vhosted sites, changes host header to match to target's host
+      ws: true, // enable websocket proxy
+      // logLevel: 'debug',
+    },
+    '/api': {
+      target: 'http://localhost:3030',
+      pathRewrite: { '^/api/': '' },
+      // changeOrigin: true, // for vhosted sites, changes host header to match to target's host
+      ws: false, // enable websocket proxy
+    },
+  },
+
   // Build Configuration: https://go.nuxtjs.dev/config-build
   build: {
     transpile: ['feathers-vuex'],

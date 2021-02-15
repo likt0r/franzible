@@ -10,11 +10,12 @@ import { iff, discard } from 'feathers-hooks-common'
 import feathersVuex, { initAuth, hydrateApi } from 'feathers-vuex'
 // Get the api url from the environment variable
 const apiUrl = process.env.API_URL
+const apiSocket = process.env.API_SOCKET
 let socket
 let restClient
 // We won't use socket to comunicate from server to server
 if (process.client) {
-  socket = io(apiUrl, { transports: ['websocket'] })
+  socket = io(apiSocket, { transports: ['websocket'], path: '/api.socket.io' })
 } else {
   restClient = rest(apiUrl)
 }
