@@ -1,6 +1,6 @@
 # Franzible
 
-## Build Setup
+## Build Frontend Setup
 
 ```bash
 # install dependencies
@@ -17,4 +17,17 @@ $ npm run start
 $ npm run generate
 ```
 
-For detailed explanation on how things work, check out [Nuxt.js docs](https://nuxtjs.org).
+## Deployment on Linux
+
+1. Clone repository
+2. Add enviroment variables to yout bash_profile
+   $ nano ~/.profile
+   ```
+   export FRANZIBLE_AUTH_SECRET=yourAuthSecret
+   export FRANZIBLE_DOMAIN=www.yourdomain.com
+   export FRANZIBLE_PORT=PortFranzibleShouldRunOn 
+   export FRANZIBLE_MEDIA_PATH=pathToYourAudiobooks
+   ```
+  $ source ~./profile
+3. go to franzible directory
+   docker-compose up -d
