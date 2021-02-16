@@ -1,19 +1,39 @@
 version: "3"
 
 services:
-  web-service:
-    build: .
+  nuxt-app:
+    build: "./frontend/"
+    restart: always
     ports:
-      - "3000:3000"
-      - "3030:3030"
-  db:
+      - "${FRANZIBLE_PORT}:80"
+    links:
+      - "feather-app:api"
+    environment:
+      NODE_ENV: production
+
+  feather-app:
+    build: "./backend/"
+    depends_on:
+      - mongo-db
+    restart: always
+    environment:
+      NODE_ENV: production
+      PORT: "80"
+      MONGOHQ_URL: "mongodb://db:27017/franzible"
+      MEDIA_PATH: "/mnt/media/"
+      AUTH_SECRET: "${FRANZIBLE_AUTH_SECRET}"
+      AUDIENCE: "${FRANZIBLE_DOMAIN}"
+    links:
+      - "mongo-db:db"
+    volumes:
+      - ${FRANZIBLE_MEDIA_PATH}:/mnt/media
+
+  mongo-db:
     image: mongo:latest
     restart: unless-stopped
     volumes:
       - ./mongodb-data:/data/db
-    ports:
-      - 27017:27017
-
+    restart: always
     # Uncomment to change startup options
     environment:
       #  MONGO_INITDB_ROOT_USERNAME: root
@@ -27,4 +47,4 @@ networks:
   default:
     ipam:
       config:
-        - subnet: 172.16.57.0/24
+        - subnet: 172.16.59.0/24

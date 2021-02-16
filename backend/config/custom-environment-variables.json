@@ -1,0 +1,16 @@
+
+
+{
+  "port": "PORT",
+  "mongodb": "MONGOHQ_URL",
+  "mediaPath": "MEDIA_PATH",
+  "authentication": {
+    "secret": "AUTH_SECRET"
+  },
+  "jwtOptions": {
+    "audience": "AUDIENCE"
+  }
+}
+
+
+

@@ -22,8 +22,8 @@ export default {
   components: true,
 
   env: {
-    API_URL: process.env.API_URL || 'http://localhost:3000/api',
-    API_SOCKET: process.env.API_SOCKET || 'http://localhost:3000',
+    API_URL: '/api',
+    API_SOCKET: '/',
   },
   router: {
     middleware: ['feathers'],
@@ -44,13 +44,19 @@ export default {
   proxy: {
     // Simple proxy
     '/api.socket.io': {
-      target: 'http://localhost:3030/socket.io',
+      target:
+        process.env.NODE_ENV === 'production'
+          ? 'http://api:80/socket.io'
+          : 'http://localhost:3030/socket.io',
       changeOrigin: false, // for vhosted sites, changes host header to match to target's host
       ws: true, // enable websocket proxy
       // logLevel: 'debug',
     },
     '/api': {
-      target: 'http://localhost:3030',
+      target:
+        process.env.NODE_ENV === 'production'
+          ? 'http://api:80/'
+          : 'http://localhost:3030',
       pathRewrite: { '^/api/': '' },
       // changeOrigin: true, // for vhosted sites, changes host header to match to target's host
       ws: false, // enable websocket proxy

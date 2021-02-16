@@ -1,8 +1,8 @@
 FROM node:lts-alpine3.12
 
 # create destination directory
-RUN mkdir -p /usr/src/feather-app
-WORKDIR /usr/src/feather-app
+RUN mkdir -p /usr/src/nuxt-app
+WORKDIR /usr/src/nuxt-app
 
 # create upload directory
 RUN mkdir -p /mnt/volume
@@ -12,7 +12,7 @@ RUN apk update && apk upgrade
 RUN apk add git
 
 # copy the app, note .dockerignore
-COPY . /usr/src/feather-app/
+COPY . /usr/src/nuxt-app/
 RUN npm install
 
 # build necessary, even if no static files are needed,
@@ -22,11 +22,11 @@ RUN npm run build
 # expose 5000 on container
 EXPOSE 5000
 
-
-ENV API_SOCKET = http://api:80/
-ENV API_URL = http://api:80/
-# set upload folder
-ENV MEDIA_FOLDER=/mnt/media
-
+# set app serving to permissive / assigned
+ENV NUXT_HOST=0.0.0.0
+# set app port
+ENV NUXT_PORT=80
+ENV API_SOCKET="api"
+ENV API_URL="api"
 # start the appcd
 CMD [ "npm", "start" ]
