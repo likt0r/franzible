@@ -70,6 +70,10 @@ class AudioPlayer {
     this.elAudio.play()
   }
 
+  setSpeed(speed) {
+    this.elAudio.playbackRate = speed
+  }
+
   seek(position) {
     this.elAudio.currentTime = position
   }

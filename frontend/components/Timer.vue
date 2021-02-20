@@ -9,8 +9,8 @@
     <v-hover>
       <v-chip
         slot-scope="{ hover }"
-        :class="`elevation-${hover ? 5 : 2}`"
         v-ripple
+        :class="`elevation-${hover ? 5 : 2}`"
         dark
         outlined
       >
@@ -47,7 +47,7 @@
 import { mapState } from 'vuex'
 export default {
   components: {},
-  data: function () {
+  data: () => {
     return {
       cancelDialog: false,
     }
@@ -59,6 +59,12 @@ export default {
       active: (state) => state.shutdown.active,
     }),
   },
+  async mounted() {
+    const { data } = await this.$axios.get('/api/commands/shutdown')
+    if (data.timer) {
+      this.$store.dispatch('shutdown/initTimer', { seconds: data.timer })
+    }
+  },
   methods: {
     stopTimer() {
       this.$store.dispatch('shutdown/stopTimer')
@@ -67,12 +73,6 @@ export default {
     pad(num, size) {
       return ('000000000' + num).substr(-size)
     },
-  },
-  async mounted() {
-    const { data } = await this.$axios.get('/api/commands/shutdown')
-    if (data.timer) {
-      this.$store.dispatch('shutdown/initTimer', { seconds: data.timer })
-    }
   },
 }
 </script>

@@ -9,6 +9,7 @@ export const state = () => ({
   playerState: PLAYER_STATE_ENUM.stopped,
   fastStep: 30,
   progressId: null,
+  speed: 100,
 })
 
 export const mutations = {
@@ -37,6 +38,9 @@ export const mutations = {
 
   SET_FILE_POSTION(state, filePosition) {
     state.filePosition = filePosition
+  },
+  SET_SPEED(state, speed) {
+    state.speed = speed
   },
 }
 
@@ -68,9 +72,14 @@ export const actions = {
       console.warn('ACTION/playFile: Boock and File are the same as current')
     }
   },
+  setSpeed({ commit }, speed) {
+    commit('SET_SPEED', speed)
+    getInstance().setSpeed(speed / 100)
+  },
   pause() {
     getInstance().pause()
   },
+
   resume() {
     getInstance().resume()
   },
@@ -128,6 +137,9 @@ export const actions = {
 }
 
 export const getters = {
+  speed(state) {
+    return state.speed
+  },
   activeBookId(state) {
     return state.bookId
   },

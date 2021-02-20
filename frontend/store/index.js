@@ -1,5 +1,6 @@
 // ~/store/index.js
 import { playerInitPlugin } from './player'
+import { timerInitPlugin } from './timer'
 import {
   makeAuthPlugin,
   initAuth,
@@ -87,4 +88,9 @@ export const getters = {
   },
 }
 
-export const plugins = [...servicePlugins, auth, playerInitPlugin]
+export const plugins = [
+  ...servicePlugins,
+  auth,
+  playerInitPlugin,
+  timerInitPlugin,
+]

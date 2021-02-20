@@ -8,7 +8,11 @@
         lg="6"
         class="pa-0 justify-center pl-14 pr-14"
       >
-        <v-img :src="getFullUrl(book.cover)" contain> </v-img>
+        <v-img :src="getFullUrl(book.cover)" contain
+          ><v-overlay absolute :value="timerActiveState"
+            ><h1>{{ toMinutesAndSeconds(timerCurrentTime) }}</h1></v-overlay
+          >
+        </v-img>
       </v-col>
     </v-row>
     <v-row justify="center" class="pt-0" align="end">
@@ -103,28 +107,7 @@
 
             <v-spacer></v-spacer>
           </v-card-actions>
-
-          <v-bottom-navigation
-            flat
-            class="elevation-0 mt-4 justify-center"
-            :height="bottomBarHeigth"
-          >
-            <v-btn :width="bottomBarHeigth">
-              <span class="pa-2">Speed</span>
-              <span class="pa-1">1.00X</span>
-            </v-btn>
-
-            <v-btn :width="bottomBarHeigth" @click.stop="toggleFileList">
-              <span class="pa-2">File</span>
-              <v-icon>mdi-format-list-numbered-rtl</v-icon>
-            </v-btn>
-
-            <v-btn :width="bottomBarHeigth">
-              <span class="pa-2">Sleep timer</span>
-
-              <v-icon>mdi-timer-outline</v-icon>
-            </v-btn>
-          </v-bottom-navigation>
+          <player-bottom-navigation></player-bottom-navigation>
         </v-card>
       </v-col>
     </v-row>
@@ -135,8 +118,13 @@
 import { mapGetters, mapActions } from 'vuex'
 import { toMinutesAndSeconds } from '../../tools/formatTime'
 import { getFullUrl } from '../../tools/url'
+import PlayerBottomNavigation from '~/components/PlayerBottomNavigation.vue'
+
 export default {
   name: 'Player',
+  components: {
+    PlayerBottomNavigation,
+  },
   layout: 'single',
   async asyncData({ params, store }) {
     const response = await store.dispatch('progress/find', {
@@ -158,10 +146,8 @@ export default {
           }
         : response.data[0]
 
-    console.log(progress)
     let book = await store.getters['books/get'](params.id)
     if (!book) book = await store.dispatch('books/get', params.id)
-    console.log('book', book)
     return { progress, book }
   },
 
@@ -173,8 +159,11 @@ export default {
   },
   computed: {
     ...mapGetters(['fileListState']),
-    bottomBarHeigth() {
-      return this.$vuetify.breakpoint.xs ? 60 : 80
+    timerActiveState() {
+      return this.$store.getters['timer/getTimeActiveState']
+    },
+    timerCurrentTime() {
+      return this.$store.getters['timer/getCurrentTime']
     },
     activeBookId() {
       return this.$store.getters['player/activeBookId']
@@ -231,10 +220,7 @@ export default {
   },
   methods: {
     ...mapActions(['toggleFileList']),
-    doSomething() {
-      console.log('done')
-      console.log('done')
-    },
+
     playButtonClick() {
       if (this.activeBookId !== this.id) {
         this.$store.dispatch('player/playFile', {
