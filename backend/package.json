@@ -26,7 +26,7 @@
   "scripts": {
     "test": "npm run lint && npm run build && npm run jest",
     "lint": "eslint src/. test/. --config .eslintrc.json --ext .ts --fix",
-    "dev": "ts-node-dev --no-notify src/",
+    "dev": "ts-node-dev --project tsconfig.json --no-notify src/index.ts",
     "start": "node lib/",
     "jest": "jest  --forceExit",
     "build": "shx rm -rf lib/ && tsc"

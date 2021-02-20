@@ -1,0 +1,17 @@
+version: "3"
+
+services:
+  mongo-db-dev:
+    image: mongo:latest
+    restart: unless-stopped
+    volumes:
+      - ../mongodb-data:/data/db
+    restart: always
+    # Uncomment to change startup options
+    ports:
+      - "27017:27017"
+    environment:
+      #  MONGO_INITDB_ROOT_USERNAME: root
+      #  MONGO_INITDB_ROOT_PASSWORD: example
+      MONGO_INITDB_DATABASE: franzible
+
