@@ -1,38 +1,46 @@
-version: "3"
+version: "3.7"
 
 services:
-  nuxt-app:
-    build: "./frontend/"
+  franzible:
+    image: bewr42/franzible_nuxt-app:v0.1
     restart: always
-    ports:
-      - "${FRANZIBLE_PORT}:80"
+    container_name: "franzible"
+    hostname: "franzible"
+#    ports: 
+#      - 8050:80
+    labels:
+          - "traefik.enable=true"
+          - "traefik.http.routers.franzible.entrypoints=websecure"
+          - "traefik.http.routers.franzible.rule=Host(`franzible.$MY_DOMAIN`)"
+          - "traefik.http.routers.franzible.tls.certresolver=lets-encr"
+          - "traefik.http.services.franzible.loadbalancer.server.port=80"
     links:
-      - "feather-app:api"
+      - "franzible_feather-app:api"
     environment:
       NODE_ENV: production
 
-  feather-app:
-    build: "./backend/"
+  franzible_feather-app:
+    image: bewr42/franzible_feather-app:v0.1
     depends_on:
-      - mongo-db
+      - franzible_mongo-db
     restart: always
     environment:
       NODE_ENV: production
       PORT: "80"
       MONGOHQ_URL: "mongodb://db:27017/franzible"
-      MEDIA_PATH: "/mnt/media/"
-      AUTH_SECRET: "${FRANZIBLE_AUTH_SECRET}"
-      AUDIENCE: "${FRANZIBLE_DOMAIN}"
+      MEDIA_PATH: "/mnt/media"
+      AUTH_SECRET: "$FRANZIBLE_AUTH_SECRET"
+      AUDIENCE: "$FRANZIBLE_DOMAIN"
     links:
-      - "mongo-db:db"
+      - "franzible_mongo-db:db"
     volumes:
-      - ${FRANZIBLE_MEDIA_PATH}:/mnt/media
+      - $FRANZIBLE_MEDIA_PATH:/mnt/media
 
-  mongo-db:
+  franzible_mongo-db:
     image: mongo:latest
     restart: unless-stopped
     volumes:
-      - ./mongodb-data:/data/db
+      - $FRANZIBLE_DB_FOLDER:/data/db
     restart: always
     # Uncomment to change startup options
     environment:
@@ -45,6 +53,5 @@ services:
 
 networks:
   default:
-    ipam:
-      config:
-        - subnet: 172.16.59.0/24
+    external:
+      name: $DEFAULT_NETWORK
