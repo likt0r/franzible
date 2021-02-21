@@ -1,5 +1,6 @@
 import * as feathersAuthentication from '@feathersjs/authentication'
 import * as local from '@feathersjs/authentication-local'
+import isAdmin from '../../hooks/is-admin'
 // Don't remove this comment. It's needed to format import lines nicely.
 
 const { authenticate } = feathersAuthentication.hooks
@@ -8,7 +9,7 @@ const { hashPassword, protect } = local.hooks
 export default {
   before: {
     all: [],
-    find: [authenticate('jwt')],
+    find: [authenticate('jwt'), isAdmin()],
     get: [authenticate('jwt')],
     create: [hashPassword('password')],
     update: [hashPassword('password'), authenticate('jwt')],

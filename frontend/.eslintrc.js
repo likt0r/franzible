@@ -23,5 +23,6 @@ module.exports = {
     'no-unused-vars': 'warn',
     'vue/no-unused-vars': 'warn',
     'no-useless-constructor': 'warn',
+    'vue/valid-v-slot': 'off',
   },
 }

@@ -1,8 +1,8 @@
 <template>
   <v-list>
     <v-list-item
-      v-for="(item, i) in items"
-      :key="i"
+      v-for="item in menu"
+      :key="item.title"
       router
       exact
       :to="item.to"
@@ -15,23 +15,44 @@
         <v-list-item-title v-text="item.title" />
       </v-list-item-content>
     </v-list-item>
+
+    <fragment v-if="userIsAdmin">
+      <v-divider></v-divider>
+      <v-list-item
+        v-for="item in adminMenu"
+        :key="item.title"
+        router
+        exact
+        :to="item.to"
+        @click="item.click && item.click()"
+      >
+        <v-list-item-action>
+          <v-icon>{{ item.icon }}</v-icon>
+        </v-list-item-action>
+        <v-list-item-content>
+          <v-list-item-title v-text="item.title" />
+        </v-list-item-content>
+      </v-list-item>
+    </fragment>
   </v-list>
 </template>
 
 <script>
+import { Fragment } from 'vue-fragment'
 export default {
+  components: { Fragment },
   data() {
     return {
-      items: [
+      menu: [
+        {
+          icon: 'mdi-book-open-page-variant-outline',
+          title: 'Acount',
+          to: '/acount',
+        },
         {
           icon: 'mdi-book-open-page-variant-outline',
           title: 'Libary',
           to: '/',
-        },
-        {
-          icon: 'mdi-account-details-outline',
-          title: 'Users',
-          to: '/users/',
         },
         {
           icon: 'mdi-exit-to-app',
@@ -39,14 +60,26 @@ export default {
           click: this.logout,
         },
       ],
+      adminMenu: [
+        {
+          icon: 'mdi-account-details-outline',
+          title: 'Users',
+          to: '/admin/users',
+        },
+      ],
     }
+  },
+  computed: {
+    userIsAdmin() {
+      return this.$store.state.auth.user && this.$store.state.auth.user.isAdmin
+    },
   },
   methods: {
     noOp() {},
     async logout() {
       console.log('logout')
       await this.$store.dispatch('auth/logout')
-      this.$router.push('/login')
+      setTimeout(() => location.reload(), 0)
     },
   },
 }

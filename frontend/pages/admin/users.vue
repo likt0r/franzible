@@ -8,13 +8,13 @@
           sort-by="calories"
           class="elevation-1"
         >
-          <template v-slot:top>
+          <template #top>
             <v-toolbar flat>
               <v-toolbar-title>Users</v-toolbar-title>
               <v-divider class="mx-4" inset vertical></v-divider>
               <v-spacer></v-spacer>
               <v-dialog v-model="dialog" max-width="500px">
-                <template v-slot:activator="{ on, attrs }">
+                <template #activator="{ on, attrs }">
                   <v-btn
                     color="primary"
                     dark
@@ -113,12 +113,12 @@
 
 <script>
 import { makeFindMixin } from 'feathers-vuex'
-import { getFullUrl } from '../tools/url'
+import { getFullUrl } from '~/tools/url'
 
 export default {
   mixins: [makeFindMixin({ service: 'users' })],
   layout: 'default',
-
+  middleware: 'admin',
   data: () => {
     return {
       dialog: false,
