@@ -16,6 +16,7 @@ class User extends BaseModel {
     return {
       email: '',
       password: '',
+      isAdmin: false,
       permissions: [],
     }
   }

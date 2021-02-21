@@ -8,10 +8,10 @@
         lg="6"
         class="pa-0 justify-center pl-14 pr-14"
       >
-        <v-img :src="getFullUrl(book.cover)" contain
-          ><v-overlay absolute :value="timerActiveState"
-            ><h1>{{ toMinutesAndSeconds(timerCurrentTime) }}</h1></v-overlay
-          >
+        <v-img :src="getFullUrl(book.cover)" contain>
+          <v-overlay absolute :value="timerActiveState">
+            <h1>{{ toMinutesAndSeconds(timerCurrentTime) }}</h1>
+          </v-overlay>
         </v-img>
       </v-col>
     </v-row>
@@ -115,6 +115,7 @@
 </template>
 
 <script>
+import { makeGetMixin } from 'feathers-vuex'
 import { mapGetters, mapActions } from 'vuex'
 import { toMinutesAndSeconds } from '../../tools/formatTime'
 import { getFullUrl } from '../../tools/url'
@@ -125,30 +126,40 @@ export default {
   components: {
     PlayerBottomNavigation,
   },
+  mixins: [
+    makeGetMixin({
+      service: 'books', // depending on service
+      id() {
+        return this.$route.params.id
+      },
+    }),
+    makeGetMixin({
+      service: 'progress', // depending on service
+      id() {
+        return this.rprogressId
+      },
+    }),
+  ],
   layout: 'single',
   async asyncData({ params, store }) {
-    const response = await store.dispatch('progress/find', {
+    let response = await store.dispatch('progress/find', {
       query: { bookId: params.id },
     })
-    if (response.total === 0) {
+    console.log('#asyncData res', response)
+    if (response.length === 0) {
+      // progress does not exist create it
       await store.dispatch('progress/create', {
         bookId: params.id,
         fileIndex: 0,
         filePosition: 0,
       })
+      response = await store.dispatch('progress/find', {
+        query: { bookId: params.id },
+      })
     }
-    const progress =
-      response.total === 0
-        ? {
-            bookId: params.id,
-            fileIndex: 0,
-            filePosition: 0,
-          }
-        : response.data[0]
-
-    let book = await store.getters['books/get'](params.id)
-    if (!book) book = await store.dispatch('books/get', params.id)
-    return { progress, book }
+    const progress = response[0]
+    console.log('#asyncData', progress)
+    return { rprogressId: progress._id }
   },
 
   data() {
@@ -159,6 +170,7 @@ export default {
   },
   computed: {
     ...mapGetters(['fileListState']),
+
     timerActiveState() {
       return this.$store.getters['timer/getTimeActiveState']
     },
@@ -169,37 +181,34 @@ export default {
       return this.$store.getters['player/activeBookId']
     },
     activeFileIndex() {
-      return this.activeBookId === this.id
+      return this.activeBookId === this.bookId
         ? this.$store.getters['player/activeFileIndex']
         : 0
     },
     playerIsLoading() {
-      return this.activeBookId === this.id
+      return this.activeBookId === this.bookId
         ? this.$store.getters['player/isLoading']
         : false
     },
     playerIsPlaying() {
-      return this.activeBookId === this.id
+      return this.activeBookId === this.bookId
         ? this.$store.getters['player/isPlaying']
         : false
     },
     filePositionInSecs() {
-      return this.activeBookId === this.id
+      return this.activeBookId === this.bookId
         ? this.$store.getters['player/filePositionInSecs']
         : this.progress.filePosition
     },
     fileDuration() {
-      return this.activeBookId === this.id
+      return this.activeBookId === this.bookId
         ? this.$store.getters['player/fileDuration']
         : this.book.files[this.progress.fileIndex].duration
     },
     fileRemainingTime() {
-      return this.activeBookId === this.id
+      return this.activeBookId === this.bookId
         ? this.$store.getters['player/fileRemainingTime']
         : this.fileDuration
-    },
-    id() {
-      return this.$route.params.id
     },
   },
   watch: {
@@ -222,9 +231,9 @@ export default {
     ...mapActions(['toggleFileList']),
 
     playButtonClick() {
-      if (this.activeBookId !== this.id) {
+      if (this.activeBookId !== this.bookId) {
         this.$store.dispatch('player/playFile', {
-          bookId: this.id,
+          bookId: this.bookId,
           fileIndex: this.progress.fileIndex,
           filePosition: this.progress.filePosition,
         })
