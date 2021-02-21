@@ -157,8 +157,7 @@ export default {
     },
     valid() {
       return (
-        (this.editedItem.password === this.editedItem.retyped &&
-          this.editedIndex >= 0) ||
+        this.editedIndex >= 0 ||
         (this.editedItem.password === this.editedItem.retyped &&
           this.editedIndex === -1 &&
           this.editedItem.password !== '')
@@ -209,9 +208,15 @@ export default {
     },
 
     async save() {
-      console.log(this.editedItem)
       if (this.editedIndex > -1) {
-        console.log('update')
+        if (this.editedItem.password === '') {
+          delete this.editedItem.password
+        }
+        console.log('patch item', this.editedItem)
+        await this.$store.dispatch('users/patch', [
+          this.editedItem._id,
+          this.editedItem,
+        ])
       } else {
         await this.$store.dispatch('users/create', this.editedItem)
       }
