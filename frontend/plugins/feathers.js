@@ -20,7 +20,7 @@ if (process.client) {
   restClient = rest(apiUrl)
 }
 const transport = process.client ? socketio(socket) : restClient.axios(axios)
-const storage = window.localStorage // new CookieStorage()
+const storage = new CookieStorage()
 
 const feathersClient = feathers()
   .configure(transport)

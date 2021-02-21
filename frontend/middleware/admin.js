@@ -1,8 +1,7 @@
 // ~/middleware/admin.js
 export default function ({ store, redirect }) {
   const { auth } = store.state
-  const permissions = auth.payload.permissions
-  if (!auth.payload || !permissions.includes('admin')) {
+  if (!auth.payload || !auth.user.isAdmin) {
     return redirect('/')
   }
 }
