@@ -156,6 +156,7 @@ export default {
       response = await store.dispatch('progress/find', {
         query: { bookId: params.id },
       })
+      console.log('#asyncData res', response)
     }
     const progress = response[0]
     console.log('#asyncData', progress)
