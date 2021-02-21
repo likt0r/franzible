@@ -1,3 +1,4 @@
 mongodb-data/*
 .devcontainer
 .eslintcache
+.env

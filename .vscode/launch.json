@@ -26,6 +26,7 @@
                 "program": "${workspaceFolder}/frontend/node_modules/.bin/nuxt",
                 "args": ["${workspaceFolder}/frontend/"]
             },
+            "envFile": "${workspaceFolder}/.env"
 
         },
         {
@@ -39,7 +40,7 @@
             "cwd": "${workspaceRoot}/backend",
             "sourceMaps": true,
             "smartStep": true,
-      
+            "envFile": "${workspaceFolder}/.env",
             "args": [
               "--watch",
               "'src/**/*.ts'",
@@ -54,6 +55,7 @@
             "skipFiles": [
               "<node_internals>/**"
             ]
+            
           }
     ],
     "compounds": [
