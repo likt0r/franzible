@@ -46,8 +46,8 @@ export default {
       menu: [
         {
           icon: 'mdi-book-open-page-variant-outline',
-          title: 'Acount',
-          to: '/acount',
+          title: 'Account',
+          to: '/account',
         },
         {
           icon: 'mdi-book-open-page-variant-outline',

@@ -73,6 +73,7 @@
                       color="blue darken-1"
                       text
                       :disabled="!valid"
+                      :loading="loading"
                       @click="save"
                     >
                       Save
@@ -83,14 +84,21 @@
               <v-dialog v-model="dialogDelete" max-width="500px">
                 <v-card>
                   <v-card-title class="headline"
-                    >Are you sure you want to delete this user?</v-card-title
+                    >User: {{ editedItem.email }}</v-card-title
+                  >
+                  <v-card-text class="headline"
+                    >Are you sure you want to delete this user?</v-card-text
                   >
                   <v-card-actions>
                     <v-spacer></v-spacer>
-                    <v-btn color="blue darken-1" text @click="closeDelete"
+                    <v-btn color="blue darken-1" text @click="close"
                       >Cancel</v-btn
                     >
-                    <v-btn color="blue darken-1" text @click="deleteItemConfirm"
+                    <v-btn
+                      color="blue darken-1"
+                      text
+                      :loading="loading"
+                      @click="deleteItemConfirm"
                       >OK</v-btn
                     >
                     <v-spacer></v-spacer>
@@ -121,6 +129,7 @@ export default {
   middleware: 'admin',
   data: () => {
     return {
+      loading: false,
       dialog: false,
       dialogDelete: false,
       headers: [
@@ -165,14 +174,7 @@ export default {
     },
   },
 
-  watch: {
-    dialog(val) {
-      val || this.close()
-    },
-    dialogDelete(val) {
-      val || this.closeDelete()
-    },
-  },
+  watch: {},
   methods: {
     editItem(item) {
       this.editedIndex = this.users.indexOf(item)
@@ -187,19 +189,11 @@ export default {
     },
 
     deleteItemConfirm() {
-      // this.users.splice(this.editedIndex, 1)
-      // this.closeDelete()
+      this.closeDelete()
     },
 
     close() {
       this.dialog = false
-      this.$nextTick(() => {
-        this.editedItem = Object.assign({}, this.defaultItem)
-        this.editedIndex = -1
-      })
-    },
-
-    closeDelete() {
       this.dialogDelete = false
       this.$nextTick(() => {
         this.editedItem = Object.assign({}, this.defaultItem)
@@ -207,7 +201,24 @@ export default {
       })
     },
 
+    async closeDelete() {
+      console.log('closeDelete')
+      this.loading = true
+      try {
+        await this.$store.dispatch('users/remove', this.editedItem._id)
+        this.loading = false
+        this.dialogDelete = false
+        this.$nextTick(() => {
+          this.editedItem = Object.assign({}, this.defaultItem)
+          this.editedIndex = -1
+        })
+      } catch (error) {
+        this.loading = false
+      }
+    },
+
     async save() {
+      this.loading = true
       if (this.editedIndex > -1) {
         if (this.editedItem.password === '') {
           delete this.editedItem.password
@@ -220,6 +231,7 @@ export default {
       } else {
         await this.$store.dispatch('users/create', this.editedItem)
       }
+      this.loading = false
       this.close()
     },
     getFullUrl,
