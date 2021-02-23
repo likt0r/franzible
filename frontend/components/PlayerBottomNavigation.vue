@@ -13,7 +13,7 @@
       </template>
       <template #default="dialog">
         <v-card>
-          <v-toolbar color="primary" dark>Speed</v-toolbar>
+          <v-toolbar color="#13202a" dark>Speed</v-toolbar>
           <v-card-text class="pt-16">
             <v-slider
               v-model="sliderValue"
@@ -23,6 +23,7 @@
               thumb-label="always"
               :thumb-size="48"
               dense
+              color="secondary"
             >
               <template #prepend>0.50x</template>
               <template #thumb-label="{ value }">
@@ -32,7 +33,7 @@
             </v-slider>
           </v-card-text>
           <v-card-actions class="justify-end">
-            <v-btn text @click="dialog.value = false">Close</v-btn>
+            <v-btn @click="dialog.value = false" color="#13202a">Close</v-btn>
           </v-card-actions>
         </v-card>
       </template>
@@ -51,7 +52,7 @@
       </template>
       <template #default="dialog">
         <v-card>
-          <v-toolbar color="primary" dark>Sleep Timer</v-toolbar>
+          <v-toolbar color="#13202a" dark>Sleep Timer</v-toolbar>
           <v-card-text>
             <v-btn-toggle v-model="btnToggleModel" class="pt-6">
               <v-btn
@@ -65,11 +66,15 @@
             </v-btn-toggle>
           </v-card-text>
           <v-card-actions class="justify-end">
-            <v-btn v-if="timerActiveState" text @click="stopTimer(dialog)">
+            <v-btn
+              v-if="timerActiveState"
+              @click="stopTimer(dialog)"
+              color="#13202a"
+            >
               Cancel Timer
             </v-btn>
             <v-spacer></v-spacer>
-            <v-btn text @click="dialog.value = false">Close</v-btn>
+            <v-btn @click="dialog.value = false" color="#13202a">Close</v-btn>
           </v-card-actions>
         </v-card>
       </template>

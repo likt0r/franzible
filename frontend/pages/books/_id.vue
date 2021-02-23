@@ -1,14 +1,10 @@
 <template>
-  <v-container
-    v-if="book"
-    class="pa-0 fill-height"
-    style="background-color: black"
-  >
+  <v-container v-if="book" class="fill-height" style="background-color: black">
     <v-row justify="center" class="pa-0">
       <v-col xs="12" sm="8" md="8" lg="6" class="pa-0">
         <v-img :src="getFullUrl(book.cover)" contain>
           <v-overlay absolute :value="timerActiveState">
-            <h1>{{ toMinutesAndSeconds(timerCurrentTime) }}</h1>
+            <h1>{{ timerDisplay(timerCurrentTime) }}</h1>
           </v-overlay>
         </v-img>
       </v-col>
@@ -186,6 +182,7 @@ export default {
       }
       return '800px'
     },
+
     timerActiveState() {
       return this.$store.getters['timer/getTimeActiveState']
     },
@@ -244,7 +241,10 @@ export default {
   },
   methods: {
     ...mapActions(['toggleFileList']),
-
+    timerDisplay(time) {
+      console.log('time', time)
+      return time > -1 ? toMinutesAndSeconds(time) : 'Bis Kapitelende'
+    },
     playButtonClick() {
       if (this.activeBookId !== this.bookId) {
         this.$store.dispatch('player/playFile', {

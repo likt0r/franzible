@@ -33,7 +33,7 @@ export class Media implements ServiceMethods<Data> {
     for (const author of authors) {
       const books = await getDirectories(path.join(mediaPath, author))
       for (const book of books) {
-        const splits = book.split('|').map((entry) => entry.trim())
+        const splits = book.split(';').map((entry) => entry.trim())
 
         const audioFiles = await getAudioFiles(
           path.join(mediaPath, author, book)

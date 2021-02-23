@@ -13,7 +13,7 @@
     <v-main>
       <nuxt />
     </v-main>
-    <v-btn class="ma-2" mid fab color="#13202a" fixed to="/">
+    <v-btn class="mt-4 ml-2" mid fab color="#13202a" fixed to="/">
       <v-icon dark> mdi-arrow-left </v-icon>
     </v-btn>
     <v-navigation-drawer

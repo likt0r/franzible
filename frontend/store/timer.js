@@ -37,7 +37,7 @@ export const timerInitPlugin = (store) => {
         if (state.timer.currentTime > 0) {
           // Start timer interval
           timer = setInterval(() => {
-            if (state.timer.currentTime > 0) {
+            if (state.timer.currentTime > 0 || state.timer.currentTime < 0) {
               store.commit(
                 'timer/SET_CURRENT_TIME',
                 state.timer.currentTime - 1

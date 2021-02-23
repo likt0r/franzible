@@ -43,3 +43,6 @@ $ feathers help                           # Show all commands
 ## Help
 
 For more information on all the things you can do with Feathers visit [docs.feathersjs.com](http://docs.feathersjs.com).
+
+docker build -t bewr42/franzible_feather-app .
+docker push bewr42/franzible_feather-app

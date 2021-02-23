@@ -30,7 +30,7 @@
           </v-card-text>
           <v-card-actions>
             <v-spacer></v-spacer>
-            <v-btn color="primary" :loading="authenticating" @click="login"
+            <v-btn color="secondary" :loading="authenticating" @click="login"
               >Login</v-btn
             >
           </v-card-actions>

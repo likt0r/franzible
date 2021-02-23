@@ -1,7 +1,7 @@
 {
-  "name": "backend",
+  "name": "franzible_feather-app",
   "description": "backend of franzible",
-  "version": "0.0.0",
+  "version": "0.2.0",
   "homepage": "",
   "private": true,
   "main": "src",

@@ -1,6 +1,6 @@
 {
-  "name": "franzible",
-  "version": "1.0.0",
+  "name": "franzible_nuxt-app",
+  "version": "0.2.0",
   "private": true,
   "scripts": {
     "dev": "nuxt",

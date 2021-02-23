@@ -31,3 +31,6 @@ $ npm run generate
   $ source ~./profile
 3. go to franzible directory
    docker-compose up -d
+
+docker build -t bewr42/franzible_nuxt-app .
+docker push bewr42/franzible_nuxt-app
