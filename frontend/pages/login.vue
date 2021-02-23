@@ -2,7 +2,7 @@
   <v-container fluid fill-height>
     <v-layout align-center justify-center>
       <v-flex xs12 sm8 md4>
-        <v-card class="elevation-12" style="background-color: #000">
+        <v-card class="px-4" style="background-color: #000">
           <v-img
             height="250"
             style="background-color: #000"
@@ -30,7 +30,7 @@
           </v-card-text>
           <v-card-actions>
             <v-spacer></v-spacer>
-            <v-btn color="secondary" :loading="authenticating" @click="login"
+            <v-btn color="#13202a" :loading="authenticating" @click="login"
               >Login</v-btn
             >
           </v-card-actions>
