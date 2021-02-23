@@ -1,16 +1,7 @@
 <template>
-  <FeathersVuexFind
-    v-slot="{ items: books, isFindPending: isPending }"
-    service="books"
-    :params="{ query: {} }"
-    watch="query"
-  >
-    <section color="black">
-      <v-skeleton-loader
-        v-if="isPending"
-        :type="sekletonString"
-      ></v-skeleton-loader>
-      <v-list subheader two-line color="black">
+  <section color="black">
+    <v-list subheader two-line color="black">
+      <transition-group name="list">
         <v-list-item
           v-for="book in books.filter((book) => book.files.length > 0)"
           :key="book._id"
@@ -34,24 +25,38 @@
             </v-btn>
           </v-list-item-action>
         </v-list-item>
-      </v-list>
-    </section>
-  </FeathersVuexFind>
+      </transition-group>
+    </v-list>
+
+    <v-skeleton-loader v-if="true" :type="sekletonString"></v-skeleton-loader>
+  </section>
 </template>
 
 <script>
+import { makeFindMixin } from 'feathers-vuex'
 import { getFullUrl } from '../tools/url'
 export default {
+  mixins: [makeFindMixin({ service: 'books' })],
   layout: 'default',
+  transition: 'slide-bottom',
   data() {
     return {
-      sekletonString: [...Array(10).keys()]
+      sekletonString: [...Array(3).keys()]
         .map(() => {
           return 'list-item-avatar-two-line'
         })
         .join(','),
     }
   },
+  computed: {
+    booksParams() {
+      return { query: {} } // Step 3
+    },
+    isPending() {
+      return false
+    },
+  },
+
   methods: {
     doSomething() {
       console.log('done')
@@ -61,3 +66,23 @@ export default {
   },
 }
 </script>
+<style>
+.theme--dark.v-application {
+  background-color: black !important;
+}
+.v-skeleton-loader__list-item-avatar-two-line {
+  background-color: black !important;
+}
+.v-skeleton-loader__avatar {
+  border-radius: unset !important;
+}
+
+.list-enter-active,
+.list-leave-active {
+  transition: all 1s;
+}
+.list-enter, .list-leave-to /* .list-leave-active below version 2.1.8 */ {
+  opacity: 0;
+  transform: translateY(-30px);
+}
+</style>

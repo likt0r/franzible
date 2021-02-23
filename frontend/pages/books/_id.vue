@@ -1,133 +1,138 @@
 <template>
   <v-container class="fill-height" style="background-color: black">
-    <v-row v-if="isGetBookPending" justify="center" class="pa-0">
-      <v-col xs="12" sm="8" md="8" lg="5" xl="4">
-        <v-skeleton-loader
-          type="image, image, card-heading, actions, actions"
-        ></v-skeleton-loader> </v-col
-    ></v-row>
-    <fragment v-else>
-      <v-row justify="center" class="pa-0">
-        <v-col xs="12" sm="8" md="8" lg="5" xl="4" class="pa-0">
-          <v-img
-            :src="book.cover ? getFullUrl(book.cover) : '/logo.png'"
-            contain
-          >
-            <v-overlay absolute :value="timerActiveState">
-              <h1>{{ timerDisplay(timerCurrentTime) }}</h1>
-            </v-overlay>
-          </v-img>
-        </v-col>
-      </v-row>
-      <v-row justify="center" class="pa-0" align="end">
-        <v-col xs="12" sm="8" md="8" lg="5" xl="4" class="pa-0">
-          <v-card v-if="book" class="mx-auto">
-            <v-card-subtitle class="pb-0 text-center">
-              {{ book.files[activeFileIndex].filename }}
-            </v-card-subtitle>
-            <v-card-text
-              ><v-slider
-                v-model="sliderPosition"
-                class="pb-0 pt-0 text-center"
-                :max="fileDuration"
-                min="0"
-                @mousedown="sliederIsTouched = true"
-                @mouseup="sliederIsTouched = false"
-                @change="seek"
-              ></v-slider>
-            </v-card-text>
-            <v-card-text class="pt-0">
-              <v-row class="pt-0 pr-2 pl-2">
-                <v-col class="text-left pt-0 pb-0" :cols="3">{{
-                  toMinutesAndSeconds(filePositionInSecs)
-                }}</v-col>
+    <transition name="fade">
+      <v-row v-if="isGetBookPending && !book" justify="center" class="pa-0">
+        <v-col xs="12" sm="8" md="8" lg="5" xl="4">
+          <v-skeleton-loader
+            type="image, image, card-heading, actions, actions"
+          ></v-skeleton-loader> </v-col
+      ></v-row>
 
-                <v-col class="text-center pt-0 pb-0" :cols="6"
-                  >Restzeit des Hörspiels</v-col
+      <fragment v-else>
+        <v-row justify="center" class="pa-0">
+          <v-col xs="12" sm="8" md="8" lg="5" xl="4" class="pa-0">
+            <v-img
+              :src="book.cover ? getFullUrl(book.cover) : '/logo.png'"
+              contain
+            >
+              <v-overlay absolute :value="timerActiveState">
+                <h1>{{ timerDisplay(timerCurrentTime) }}</h1>
+              </v-overlay>
+            </v-img>
+          </v-col>
+        </v-row>
+        <v-row justify="center" class="pa-0" align="end">
+          <v-col xs="12" sm="8" md="8" lg="5" xl="4" class="pa-0">
+            <v-card v-if="book" class="mx-auto">
+              <v-card-subtitle class="pb-0 text-center">
+                {{ book.files[activeFileIndex].filename }}
+              </v-card-subtitle>
+              <v-card-text
+                ><v-slider
+                  v-model="sliderPosition"
+                  class="pb-0 pt-0 text-center"
+                  :max="fileDuration"
+                  min="0"
+                  @mousedown="sliederIsTouched = true"
+                  @mouseup="sliederIsTouched = false"
+                  @change="seek"
+                ></v-slider>
+              </v-card-text>
+              <v-card-text class="pt-0">
+                <v-row class="pt-0 pr-2 pl-2">
+                  <v-col class="text-left pt-0 pb-0" :cols="3">{{
+                    toMinutesAndSeconds(filePositionInSecs)
+                  }}</v-col>
+
+                  <v-col class="text-center pt-0 pb-0" :cols="6"
+                    >Restzeit des Hörspiels</v-col
+                  >
+
+                  <v-col class="text-right pt-0 pb-0" :cols="3"
+                    >-{{ toMinutesAndSeconds(fileRemainingTime) }}</v-col
+                  >
+                </v-row>
+              </v-card-text>
+              <v-card-actions>
+                <v-spacer></v-spacer>
+
+                <v-btn
+                  fab
+                  :medium="!$vuetify.breakpoint.xs"
+                  :small="!!$vuetify.breakpoint.xs"
+                  dark
+                  @click.stop="skipPrevious"
                 >
+                  <v-icon medium color="secondary"
+                    >mdi-skip-previous-outline</v-icon
+                  >
+                </v-btn>
 
-                <v-col class="text-right pt-0 pb-0" :cols="3"
-                  >-{{ toMinutesAndSeconds(fileRemainingTime) }}</v-col
+                <v-btn
+                  fab
+                  :medium="!$vuetify.breakpoint.xs"
+                  :small="!!$vuetify.breakpoint.xs"
+                  dark
+                  @click.stop="fastRewind"
                 >
-              </v-row>
-            </v-card-text>
-            <v-card-actions>
-              <v-spacer></v-spacer>
+                  <v-icon color="secondary" medium>mdi-rewind-30</v-icon>
+                </v-btn>
 
-              <v-btn
-                fab
-                :medium="!$vuetify.breakpoint.xs"
-                :small="!!$vuetify.breakpoint.xs"
-                dark
-                @click.stop="skipPrevious"
-              >
-                <v-icon medium color="secondary"
-                  >mdi-skip-previous-outline</v-icon
+                <v-btn
+                  fab
+                  :x-large="!$vuetify.breakpoint.xs"
+                  :medium="!!$vuetify.breakpoint.xs"
+                  dark
+                  :loading="playerIsLoading"
+                  @click="playButtonClick"
                 >
-              </v-btn>
+                  <v-icon medium color="secondary">{{
+                    playerIsPlaying
+                      ? 'mdi-pause-circle-outline'
+                      : 'mdi-play-circle-outline'
+                  }}</v-icon>
+                </v-btn>
 
-              <v-btn
-                fab
-                :medium="!$vuetify.breakpoint.xs"
-                :small="!!$vuetify.breakpoint.xs"
-                dark
-                @click.stop="fastRewind"
-              >
-                <v-icon color="secondary" medium>mdi-rewind-30</v-icon>
-              </v-btn>
+                <v-btn
+                  fab
+                  :medium="!$vuetify.breakpoint.xs"
+                  :small="!!$vuetify.breakpoint.xs"
+                  dark
+                  @click.stop="fastForward"
+                >
+                  <v-icon medium color="secondary">mdi-fast-forward-30</v-icon>
+                </v-btn>
 
-              <v-btn
-                fab
-                :x-large="!$vuetify.breakpoint.xs"
-                :medium="!!$vuetify.breakpoint.xs"
-                dark
-                :loading="playerIsLoading"
-                @click="playButtonClick"
-              >
-                <v-icon medium color="secondary">{{
-                  playerIsPlaying
-                    ? 'mdi-pause-circle-outline'
-                    : 'mdi-play-circle-outline'
-                }}</v-icon>
-              </v-btn>
+                <v-btn
+                  fab
+                  :medium="!$vuetify.breakpoint.xs"
+                  :small="!!$vuetify.breakpoint.xs"
+                  dark
+                  @click.stop="skipNext"
+                >
+                  <v-icon medium color="secondary"
+                    >mdi-skip-next-outline</v-icon
+                  >
+                </v-btn>
 
-              <v-btn
-                fab
-                :medium="!$vuetify.breakpoint.xs"
-                :small="!!$vuetify.breakpoint.xs"
-                dark
-                @click.stop="fastForward"
-              >
-                <v-icon medium color="secondary">mdi-fast-forward-30</v-icon>
-              </v-btn>
-
-              <v-btn
-                fab
-                :medium="!$vuetify.breakpoint.xs"
-                :small="!!$vuetify.breakpoint.xs"
-                dark
-                @click.stop="skipNext"
-              >
-                <v-icon medium color="secondary">mdi-skip-next-outline</v-icon>
-              </v-btn>
-
-              <v-spacer></v-spacer>
-            </v-card-actions>
-            <player-bottom-navigation></player-bottom-navigation>
-          </v-card>
-        </v-col>
-      </v-row>
-    </fragment>
+                <v-spacer></v-spacer>
+              </v-card-actions>
+              <player-bottom-navigation></player-bottom-navigation>
+            </v-card>
+          </v-col>
+        </v-row>
+      </fragment>
+    </transition>
   </v-container>
 </template>
 
 <script>
+import { Fragment } from 'vue-fragment'
 import { makeGetMixin } from 'feathers-vuex'
 import { mapGetters, mapActions } from 'vuex'
 import { toMinutesAndSeconds } from '../../tools/formatTime'
 import { getFullUrl } from '../../tools/url'
 import PlayerBottomNavigation from '~/components/PlayerBottomNavigation.vue'
-import { Fragment } from 'vue-fragment'
 export default {
   name: 'Player',
   components: {
@@ -148,7 +153,9 @@ export default {
       },
     }),
   ],
-  layout: 'single',
+  layout: 'default',
+  transition: 'slide-bottom',
+
   async asyncData({ params, store }) {
     let response = await store.dispatch('progress/find', {
       query: { bookId: params.id },
@@ -290,3 +297,11 @@ export default {
   },
 }
 </script>
+<style scoped>
+.fade-enter-active {
+  transition: opacity 1s;
+}
+.fade-enter /* .fade-leave-active below version 2.1.8 */ {
+  opacity: 0;
+}
+</style>
