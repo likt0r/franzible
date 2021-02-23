@@ -5,8 +5,8 @@
     :params="{ query: {} }"
     watch="query"
   >
-    <section>
-      <v-list subheader two-line>
+    <section color="black">
+      <v-list subheader two-line color="black">
         <v-list-item
           v-for="book in books"
           :key="book._id"
@@ -28,7 +28,7 @@
 
           <v-list-item-action>
             <v-btn icon>
-              <v-icon color="grey lighten-1">mdi-play</v-icon>
+              <v-icon color="secondary">mdi-play</v-icon>
             </v-btn>
           </v-list-item-action>
         </v-list-item>

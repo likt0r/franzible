@@ -1,11 +1,15 @@
 <template>
   <v-container fluid fill-height>
     <v-layout align-center justify-center>
-      <v-flex xs12 sm8 md6>
-        <v-card class="elevation-12">
-          <v-toolbar dark color="primary">
-            <v-toolbar-title>Login to Franzible</v-toolbar-title>
-          </v-toolbar>
+      <v-flex xs12 sm8 md4>
+        <v-card class="elevation-12" style="background-color: #000">
+          <v-img
+            height="250"
+            style="background-color: #000"
+            contain
+            src="/logo.png"
+          ></v-img>
+
           <v-card-text>
             <v-form>
               <v-text-field
@@ -53,9 +57,17 @@ export default {
     async login() {
       console.log('loginData', this.loginData)
       this.authenticating = true
-      await this.$store.dispatch('auth/authenticate', this.loginData)
-      this.authenticating = false
-      this.$router.push('/')
+      try {
+        await this.$store.dispatch('auth/authenticate', this.loginData)
+        this.authenticating = false
+        this.$router.push('/')
+      } catch (error) {
+        this.authenticating = false
+        console.log('Error', error)
+        this.$toast.error('Unbekannte Email oder Password', {
+          icon: 'alert-circle-outline',
+        })
+      }
     },
   },
 }

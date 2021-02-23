@@ -9,16 +9,21 @@
     >
       <side-menue />
     </v-navigation-drawer>
-    <v-app-bar :clipped-left="true" fixed app>
-      <v-btn icon to="/">
-        <v-icon>mdi-arrow-left</v-icon>
-      </v-btn>
-    </v-app-bar>
+
     <v-main>
       <nuxt />
     </v-main>
-
-    <v-navigation-drawer v-model="fileListState" right app :width="425" fixed>
+    <v-btn class="ma-2" mid fab color="#13202a" fixed to="/">
+      <v-icon dark> mdi-arrow-left </v-icon>
+    </v-btn>
+    <v-navigation-drawer
+      v-model="fileListState"
+      color="#13202a"
+      right
+      app
+      :width="425"
+      fixed
+    >
       <playlist />
       <template #append>
         <div class="pa-2">

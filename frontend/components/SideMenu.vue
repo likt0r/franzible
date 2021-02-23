@@ -1,5 +1,6 @@
 <template>
   <v-list>
+    <v-img contain style="background-color: #000" src="/logo.png"></v-img>
     <v-list-item
       v-for="item in menu"
       :key="item.title"

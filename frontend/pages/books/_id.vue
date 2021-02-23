@@ -1,13 +1,11 @@
 <template>
-  <v-container v-if="book" class="fill-height">
-    <v-row justify="center" class="pt-0" align="start">
-      <v-col
-        xs="10"
-        sm="8"
-        md="8"
-        lg="6"
-        class="pa-0 justify-center pl-14 pr-14"
-      >
+  <v-container
+    v-if="book"
+    class="pa-0 fill-height"
+    style="background-color: black"
+  >
+    <v-row justify="center" class="pa-0">
+      <v-col xs="12" sm="8" md="8" lg="6" class="pa-0">
         <v-img :src="getFullUrl(book.cover)" contain>
           <v-overlay absolute :value="timerActiveState">
             <h1>{{ toMinutesAndSeconds(timerCurrentTime) }}</h1>
@@ -15,7 +13,7 @@
         </v-img>
       </v-col>
     </v-row>
-    <v-row justify="center" class="pt-0" align="end">
+    <v-row justify="center" class="pa-0" align="end">
       <v-col xs="12" sm="8" md="8" lg="6" class="pa-0">
         <v-card v-if="book" class="mx-auto">
           <v-card-subtitle class="pb-0 text-center">
@@ -57,7 +55,9 @@
               dark
               @click.stop="skipPrevious"
             >
-              <v-icon medium>mdi-skip-previous-outline</v-icon>
+              <v-icon medium color="secondary"
+                >mdi-skip-previous-outline</v-icon
+              >
             </v-btn>
 
             <v-btn
@@ -67,7 +67,7 @@
               dark
               @click.stop="fastRewind"
             >
-              <v-icon medium>mdi-rewind-30</v-icon>
+              <v-icon color="secondary" medium>mdi-rewind-30</v-icon>
             </v-btn>
 
             <v-btn
@@ -78,7 +78,7 @@
               :loading="playerIsLoading"
               @click="playButtonClick"
             >
-              <v-icon medium>{{
+              <v-icon medium color="secondary">{{
                 playerIsPlaying
                   ? 'mdi-pause-circle-outline'
                   : 'mdi-play-circle-outline'
@@ -92,7 +92,7 @@
               dark
               @click.stop="fastForward"
             >
-              <v-icon medium>mdi-fast-forward-30</v-icon>
+              <v-icon medium color="secondary">mdi-fast-forward-30</v-icon>
             </v-btn>
 
             <v-btn
@@ -102,7 +102,7 @@
               dark
               @click.stop="skipNext"
             >
-              <v-icon medium>mdi-skip-next-outline</v-icon>
+              <v-icon medium color="secondary">mdi-skip-next-outline</v-icon>
             </v-btn>
 
             <v-spacer></v-spacer>
@@ -171,7 +171,21 @@ export default {
   },
   computed: {
     ...mapGetters(['fileListState']),
-
+    imageWidth() {
+      switch (this.$vuetify.breakpoint.name) {
+        case 'xs':
+          return '220px'
+        case 'sm':
+          return '400px'
+        case 'md':
+          return '500px'
+        case 'lg':
+          return '592px'
+        case 'xl':
+          return '800px'
+      }
+      return '800px'
+    },
     timerActiveState() {
       return this.$store.getters['timer/getTimeActiveState']
     },

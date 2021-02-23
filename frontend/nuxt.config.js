@@ -40,9 +40,24 @@ export default {
     // https://go.nuxtjs.dev/axios
     // https://go.nuxtjs.dev/pwa
     // '@nuxtjs/pwa',
+    '@nuxtjs/toast',
     '@nuxtjs/proxy',
     'nuxt-client-init-module',
   ],
+  toast: {
+    position: 'top-center',
+    duration: 8000,
+    keepOnHover: true,
+    fullscreen: true,
+    fitToScreen: true,
+    iconPack: 'mdi',
+    action: {
+      icon: 'close-circle-outline',
+      onClick: (e, toastObject) => {
+        toastObject.goAway(0)
+      },
+    },
+  },
 
   proxy: {
     // Simple proxy
@@ -77,14 +92,21 @@ export default {
     '@nuxtjs/eslint-module',
     // https://go.nuxtjs.dev/vuetify
     '@nuxtjs/vuetify',
+    '@nuxtjs/pwa',
   ],
 
   // PWA module configuration: https://go.nuxtjs.dev/pwa
-  // pwa: {
-  //   manifest: {
-  //     lang: 'en',
-  //   },
-  // },
+  pwa: {
+    manifest: {
+      short_name: 'Franzible',
+      name: 'Franzible',
+      start_url: '/',
+      display: 'standalone',
+      background_color: '#fff',
+      description: 'Franzible zeit für Hörbücher',
+      lang: 'de',
+    },
+  },
 
   // Vuetify module configuration: https://go.nuxtjs.dev/config-vuetify
   vuetify: {
@@ -93,9 +115,9 @@ export default {
       dark: true,
       themes: {
         dark: {
-          primary: colors.blue.darken2,
-          accent: colors.grey.darken3,
-          secondary: colors.amber.darken3,
+          primary: '#C0C1C1',
+          accent: '#75E6DA',
+          secondary: '#189AB4',
           info: colors.teal.lighten1,
           warning: colors.amber.base,
           error: colors.deepOrange.accent4,
