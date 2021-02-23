@@ -46,7 +46,7 @@ export default {
     return {
       menu: [
         {
-          icon: 'mdi-book-open-page-variant-outline',
+          icon: 'mdi-account-outline',
           title: 'Account',
           to: '/account',
         },

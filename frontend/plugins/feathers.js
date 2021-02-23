@@ -18,12 +18,13 @@ if (process.client) {
   socket = io(apiSocket, {
     transports: ['websocket'],
     path: '/api.socket.io',
-    timeout: 30000,
   })
 } else {
   restClient = rest(apiUrl)
 }
-const transport = process.client ? socketio(socket) : restClient.axios(axios)
+const transport = process.client
+  ? socketio(socket, { timeout: 60000 })
+  : restClient.axios(axios)
 const storage = new CookieStorage()
 
 const feathersClient = feathers()

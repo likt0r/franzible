@@ -1,11 +1,15 @@
 <template>
   <FeathersVuexFind
-    v-slot="{ items: books }"
+    v-slot="{ items: books, isFindPending: isPending }"
     service="books"
     :params="{ query: {} }"
     watch="query"
   >
     <section color="black">
+      <v-skeleton-loader
+        v-if="isPending"
+        :type="sekletonString"
+      ></v-skeleton-loader>
       <v-list subheader two-line color="black">
         <v-list-item
           v-for="book in books.filter((book) => book.files.length > 0)"
@@ -39,6 +43,15 @@
 import { getFullUrl } from '../tools/url'
 export default {
   layout: 'default',
+  data() {
+    return {
+      sekletonString: [...Array(10).keys()]
+        .map(() => {
+          return 'list-item-avatar-two-line'
+        })
+        .join(','),
+    }
+  },
   methods: {
     doSomething() {
       console.log('done')
