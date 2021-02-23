@@ -10,8 +10,8 @@
             "request": "launch",
             "name": "frontend: chrome",
             "url": "http://localhost:3000",
-            "webRoot": "${workspaceFolder}",
-
+            "webRoot": "${workspaceFolder}/frontend/",
+ 
         },
         {
             "type": "node",
@@ -21,12 +21,11 @@
                 "dev"
             ],
             "console": "integratedTerminal",
-            
             "linux": {
                 "program": "${workspaceFolder}/frontend/node_modules/.bin/nuxt",
                 "args": ["${workspaceFolder}/frontend/"]
             },
-            "envFile": "${workspaceFolder}/.env"
+   
 
         },
         {
@@ -40,7 +39,6 @@
             "cwd": "${workspaceRoot}/backend",
             "sourceMaps": true,
             "smartStep": true,
-            "envFile": "${workspaceFolder}/.env",
             "args": [
               "--watch",
               "'src/**/*.ts'",

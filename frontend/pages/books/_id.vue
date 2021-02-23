@@ -154,7 +154,7 @@ export default {
     }),
   ],
   layout: 'default',
-  transition: 'slide-bottom',
+  transition: 'slide-left',
 
   async asyncData({ params, store }) {
     let response = await store.dispatch('progress/find', {

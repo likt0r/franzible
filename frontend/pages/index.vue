@@ -28,7 +28,10 @@
       </transition-group>
     </v-list>
 
-    <v-skeleton-loader v-if="true" :type="sekletonString"></v-skeleton-loader>
+    <v-skeleton-loader
+      v-if="isFindBooksPending"
+      :type="sekletonString"
+    ></v-skeleton-loader>
   </section>
 </template>
 
@@ -38,7 +41,7 @@ import { getFullUrl } from '../tools/url'
 export default {
   mixins: [makeFindMixin({ service: 'books' })],
   layout: 'default',
-  transition: 'slide-bottom',
+  transition: 'slide-right',
   data() {
     return {
       sekletonString: [...Array(3).keys()]
@@ -66,7 +69,7 @@ export default {
   },
 }
 </script>
-<style>
+<style scoped>
 .theme--dark.v-application {
   background-color: black !important;
 }
@@ -77,11 +80,10 @@ export default {
   border-radius: unset !important;
 }
 
-.list-enter-active,
-.list-leave-active {
+.list-enter-active {
   transition: all 1s;
 }
-.list-enter, .list-leave-to /* .list-leave-active below version 2.1.8 */ {
+.list-enter/* .list-leave-active below version 2.1.8 */ {
   opacity: 0;
   transform: translateY(-30px);
 }

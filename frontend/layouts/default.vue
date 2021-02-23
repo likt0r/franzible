@@ -10,7 +10,7 @@
     >
       <side-menue />
     </v-navigation-drawer>
-    <transition name="slide-top">
+    <transition name="fade">
       <v-app-bar
         v-if="!isSingleBookPage"
         :clipped-left="true"
@@ -94,31 +94,37 @@ export default {
 }
 </script>
 <style scoped>
-.slide-bottom-enter-active,
-.slide-bottom-leave-active {
-  transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+.slide-left-enter-active,
+.slide-left-leave-active {
+  transition: opacity 0.25s ease-in-out, transform 0.25s ease-in-out;
 }
-.slide-bottom-enter,
-.slide-bottom-leave-to {
+.slide-left-enter {
   opacity: 0;
-  transform: translate3d(0, 15px, 0);
+  transform: translate3d(50vw, 0px, 0);
+}
+.slide-left-leave-to {
+  opacity: 0;
+  transform: translate3d(-50vw, 0px, 0);
 }
 
-.slide-top-enter-active,
-.slide-top-leave-active {
-  transition: transform 0.5s linear;
+.slide-right-enter-active,
+.slide-right-leave-active {
+  transition: opacity 0.25s ease-in-out, transform 0.25s ease-in-out;
 }
-.slide-top-enter,
-.slide-top-leave-to {
-  transform: translate3d(-80, 0px, 0);
+.slide-right-enter {
+  opacity: 0;
+  transform: translate3d(-50vw, 0px, 0);
+}
+.slide-right-leave-to {
+  opacity: 0;
+  transform: translate3d(50vw, 0px, 0);
 }
 
 .fade-enter-active,
 .fade-leave-active {
-  transition: opacity 0.5s ease-in-out;
+  transition: opacity 0.25s;
 }
-.fade-enter,
-.fade-leave-to {
+.fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
   opacity: 0;
 }
 </style>

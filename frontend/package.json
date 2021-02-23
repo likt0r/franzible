@@ -9,7 +9,8 @@
     "generate": "nuxt generate",
     "lint:js": "eslint --ext \".js,.vue\" --ignore-path .gitignore .",
     "lint": "npm run lint:js",
-    "test": "jest"
+    "test": "jest",
+    "docker": "docker build -t bewr42/franzible_nuxt-app . && docker push bewr42/franzible_nuxt-app"
   },
   "dependencies": {
     "@feathersjs/authentication-client": "^4.5.11",

@@ -64,6 +64,7 @@ app.hooks(appHooks)
 // create Admin User if there are no users
 createAdminAccount(app)
 // start import media files
+
 const service = app.service('media-update')
 service.find()
 export default app

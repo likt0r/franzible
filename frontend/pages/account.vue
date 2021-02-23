@@ -67,6 +67,7 @@
 <script>
 export default {
   layout: 'default',
+  transition: 'slide-left',
   data() {
     return {
       updating: false,

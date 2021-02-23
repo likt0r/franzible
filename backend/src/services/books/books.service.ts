@@ -22,7 +22,7 @@ export default function (app: Application): void {
   app.use('/books', new Books(options, app))
 
   // Get our initialized service so that we can register hooks
-  const service = app.service('books')
-
+  const service: any = app.service('books')
+  service.options.timeout = 50000
   service.hooks(hooks)
 }
