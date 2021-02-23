@@ -8,17 +8,15 @@
     <section color="black">
       <v-list subheader two-line color="black">
         <v-list-item
-          v-for="book in books"
+          v-for="book in books.filter((book) => book.files.length > 0)"
           :key="book._id"
           :to="`/books/${book._id}`"
         >
           <v-list-item-avatar tile>
             <v-img
-              v-if="book.cover"
               :alt="`${book.title} cover image`"
-              :src="getFullUrl(book.cover)"
+              :src="book.cover ? getFullUrl(book.cover) : '/icon.png'"
             ></v-img>
-            <v-icon v-else x-large>mdi-image-area</v-icon>
           </v-list-item-avatar>
 
           <v-list-item-content>

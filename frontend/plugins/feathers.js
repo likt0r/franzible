@@ -15,7 +15,11 @@ let socket
 let restClient
 // We won't use socket to comunicate from server to server
 if (process.client) {
-  socket = io(apiSocket, { transports: ['websocket'], path: '/api.socket.io' })
+  socket = io(apiSocket, {
+    transports: ['websocket'],
+    path: '/api.socket.io',
+    timeout: 30000,
+  })
 } else {
   restClient = rest(apiUrl)
 }

@@ -60,7 +60,7 @@
                 :key="timeValue"
                 @click="startTimer(timeValue, dialog)"
                 >{{
-                  timeValue > -1 ? `${timeValue} Minuten` : 'Ende des Kapitels'
+                  timeValue > -1 ? `${timeValue} Minuten` : 'Bis Kapitelende'
                 }}</v-btn
               >
             </v-btn-toggle>

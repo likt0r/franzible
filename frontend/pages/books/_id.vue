@@ -2,7 +2,7 @@
   <v-container v-if="book" class="fill-height" style="background-color: black">
     <v-row justify="center" class="pa-0">
       <v-col xs="12" sm="8" md="8" lg="6" class="pa-0">
-        <v-img :src="getFullUrl(book.cover)" contain>
+        <v-img :src="book.cover ? getFullUrl(book.cover) : '/logo.png'" contain>
           <v-overlay absolute :value="timerActiveState">
             <h1>{{ timerDisplay(timerCurrentTime) }}</h1>
           </v-overlay>
