@@ -30,7 +30,8 @@
     "nuxt": "^2.14.12",
     "nuxt-client-init-module": "^0.1.10",
     "socket.io-client": "<3.0.0",
-    "vue-fragment": "^1.5.1"
+    "vue-fragment": "^1.5.1",
+    "vue-marquee-text-component": "^1.2.0"
   },
   "devDependencies": {
     "@nuxtjs/eslint-config": "^5.0.0",

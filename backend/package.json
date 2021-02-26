@@ -29,7 +29,8 @@
     "dev": "ts-node-dev --project tsconfig.json --no-notify src/index.ts",
     "start": "node lib/",
     "jest": "jest  --forceExit",
-    "build": "shx rm -rf lib/ && tsc"
+    "build": "shx rm -rf lib/ && tsc",
+    "docker": "docker build -t bewr42/franzible_feather-app . && docker push bewr42/franzible_feather-app"
   },
   "standard": {
     "env": [

@@ -1,8 +1,8 @@
 <template>
   <v-container fluid fill-height>
     <v-layout align-center justify-center>
-      <v-flex xs12 sm8 md4>
-        <v-card class="px-4" style="background-color: #000">
+      <v-flex xs12 sm8 md5 lg3 class="">
+        <v-card class="px-4 pt-6" style="background-color: #000">
           <v-img
             height="250"
             style="background-color: #000"
