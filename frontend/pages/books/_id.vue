@@ -45,7 +45,10 @@
                   }}</v-col>
 
                   <v-col class="text-center pt-0 pb-0" :cols="6"
-                    >Restzeit des Hörspiels</v-col
+                    >{{
+                      toMinutesAndSeconds(bookRemainingTime)
+                    }}
+                    verbleibend</v-col
                   >
 
                   <v-col class="text-right pt-0 pb-0" :cols="3"
@@ -241,6 +244,24 @@ export default {
         ? this.$store.getters['player/fileRemainingTime']
         : this.fileDuration
     },
+    bookDuration() {
+      return this.book
+        ? this.book.files.reduce((acc, file) => acc + file.duration, 0)
+        : 0
+    },
+    tillChapter() {
+      if (this.progress) {
+        let tillChapter = 0
+        for (let i = 0; i < this.progress.fileIndex; i++)
+          tillChapter += this.book.files[i].duration
+        return tillChapter
+      } else {
+        return 0
+      }
+    },
+    bookRemainingTime() {
+      return this.bookDuration - this.tillChapter - this.progress.filePosition
+    },
   },
   watch: {
     filePositionInSecs(value) {
@@ -261,7 +282,6 @@ export default {
   methods: {
     ...mapActions(['toggleFileList']),
     timerDisplay(time) {
-      console.log('time', time)
       return time > -1 ? toMinutesAndSeconds(time) : 'Bis Kapitelende'
     },
     playButtonClick() {

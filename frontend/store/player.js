@@ -83,6 +83,7 @@ export const actions = {
   resume() {
     getInstance().resume()
   },
+
   fastForward({ state, dispatch }) {
     const file = state.book.files[state.fileIndex]
     if (state.filePosition + state.fastStep < file.duration) {
@@ -91,10 +92,11 @@ export const actions = {
       dispatch('skipNext', state.filePosition + state.fastStep - file.duration)
     }
   },
+
   fastRewind({ state, dispatch }) {
     if (state.filePosition - state.fastStep > 0) {
       getInstance().seek(state.filePosition - state.fastStep)
-    } else if (state.fileIndex - 1 > 0) {
+    } else if (state.fileIndex - 1 > -1) {
       dispatch(
         'skipPrevious',
         state.book.files[state.fileIndex - 1].duration +
@@ -104,9 +106,11 @@ export const actions = {
       getInstance().seek(0)
     }
   },
+
   seek(_, position) {
     getInstance().seek(position)
   },
+
   skipNext({ commit, state }, position = 0) {
     // has next
     if (state.fileIndex < state.book.files.length - 1) {
@@ -122,6 +126,7 @@ export const actions = {
       getInstance().seek(state.book.files[state.fileIndex].duration - 0.01)
     }
   },
+
   skipPrevious({ commit, state }, position = 0) {
     // has next
     if (state.fileIndex > 0) {
@@ -193,6 +198,7 @@ export const playerInitPlugin = (store) => {
         {
           fileIndex: state.player.fileIndex,
           filePosition: state.player.filePosition,
+          played: true,
         },
       ])
     }

@@ -13,7 +13,7 @@ export default function (app: Application): Model<any> {
     {
       userId: { type: mongooseClient.Schema.Types.ObjectId, ref: 'users' },
       bookId: { type: mongooseClient.Schema.Types.ObjectId, ref: 'books' },
-      lastPlayed: { type: Boolean },
+      played: { type: Boolean, default: false },
       fileIndex: { type: Number },
       filePosition: { type: Number },
     },

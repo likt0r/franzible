@@ -6,9 +6,10 @@ function pad(num, size) {
 export function toMinutesAndSeconds(time) {
   const all = Math.abs(Math.round(time))
   const seconds = all % 60
-  const minutes = (all - seconds) / 60
-  return `${Math.sign(time) < 0 ? '-' : ''}${pad(minutes, 2)}:${pad(
-    seconds,
+  const hours = Math.floor(all / 3600)
+  const minutes = (all - hours * 3600 - seconds) / 60
+  return `${Math.sign(time) < 0 ? '-' : ''}${hours ? hours + ':' : ''}${pad(
+    minutes,
     2
-  )}`
+  )}:${pad(seconds, 2)}`
 }

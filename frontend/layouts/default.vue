@@ -59,16 +59,16 @@
         </div>
       </template>
     </v-navigation-drawer>
-    <small-p-layer v-if="!isSingleBookPage" />
+    <small-player v-if="!isSingleBookPage" />
   </v-app>
 </template>
 
 <script>
 import Playlist from '../components/Playlist.vue'
 import SideMenue from '../components/SideMenu.vue'
-import SmallPLayer from '~/components/SmallPLayer.vue'
+import SmallPlayer from '~/components/SmallPlayer.vue'
 export default {
-  components: { SideMenue, Playlist, SmallPLayer },
+  components: { SideMenue, Playlist, SmallPlayer },
 
   data() {
     return {
