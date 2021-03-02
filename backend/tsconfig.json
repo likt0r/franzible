@@ -7,8 +7,7 @@
     "strict": true,
     "esModuleInterop": true,
     "sourceMap": true,
+    "typeRoots": ["./node_modules/@types", "./src/types"]
   },
-  "exclude": [
-    "test",
-  ]
+  "exclude": ["test"]
 }

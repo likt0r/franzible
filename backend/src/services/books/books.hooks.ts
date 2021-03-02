@@ -1,8 +1,7 @@
 import { disallow } from 'feathers-hooks-common'
 // Don't remove this comment. It's needed to format import lines nicely.
 import { hooks } from '@feathersjs/authentication'
-
-// import createDelay from '../../hooks/create-delay'
+import addSearch from '../../hooks/add-search'
 
 const { authenticate } = hooks
 
@@ -18,7 +17,7 @@ export default {
   },
 
   after: {
-    all: [],
+    all: [addSearch()],
     find: [],
     get: [],
     create: [],

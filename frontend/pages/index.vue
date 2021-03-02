@@ -39,7 +39,7 @@
 import { makeFindMixin } from 'feathers-vuex'
 import { getFullUrl } from '../tools/url'
 export default {
-  mixins: [makeFindMixin({ service: 'books' })],
+  mixins: [makeFindMixin({ service: 'books', watch: 'search' })],
   layout: 'default',
   transition: 'slide-right',
   data() {
@@ -52,8 +52,15 @@ export default {
     }
   },
   computed: {
+    search() {
+      return this.$store.getters.search
+    },
     booksParams() {
-      return { query: {} } // Step 3
+      return {
+        query: {
+          search: this.search != '' ? this.search.toString() : undefined,
+        },
+      } // Step 3
     },
     isPending() {
       return false

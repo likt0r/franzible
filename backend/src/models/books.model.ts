@@ -4,6 +4,7 @@
 // for more of what you can do here.
 import { Application } from '../declarations'
 import { Model, Mongoose } from 'mongoose'
+import mongoose_fuzzy_searching from 'mongoose-fuzzy-searching'
 
 export default function (app: Application): Model<any> {
   const modelName = 'books'
@@ -20,6 +21,7 @@ export default function (app: Application): Model<any> {
       timestamps: true,
     }
   )
+  schema.plugin(mongoose_fuzzy_searching, { fields: ['author', 'title'] })
 
   // This is necessary to avoid model compilation errors in watch mode
   // see https://mongoosejs.com/docs/api/connection.html#connection_Connection-deleteModel

@@ -21,9 +21,20 @@
         <v-app-bar-nav-icon @click.stop="drawer = !drawer" />
         <v-toolbar-title v-text="title" />
         <v-spacer />
-        <v-btn icon disabled>
+        <template v-slot:extension>
+          <v-text-field
+            v-model="search"
+            hide-details
+            prepend-icon="mdi-magnify"
+            single-line
+            label="Search"
+          >
+          </v-text-field>
+        </template>
+
+        <!-- <v-btn icon disabled>
           <v-icon>mdi-magnify</v-icon>
-        </v-btn>
+        </v-btn> -->
       </v-app-bar>
     </transition>
 
@@ -86,6 +97,14 @@ export default {
       },
       set(value) {
         this.$store.commit('SET_FILE_LIST', value)
+      },
+    },
+    search: {
+      get() {
+        return this.$store.getters.search
+      },
+      set(val) {
+        this.$store.dispatch('setSearch', val)
       },
     },
     isSingleBookPage() {

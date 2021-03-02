@@ -50,15 +50,22 @@ export const modules = {
 
 export const state = () => ({
   fileListState: false,
+  search: '1984',
 })
 
 export const mutations = {
   SET_FILE_LIST(state, fileListState) {
     state.fileListState = fileListState
   },
+  SET_SEARCH(state, search) {
+    state.search = search
+  },
 }
 
 export const actions = {
+  setSearch({ commit }, search) {
+    commit('SET_SEARCH', search)
+  },
   // Custom actions
   nuxtServerInit({ commit, dispatch }, { req }) {
     return initAuth({
@@ -85,6 +92,9 @@ export const getters = {
   // Custom getters
   fileListState(state) {
     return state.fileListState
+  },
+  search(state) {
+    return state.search
   },
 }
 
