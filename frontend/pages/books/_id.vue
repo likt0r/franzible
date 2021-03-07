@@ -217,7 +217,7 @@ export default {
     activeFileIndex() {
       return this.activeBookId === this.bookId
         ? this.$store.getters['player/activeFileIndex']
-        : 0
+        : this.progress.fileIndex
     },
     playerIsLoading() {
       return this.activeBookId === this.bookId
