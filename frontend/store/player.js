@@ -1,3 +1,4 @@
+/* global MediaMetadata:true */
 import { PLAYER_STATE_ENUM, getInstance, init } from '../tools/AudioPlayer'
 import { getFullUrl } from '../tools/url'
 
@@ -45,9 +46,9 @@ export const mutations = {
 }
 
 export const actions = {
-  async playFile(
+  async loadFile(
     { dispatch, commit, getters, state, rootGetters },
-    { bookId, fileIndex, filePosition = 0 }
+    { bookId, fileIndex, filePosition = 0, startPlaying = false }
   ) {
     if (state.bookId !== bookId || state.fileIndex !== fileIndex) {
       const book = rootGetters['books/get'](bookId)
@@ -67,7 +68,62 @@ export const actions = {
       getInstance().loadAudioBook({
         audioUrl: getFullUrl(book.files[fileIndex].filepath),
         filePosition,
+        startPlaying,
       })
+      // set media Notification from Chrome
+      if ('mediaSession' in navigator) {
+        /** */
+        navigator.mediaSession.metadata = new MediaMetadata({
+          title: state.book.title,
+          artist: state.book.author,
+          album: state.book.files[fileIndex].name,
+          artwork: [
+            // {
+            //   src: 'https://dummyimage.com/96x96',
+            //   sizes: '96x96',
+            //   type: 'image/png',
+            // },
+            // {
+            //   src: 'https://dummyimage.com/128x128',
+            //   sizes: '128x128',
+            //   type: 'image/png',
+            // },
+            // {
+            //   src: 'https://dummyimage.com/192x192',
+            //   sizes: '192x192',
+            //   type: 'image/png',
+            // },
+            // {
+            //   src: 'https://dummyimage.com/256x256',
+            //   sizes: '256x256',
+            //   type: 'image/png',
+            // },
+            // {
+            //   src: 'https://dummyimage.com/384x384',
+            //   sizes: '384x384',
+            //   type: 'image/png',
+            // },
+            {
+              src: getFullUrl(state.book.cover[0] || '/logo.png'),
+              sizes: '512x512',
+              type: 'image/png',
+            },
+          ],
+        })
+
+        navigator.mediaSession.setActionHandler('play', function () {
+          dispatch('resume')
+        })
+        navigator.mediaSession.setActionHandler('pause', function () {
+          dispatch('pause')
+        })
+        navigator.mediaSession.setActionHandler('seekbackward', function () {
+          dispatch('fastRewind')
+        })
+        // navigator.mediaSession.setActionHandler('seekforward', function () {})
+        // navigator.mediaSession.setActionHandler('previoustrack', function () {})
+        // navigator.mediaSession.setActionHandler('nexttrack', function () {})
+      }
     } else {
       console.warn('ACTION/playFile: Boock and File are the same as current')
     }
@@ -121,6 +177,7 @@ export const actions = {
       getInstance().loadAudioBook({
         audioUrl: getFullUrl(state.book.files[state.fileIndex].filepath),
         filePosition: position,
+        startPlaying: true,
       })
     } else {
       getInstance().seek(state.book.files[state.fileIndex].duration - 0.01)
@@ -134,6 +191,7 @@ export const actions = {
       getInstance().loadAudioBook({
         audioUrl: getFullUrl(state.book.files[state.fileIndex].filepath),
         filePosition: position,
+        startPlaying: true,
       })
     } else {
       getInstance().seek(0)

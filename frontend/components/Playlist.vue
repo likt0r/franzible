@@ -57,9 +57,10 @@ export default {
   },
   methods: {
     playFile(index) {
-      this.$store.dispatch('player/playFile', {
+      this.$store.dispatch('player/loadFile', {
         bookId: this.id,
         fileIndex: index,
+        startPlaying: true,
       })
     },
     toMinutesAndSeconds,

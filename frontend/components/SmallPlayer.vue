@@ -5,6 +5,8 @@
     fixed
     dark
     height="86"
+    style="cursor: pointer"
+    @click.stop="gotoBook()"
   >
     <v-avatar shrink>
       <v-img :src="bookCoverUrl" contain></v-img>
@@ -25,7 +27,7 @@
         }}</marquee-text
       >
     </div>
-    <v-btn icon shrink @click="fastRewind">
+    <v-btn icon shrink @click.stop="fastRewind">
       <v-icon class="" large>mdi-rewind-30</v-icon>
     </v-btn>
     <v-btn
@@ -33,7 +35,7 @@
       :loading="playerIsLoading"
       icon
       shrink
-      @click="playButtonClick"
+      @click.stop="playButtonClick"
     >
       <v-icon large>{{ playerIsPlaying ? 'mdi-pause' : 'mdi-play' }}</v-icon>
     </v-btn>
@@ -126,18 +128,28 @@ export default {
     },
   },
 
+  watch: {
+    lastProgress(newval) {
+      // if player is empty load last played book into it
+      if (!this.playerBookId) {
+        this.$store.dispatch('player/loadFile', {
+          bookId: this.lastProgress.bookId,
+          fileIndex: this.lastProgress.fileIndex,
+          filePosition: this.lastProgress.filePosition,
+          startPlaying: false,
+        })
+      }
+    },
+  },
   methods: {
+    gotoBook() {
+      this.$router.push(`/books/${this.bookId}`)
+    },
     toMinutesAndSeconds,
     getFullUrl,
     playButtonClick() {
       // if no bookId in player is set
-      if (!this.playerBookId) {
-        this.$store.dispatch('player/playFile', {
-          bookId: this.lastProgress.bookId,
-          fileIndex: this.lastProgress.fileIndex,
-          filePosition: this.lastProgress.filePosition,
-        })
-      } else if (this.playerIsPlaying) {
+      if (this.playerIsPlaying) {
         this.$store.dispatch('player/pause')
       } else {
         this.$store.dispatch('player/resume')
