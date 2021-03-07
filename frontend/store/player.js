@@ -75,8 +75,8 @@ export const actions = {
         /** */
         navigator.mediaSession.metadata = new MediaMetadata({
           title: state.book.title,
-          artist: state.book.author,
-          album: state.book.files[fileIndex].name,
+          artist: `Kapitel ${fileIndex + 1}/${book.files.length}`,
+          // album:
           artwork: [
             // {
             //   src: 'https://dummyimage.com/96x96',
