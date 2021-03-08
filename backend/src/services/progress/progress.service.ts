@@ -25,4 +25,8 @@ export default function (app: Application): void {
   const service = app.service('progress')
 
   service.hooks(hooks)
+
+  service.publish((data, _) => {
+    return app.channel(`private/${data.userId.toString()}`)
+  })
 }

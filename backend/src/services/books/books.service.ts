@@ -25,4 +25,7 @@ export default function (app: Application): void {
   const service: any = app.service('books')
   service.options.timeout = 50000
   service.hooks(hooks)
+  service.publish(() => {
+    return app.channel('public')
+  })
 }
