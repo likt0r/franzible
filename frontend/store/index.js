@@ -50,16 +50,23 @@ export const modules = {
 
 export const state = () => ({
   fileListState: false,
+  searchTerm: '1984',
 })
 
 export const mutations = {
   SET_FILE_LIST(state, fileListState) {
     state.fileListState = fileListState
   },
+  SET_SEARCH(state, searchTerm) {
+    state.searchTerm = searchTerm
+  },
 }
 
 export const actions = {
   // Custom actions
+  setSearch({ commit }, searchTerm) {
+    commit('SET_SEARCH', searchTerm)
+  },
   nuxtServerInit({ commit, dispatch }, { req }) {
     return initAuth({
       commit,

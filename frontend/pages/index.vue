@@ -3,7 +3,7 @@
     <v-list subheader two-line color="black">
       <transition-group name="list">
         <v-list-item
-          v-for="book in books.filter((book) => book.files.length > 0)"
+          v-for="book in books"
           :key="book._id"
           :to="`/books/${book._id}`"
         >
@@ -29,17 +29,19 @@
     </v-list>
 
     <v-skeleton-loader
-      v-if="isFindBooksPending"
+      v-if="requestPending"
       :type="sekletonString"
     ></v-skeleton-loader>
   </section>
 </template>
 
 <script>
-import { makeFindMixin } from 'feathers-vuex'
+import { CookieStorage } from 'cookie-storage'
+
 import { getFullUrl } from '../tools/url'
+const cookieStorage = new CookieStorage()
 export default {
-  mixins: [makeFindMixin({ service: 'books' })],
+  mixins: [],
   layout: 'default',
   transition: 'slide-right',
   data() {
@@ -49,6 +51,9 @@ export default {
           return 'list-item-avatar-two-line'
         })
         .join(','),
+      books: [],
+      requestThrottle: null,
+      requestPending: false,
     }
   },
   computed: {
@@ -58,14 +63,41 @@ export default {
     isPending() {
       return false
     },
+    searchTerm() {
+      return this.$store.state.searchTerm
+    },
   },
-
+  watch: {
+    searchTerm(val) {
+      console.log('searchTerm changed', val)
+      if (this.requestThrottle) {
+        clearTimeout(this.requestThrottle)
+      }
+      this.books = []
+      this.requestThrottle = setTimeout(() => {
+        this.requestSearch()
+      }, 800)
+    },
+  },
   methods: {
     doSomething() {
       console.log('done')
-      console.log('done')
     },
     getFullUrl,
+    async requestSearch() {
+      console.log('requestSearch', this.searchTerm)
+      const response = await this.$axios('/api/search', {
+        method: 'get',
+        headers: {
+          Authorization: `Bearer ${cookieStorage.getItem('feathers-jwt')}`,
+        },
+        params: {
+          term: this.searchTerm,
+        },
+      })
+      console.log(response)
+      this.books = this.books.concat(response.data)
+    },
   },
 }
 </script>

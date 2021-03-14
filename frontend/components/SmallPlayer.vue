@@ -107,7 +107,7 @@ export default {
         : 0
     },
     tillChapter() {
-      if (this.lastProgress) {
+      if (this.lastProgress && this.book) {
         let tillChapter = 0
         for (let i = 0; i < this.lastProgress.fileIndex; i++)
           tillChapter += this.book.files[i].duration

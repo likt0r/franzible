@@ -1,30 +1,7 @@
 <template>
   <v-app dark>
-    <v-navigation-drawer
-      v-if="!isSingleBookPage"
-      v-model="drawer"
-      fixed
-      app
-      temporary
-      style="background-color: #13202a"
-    >
-      <side-menue />
-    </v-navigation-drawer>
     <transition name="fade">
-      <v-app-bar
-        v-if="!isSingleBookPage"
-        :clipped-left="true"
-        fixed
-        app
-        color="#13202a"
-      >
-        <v-app-bar-nav-icon @click.stop="drawer = !drawer" />
-        <v-toolbar-title v-text="title" />
-        <v-spacer />
-        <v-btn icon disabled>
-          <v-icon>mdi-magnify</v-icon>
-        </v-btn>
-      </v-app-bar>
+      <app-bar :hide-bar="!isSingleBookPage"> </app-bar>
     </transition>
 
     <v-main> <nuxt /> </v-main>
@@ -64,11 +41,11 @@
 </template>
 
 <script>
-import Playlist from '../components/Playlist.vue'
-import SideMenue from '../components/SideMenu.vue'
+import Playlist from '~/components/Playlist.vue'
 import SmallPlayer from '~/components/SmallPlayer.vue'
+import AppBar from '~/components/AppBar.vue'
 export default {
-  components: { SideMenue, Playlist, SmallPlayer },
+  components: { Playlist, SmallPlayer, AppBar },
 
   data() {
     return {
@@ -76,7 +53,6 @@ export default {
       fixed: false,
       miniVariant: false,
       right: true,
-      title: 'Franzible',
     }
   },
   computed: {

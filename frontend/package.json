@@ -18,7 +18,7 @@
     "@feathersjs/rest-client": "^4.5.11",
     "@feathersjs/socketio-client": "^4.5.11",
     "@nuxtjs/auth": "^4.9.1",
-    "@nuxtjs/axios": "^5.12.5",
+    "@nuxtjs/axios": "^5.13.1",
     "@nuxtjs/proxy": "^2.1.0",
     "@nuxtjs/toast": "^3.3.1",
     "@vue/composition-api": "0.6.7",

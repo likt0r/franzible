@@ -37,9 +37,8 @@ export default {
 
   // Modules: https://go.nuxtjs.dev/config-modules
   modules: [
-    // https://go.nuxtjs.dev/axios
-    // https://go.nuxtjs.dev/pwa
-    // '@nuxtjs/pwa',
+    '@nuxtjs/axios',
+    '@nuxtjs/pwa',
     '@nuxtjs/toast',
     '@nuxtjs/proxy',
     'nuxt-client-init-module',
@@ -91,6 +90,7 @@ export default {
     // https://go.nuxtjs.dev/eslint
     '@nuxtjs/eslint-module',
     // https://go.nuxtjs.dev/vuetify
+
     '@nuxtjs/vuetify',
     '@nuxtjs/pwa',
   ],
