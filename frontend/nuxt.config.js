@@ -102,9 +102,11 @@ export default {
       name: 'Franzible',
       start_url: '/',
       display: 'standalone',
-      background_color: '#fff',
-      description: 'Franzible zeit für Hörbücher',
+      orientation: 'portrait',
+      background_color: '#000',
+      description: 'Franzible Zeit für Hörbücher',
       lang: 'de',
+      theme_color: '#189AB4',
     },
   },
 
