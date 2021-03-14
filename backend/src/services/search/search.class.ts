@@ -28,7 +28,7 @@ export class Search implements ServiceMethods<Data> {
     const result = await (Books.find({}, '_id series title author cover', {
       limit: query?.$limit || 20,
       skip: query?.$skip || 0,
-    }) as any).fuzzySearch({ query: query?.term || '', excact: true })
+    }) as any).fuzzySearch({ query: query?.term || '', exact: true })
     return result
   }
 
