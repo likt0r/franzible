@@ -15,6 +15,7 @@
       single-line
       label="Search"
       autofocus
+      clearable
     >
     </v-text-field>
   </v-app-bar>

@@ -42,6 +42,9 @@ export default {
     books() {
       return this.$store.getters.getSearchResult
     },
+    scrollPosition() {
+      return this.$store.getters.getSearchScrollPosition
+    },
   },
 
   mounted() {
@@ -50,17 +53,23 @@ export default {
       window.addEventListener('scroll', this.onScroll, {
         passive: true,
       })
-      this.onScroll() // needed for initial loading on page
+      if (this.books.length === 0) {
+        this.requestSearchApi() // needed for initial loading on page
+      }
     })
+    requestAnimationFrame(() => {
+      window.scrollTo(0, this.scrollPosition)
+    }, 1000)
+    console.log('mounted')
   },
   beforeDestroy() {
     window.removeEventListener('scroll', this.onScroll)
   },
   methods: {
-    ...mapActions(['requestSearchApi']),
+    ...mapActions(['requestSearchApi', 'setSearchScrollPosition']),
     onScroll() {
       const { scrollTop, scrollHeight, clientHeight } = document.documentElement
-
+      this.setSearchScrollPosition(scrollTop)
       if (scrollTop + clientHeight >= scrollHeight - 5) {
         this.requestSearchApi()
       }

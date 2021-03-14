@@ -58,6 +58,7 @@ export const state = () => ({
   searchRequestPending: false,
   searchRequestEndReached: false,
   showNavigationDrawer: false,
+  searchScrollPosition: 0,
 })
 
 export const mutations = {
@@ -86,10 +87,16 @@ export const mutations = {
   SET_SEARCH_REQUEST_END_REACHED(state, status) {
     state.searchRequestEndReached = status
   },
+  SET_SEARCH_SCROLL_POSITION(state, position) {
+    state.searchScrollPosition = position
+  },
 }
 
 export const actions = {
   // Custom actions
+  setSearchScrollPosition({ commit }, position) {
+    commit('SET_SEARCH_SCROLL_POSITION', position)
+  },
   setShowNavigationDrawer({ commit }, showNavigationDrawer) {
     console.log('hello ', showNavigationDrawer)
     commit('SET_SHOW_NAVIGATION_DRAWER', showNavigationDrawer)
@@ -176,6 +183,9 @@ export const getters = {
   },
   getRequestPending(state) {
     return state.searchRequestPending
+  },
+  getSearchScrollPosition(state) {
+    return state.searchScrollPosition
   },
 }
 
