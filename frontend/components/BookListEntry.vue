@@ -1,5 +1,5 @@
 <template>
-  <v-list-item>
+  <v-list-item :to="`/books/${book._id}`">
     <v-list-item-avatar tile>
       <v-img
         :alt="`${book.title} cover image`"
@@ -8,6 +8,11 @@
     </v-list-item-avatar>
 
     <v-list-item-content>
+      <v-list-item-title v-if="book.series.length > 0"
+        ><v-chip class="mr-2" small v-for="serie in book.series" :key="serie">
+          {{ serie }}
+        </v-chip></v-list-item-title
+      >
       <v-list-item-title v-text="book.title"></v-list-item-title>
       <v-list-item-subtitle v-text="book.author"></v-list-item-subtitle>
     </v-list-item-content>
@@ -20,6 +25,7 @@
   </v-list-item>
 </template>
 <script>
+import { getFullUrl } from '../tools/url'
 export default {
   props: {
     book: {
@@ -27,5 +33,20 @@ export default {
       default: () => {},
     },
   },
+  methods: {
+    getFullUrl,
+  },
 }
 </script>
+<style scoped>
+.v-chip {
+  border-radius: 5px;
+  font-size: 12px;
+  height: 22px;
+}
+.v-avatar {
+  height: 72px !important;
+  width: 72px !important;
+  border-radius: unset;
+}
+</style>

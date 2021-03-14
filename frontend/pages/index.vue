@@ -2,29 +2,8 @@
   <section color="black">
     <v-list subheader two-line color="black">
       <transition-group name="list">
-        <v-list-item
-          v-for="book in books"
-          :key="book._id"
-          :to="`/books/${book._id}`"
-        >
-          <v-list-item-avatar tile>
-            <v-img
-              :alt="`${book.title} cover image`"
-              :src="book.cover ? getFullUrl(book.cover) : '/icon.png'"
-            ></v-img>
-          </v-list-item-avatar>
-
-          <v-list-item-content>
-            <v-list-item-title v-text="book.title"></v-list-item-title>
-            <v-list-item-subtitle v-text="book.author"></v-list-item-subtitle>
-          </v-list-item-content>
-
-          <v-list-item-action>
-            <v-btn icon>
-              <v-icon color="secondary">mdi-play</v-icon>
-            </v-btn>
-          </v-list-item-action>
-        </v-list-item>
+        <book-list-entry v-for="book in books" :key="book._id" :book="book">
+        </book-list-entry>
       </transition-group>
     </v-list>
 
@@ -37,13 +16,13 @@
 
 <script>
 import { CookieStorage } from 'cookie-storage'
-
-import { getFullUrl } from '../tools/url'
+import BookListEntry from '~/components/BookListEntry.vue'
 const cookieStorage = new CookieStorage()
 export default {
   mixins: [],
   layout: 'default',
   transition: 'slide-right',
+  components: { BookListEntry },
   data() {
     return {
       sekletonString: [...Array(3).keys()]
@@ -80,10 +59,6 @@ export default {
     },
   },
   methods: {
-    doSomething() {
-      console.log('done')
-    },
-    getFullUrl,
     async requestSearch() {
       console.log('requestSearch', this.searchTerm)
       const response = await this.$axios('/api/search', {
