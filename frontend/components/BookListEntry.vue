@@ -10,11 +10,11 @@
     <v-list-item-content>
       <v-list-item-title v-if="book.series.length > 0"
         ><v-chip
+          v-for="serie in book.series"
+          :key="serie"
           class="mr-2"
           color="#13202a"
           small
-          v-for="serie in book.series"
-          :key="serie"
         >
           {{ serie }}
         </v-chip></v-list-item-title

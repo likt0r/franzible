@@ -50,7 +50,8 @@ export const modules = {
 
 export const state = () => ({
   fileListState: false,
-  searchTerm: '1984',
+  searchTerm: '',
+  showNavigationDrawer: false,
 })
 
 export const mutations = {
@@ -60,10 +61,18 @@ export const mutations = {
   SET_SEARCH(state, searchTerm) {
     state.searchTerm = searchTerm
   },
+  SET_SHOW_NAVIGATION_DRAWER(state, showNavigationDrawer) {
+    console.log('mutations', showNavigationDrawer)
+    state.showNavigationDrawer = showNavigationDrawer
+  },
 }
 
 export const actions = {
   // Custom actions
+  setShowNavigationDrawer({ commit }, showNavigationDrawer) {
+    console.log('hello ', showNavigationDrawer)
+    commit('SET_SHOW_NAVIGATION_DRAWER', showNavigationDrawer)
+  },
   setSearch({ commit }, searchTerm) {
     commit('SET_SEARCH', searchTerm)
   },
@@ -92,6 +101,9 @@ export const getters = {
   // Custom getters
   fileListState(state) {
     return state.fileListState
+  },
+  getShowNavigationDrawer(state) {
+    return state.showNavigationDrawer
   },
 }
 

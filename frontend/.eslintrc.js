@@ -25,5 +25,8 @@ module.exports = {
     'vue/no-unused-vars': 'warn',
     'no-useless-constructor': 'warn',
     'vue/valid-v-slot': 'off',
+    'vue/no-unused-components':
+      process.env.NODE_ENV === 'production' ? 'error' : 'warn',
+    'no-unused-vars': process.env.NODE_ENV === 'production' ? 'error' : 'warn',
   },
 }

@@ -3,7 +3,7 @@
     <transition name="fade">
       <app-bar :hide-bar="!isSingleBookPage"> </app-bar>
     </transition>
-
+    <app-side-menu></app-side-menu>
     <v-main> <nuxt /> </v-main>
     <transition name="fade">
       <v-btn
@@ -44,8 +44,10 @@
 import Playlist from '~/components/Playlist.vue'
 import SmallPlayer from '~/components/SmallPlayer.vue'
 import AppBar from '~/components/AppBar.vue'
+import AppSideMenu from '~/components/AppSideMenu.vue'
+
 export default {
-  components: { Playlist, SmallPlayer, AppBar },
+  components: { Playlist, SmallPlayer, AppBar, AppSideMenu },
 
   data() {
     return {

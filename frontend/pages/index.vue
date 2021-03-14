@@ -19,10 +19,10 @@ import { CookieStorage } from 'cookie-storage'
 import BookListEntry from '~/components/BookListEntry.vue'
 const cookieStorage = new CookieStorage()
 export default {
+  components: { BookListEntry },
   mixins: [],
   layout: 'default',
   transition: 'slide-right',
-  components: { BookListEntry },
   data() {
     return {
       sekletonString: [...Array(3).keys()]
@@ -57,6 +57,9 @@ export default {
         this.requestSearch()
       }, 800)
     },
+  },
+  mounted() {
+    this.requestSearch()
   },
   methods: {
     async requestSearch() {

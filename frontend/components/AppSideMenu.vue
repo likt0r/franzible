@@ -1,26 +1,15 @@
 <template>
-  <v-list>
-    <v-img contain style="background-color: #000" src="/logo.png"></v-img>
-    <v-list-item
-      v-for="item in menu"
-      :key="item.title"
-      router
-      exact
-      :to="item.to"
-      @click="item.click && item.click()"
-    >
-      <v-list-item-action>
-        <v-icon>{{ item.icon }}</v-icon>
-      </v-list-item-action>
-      <v-list-item-content>
-        <v-list-item-title v-text="item.title" />
-      </v-list-item-content>
-    </v-list-item>
-
-    <fragment v-if="userIsAdmin">
-      <v-divider></v-divider>
+  <v-navigation-drawer
+    v-model="showNavigationDrawer"
+    fixed
+    app
+    temporary
+    style="background-color: #13202a"
+  >
+    <v-list>
+      <v-img contain style="background-color: #000" src="/logo.png"></v-img>
       <v-list-item
-        v-for="item in adminMenu"
+        v-for="item in menu"
         :key="item.title"
         router
         exact
@@ -34,8 +23,27 @@
           <v-list-item-title v-text="item.title" />
         </v-list-item-content>
       </v-list-item>
-    </fragment>
-  </v-list>
+
+      <fragment v-if="userIsAdmin">
+        <v-divider></v-divider>
+        <v-list-item
+          v-for="item in adminMenu"
+          :key="item.title"
+          router
+          exact
+          :to="item.to"
+          @click="item.click && item.click()"
+        >
+          <v-list-item-action>
+            <v-icon>{{ item.icon }}</v-icon>
+          </v-list-item-action>
+          <v-list-item-content>
+            <v-list-item-title v-text="item.title" />
+          </v-list-item-content>
+        </v-list-item>
+      </fragment>
+    </v-list>
+  </v-navigation-drawer>
 </template>
 
 <script>
@@ -73,6 +81,14 @@ export default {
   computed: {
     userIsAdmin() {
       return this.$store.state.auth.user && this.$store.state.auth.user.isAdmin
+    },
+    showNavigationDrawer: {
+      get() {
+        return this.$store.getters.getShowNavigationDrawer
+      },
+      set(val) {
+        this.$store.dispatch('setShowNavigationDrawer', val)
+      },
     },
   },
   methods: {
