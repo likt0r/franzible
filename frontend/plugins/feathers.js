@@ -25,7 +25,10 @@ if (process.client) {
 const transport = process.client
   ? socketio(socket, { timeout: 60000 })
   : restClient.axios(axios)
-const storage = new CookieStorage()
+const storage = new CookieStorage({
+  path: '/',
+  sameSite: 'Strict',
+})
 
 const feathersClient = feathers()
   .configure(transport)
