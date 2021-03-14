@@ -25,4 +25,15 @@ export default function (app: Application): void {
   const service = app.service('users')
 
   service.hooks(hooks)
+  app.service('users').publish((data, context) => {
+    return [
+      app.channel('admins'),
+      app.channel('app.channels').filter((connection) => {
+        console.log(connection)
+        const result = connection.user._id.toString() === data._id.toString()
+        console.log()
+        return result
+      }),
+    ]
+  })
 }

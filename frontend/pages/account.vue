@@ -101,7 +101,7 @@ export default {
   methods: {
     async userLogin() {
       try {
-        const response = await this.$auth.loginWith('local', {
+        await this.$auth.loginWith('local', {
           data: this.login,
         })
         // TODO: Maybe add User

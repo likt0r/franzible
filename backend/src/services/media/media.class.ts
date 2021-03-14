@@ -58,6 +58,7 @@ export class Media implements ServiceMethods<Data> {
         }
 
         const title = splits[splits.length - 1]
+        console.log('Books ', title)
         await Books.updateOne(
           { author, title },
           {

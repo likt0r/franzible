@@ -19,7 +19,6 @@ class Book extends BaseModel {
       series: '',
       files: [],
       cover: [''],
-      search: '',
     }
   }
 }
@@ -33,11 +32,7 @@ const servicePlugin = makeServicePlugin({
 // Setup the client-side Feathers hooks.
 feathersClient.service(servicePath).hooks({
   before: {
-    all: [
-      (args) => {
-        //delete params.query.search
-      },
-    ],
+    all: [],
     find: [],
     get: [],
     create: [],
@@ -46,12 +41,7 @@ feathersClient.service(servicePath).hooks({
     remove: [],
   },
   after: {
-    all: [
-      (args) => {
-        console.log('after params: ', args)
-        // delete params.query.search
-      },
-    ],
+    all: [],
     find: [],
     get: [],
     create: [],

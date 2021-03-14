@@ -62,7 +62,6 @@
     "mime-types": "^2.1.28",
     "mongodb-core": "^3.2.7",
     "mongoose": "^5.11.13",
-    "mongoose-fuzzy-searching": "^2.0.2",
     "music-metadata": "^7.6.6",
     "nuxt-client-init-module": "^0.1.10",
     "serve-favicon": "^2.5.0",

@@ -56,10 +56,12 @@ class AudioPlayer {
     })
   }
 
-  loadAudioBook({ audioUrl, filePosition = 0 }) {
+  loadAudioBook({ audioUrl, filePosition = 0, startPlaying }) {
     this.elAudio.src = audioUrl
     this.elAudio.currentTime = filePosition
-    this.elAudio.play()
+    if (startPlaying) {
+      this.elAudio.play()
+    }
   }
 
   pause() {

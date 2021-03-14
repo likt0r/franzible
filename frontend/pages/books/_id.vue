@@ -217,7 +217,7 @@ export default {
     activeFileIndex() {
       return this.activeBookId === this.bookId
         ? this.$store.getters['player/activeFileIndex']
-        : 0
+        : this.progress.fileIndex
     },
     playerIsLoading() {
       return this.activeBookId === this.bookId
@@ -286,10 +286,11 @@ export default {
     },
     playButtonClick() {
       if (this.activeBookId !== this.bookId) {
-        this.$store.dispatch('player/playFile', {
+        this.$store.dispatch('player/loadFile', {
           bookId: this.bookId,
           fileIndex: this.progress.fileIndex,
           filePosition: this.progress.filePosition,
+          startPlaying: true,
         })
       } else if (this.playerIsPlaying) {
         this.$store.dispatch('player/pause')

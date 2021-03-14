@@ -6,15 +6,12 @@
     "default": 10,
     "max": 50
   },
-  "mediaPath": "/media/apollon/Audiobooks/",
+  "mediaPath": "/media/apollon/media/Audiobooks/",
   "authentication": {
     "entity": "user",
     "service": "users",
-    "secret": "6Lo45ZeDrmj/VtLiwvsRNPH+8qQ=",
-    "authStrategies": [
-      "jwt",
-      "local"
-    ],
+    "secret": "youtSecret",
+    "authStrategies": ["jwt", "local"],
     "jwtOptions": {
       "header": {
         "typ": "access"

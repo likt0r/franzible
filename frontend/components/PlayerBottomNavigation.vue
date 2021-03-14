@@ -33,7 +33,7 @@
             </v-slider>
           </v-card-text>
           <v-card-actions class="justify-end">
-            <v-btn @click="dialog.value = false" color="#13202a">Close</v-btn>
+            <v-btn color="#13202a" @click="dialog.value = false">Close</v-btn>
           </v-card-actions>
         </v-card>
       </template>
@@ -68,13 +68,13 @@
           <v-card-actions class="justify-end">
             <v-btn
               v-if="timerActiveState"
-              @click="stopTimer(dialog)"
               color="#13202a"
+              @click="stopTimer(dialog)"
             >
               Cancel Timer
             </v-btn>
             <v-spacer></v-spacer>
-            <v-btn @click="dialog.value = false" color="#13202a">Close</v-btn>
+            <v-btn color="#13202a" @click="dialog.value = false">Close</v-btn>
           </v-card-actions>
         </v-card>
       </template>
@@ -83,7 +83,7 @@
 </template>
 
 <script>
-import { mapGetters, mapActions } from 'vuex'
+import { mapActions } from 'vuex'
 export default {
   name: 'PlayerBottomNavigation',
 
