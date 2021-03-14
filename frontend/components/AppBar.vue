@@ -33,10 +33,10 @@ export default {
   computed: {
     searchTerm: {
       get() {
-        return this.$store.getters.search
+        return this.$store.getters.getSearchTerm
       },
       set(val) {
-        this.$store.dispatch('setSearch', val)
+        this.$store.dispatch('setSearchTerm', val)
       },
     },
     showNavigationDrawer: {

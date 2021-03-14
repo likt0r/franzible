@@ -58,7 +58,7 @@ export const mutations = {
   SET_FILE_LIST(state, fileListState) {
     state.fileListState = fileListState
   },
-  SET_SEARCH(state, searchTerm) {
+  SET_SEARCH_TERM(state, searchTerm) {
     state.searchTerm = searchTerm
   },
   SET_SHOW_NAVIGATION_DRAWER(state, showNavigationDrawer) {
@@ -73,8 +73,8 @@ export const actions = {
     console.log('hello ', showNavigationDrawer)
     commit('SET_SHOW_NAVIGATION_DRAWER', showNavigationDrawer)
   },
-  setSearch({ commit }, searchTerm) {
-    commit('SET_SEARCH', searchTerm)
+  setSearchTerm({ commit }, searchTerm) {
+    commit('SET_SEARCH_TERM', searchTerm)
   },
   nuxtServerInit({ commit, dispatch }, { req }) {
     return initAuth({
@@ -101,6 +101,9 @@ export const getters = {
   // Custom getters
   fileListState(state) {
     return state.fileListState
+  },
+  getSearchTerm(state) {
+    return state.searchTerm
   },
   getShowNavigationDrawer(state) {
     return state.showNavigationDrawer
