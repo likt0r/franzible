@@ -24,11 +24,12 @@ export class Search implements ServiceMethods<Data> {
   async find(params?: Params): Promise<Data[] | Paginated<Data>> {
     const Books = mongoose.model('books')
     const query = params?.query
-
-    const result = await (Books.find({}, '_id series title author cover', {
-      limit: query?.$limit || 20,
-      skip: query?.$skip || 0,
-    }) as any).fuzzySearch({ query: query?.term || '', exact: true })
+    console.log(query)
+    const result = await (Books.find({}) as any)
+      .fuzzySearch({ query: query?.term || '', exact: true })
+      .select('_id series title author cover')
+      .limit(parseInt(query?.$limit || '20'))
+      .skip(parseInt(query?.$skip || '0'))
     return result
   }
 

@@ -1,6 +1,6 @@
 <template>
   <section color="black">
-    <v-list subheader two-line color="black">
+    <v-list ref="books" subheader two-line color="black">
       <transition-group name="list">
         <book-list-entry v-for="book in books" :key="book._id" :book="book">
         </book-list-entry>
@@ -31,6 +31,8 @@ export default {
         })
         .join(','),
       books: [],
+      skip: 0,
+      limit: 15,
       requestThrottle: null,
       requestPending: false,
     }
@@ -53,13 +55,23 @@ export default {
         clearTimeout(this.requestThrottle)
       }
       this.books = []
+      this.skip = 0
       this.requestThrottle = setTimeout(() => {
         this.requestSearch()
       }, 800)
     },
   },
   mounted() {
-    this.requestSearch()
+    // init endless scroll listener
+    this.$nextTick(function () {
+      window.addEventListener('scroll', this.onScroll, {
+        passive: true,
+      })
+      this.onScroll() // needed for initial loading on page
+    })
+  },
+  beforeDestroy() {
+    window.removeEventListener('scroll', this.onScroll)
   },
   methods: {
     async requestSearch() {
@@ -71,10 +83,24 @@ export default {
         },
         params: {
           term: this.searchTerm,
+          $skip: this.skip,
+          $limit: this.limit,
         },
       })
+      console.log('response length', response.data.length)
       console.log(response)
-      this.books = this.books.concat(response.data)
+      if (response.data.length > 0) {
+        this.books = this.books.concat(response.data)
+        this.skip = this.skip + this.limit
+        console.log('books length', this.books.length)
+      }
+    },
+    onScroll() {
+      const { scrollTop, scrollHeight, clientHeight } = document.documentElement
+
+      if (scrollTop + clientHeight >= scrollHeight - 5) {
+        this.requestSearch()
+      }
     },
   },
 }
