@@ -80,7 +80,7 @@ export default {
     async logout() {
       console.log('logout')
       await this.$store.dispatch('auth/logout')
-      setTimeout(() => location.reload(), 0)
+      location.reload()
     },
   },
 }
