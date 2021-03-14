@@ -43,6 +43,10 @@ export default {
     '@nuxtjs/proxy',
     'nuxt-client-init-module',
   ],
+  axios: {
+    baseURL: '/',
+  },
+
   toast: {
     position: 'top-center',
     duration: 8000,
