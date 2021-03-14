@@ -3,7 +3,15 @@
 // See http://mongoosejs.com/docs/models.html
 // for more of what you can do here.
 import { Application } from '../declarations'
+import { MongooseFuzzySearchingField } from 'mongoose'
+import fuzzySearching from 'mongoose-fuzzy-searching'
 import { Model, Mongoose } from 'mongoose'
+
+const fields: MongooseFuzzySearchingField<any>[] = [
+  { name: 'author' },
+  { name: 'title' },
+  'series',
+]
 
 export default function (app: Application): Model<any> {
   const modelName = 'books'
@@ -20,6 +28,7 @@ export default function (app: Application): Model<any> {
       timestamps: true,
     }
   )
+  schema.plugin(fuzzySearching, { fields })
 
   // This is necessary to avoid model compilation errors in watch mode
   // see https://mongoosejs.com/docs/api/connection.html#connection_Connection-deleteModel

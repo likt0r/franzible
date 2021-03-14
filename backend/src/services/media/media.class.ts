@@ -80,33 +80,26 @@ export class Media implements ServiceMethods<Data> {
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async get(id: Id, params?: Params): Promise<Data> {
-    return {
-      id,
-      text: `A new message with ID: ${id}!`,
-    }
+    throw new Error('Method not implemented')
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async create(data: Data, params?: Params): Promise<Data> {
-    if (Array.isArray(data)) {
-      return Promise.all(data.map((current) => this.create(current, params)))
-    }
-
-    return data
+    throw new Error('Method not implemented')
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async update(id: NullableId, data: Data, params?: Params): Promise<Data> {
-    return data
+    throw new Error('Method not implemented')
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async patch(id: NullableId, data: Data, params?: Params): Promise<Data> {
-    return data
+    throw new Error('Method not implemented')
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async remove(id: NullableId, params?: Params): Promise<Data> {
-    return { id }
+    throw new Error('Method not implemented')
   }
 }

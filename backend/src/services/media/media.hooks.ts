@@ -1,4 +1,4 @@
-import { disallow, iff } from 'feathers-hooks-common'
+import { disallow } from 'feathers-hooks-common'
 // Don't remove this comment. It's needed to format import lines nicely.
 import { hooks } from '@feathersjs/authentication'
 
