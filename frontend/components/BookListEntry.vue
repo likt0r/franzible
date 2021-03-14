@@ -9,7 +9,13 @@
 
     <v-list-item-content>
       <v-list-item-title v-if="book.series.length > 0"
-        ><v-chip class="mr-2" small v-for="serie in book.series" :key="serie">
+        ><v-chip
+          class="mr-2"
+          color="#13202a"
+          small
+          v-for="serie in book.series"
+          :key="serie"
+        >
           {{ serie }}
         </v-chip></v-list-item-title
       >
@@ -43,6 +49,7 @@ export default {
   border-radius: 5px;
   font-size: 12px;
   height: 22px;
+  margin-bottom: 4px;
 }
 .v-avatar {
   height: 72px !important;
