@@ -28,5 +28,6 @@ module.exports = {
     'vue/no-unused-components':
       process.env.NODE_ENV === 'production' ? 'error' : 'warn',
     'no-unused-vars': process.env.NODE_ENV === 'production' ? 'error' : 'warn',
+    'spaced-comment': process.env.NODE_ENV === 'production' ? 'error' : 'warn',
   },
 }

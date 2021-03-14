@@ -11,13 +11,13 @@
       v-if="requestPending"
       :type="sekletonString"
     ></v-skeleton-loader>
+    <div class="spacer"></div>
   </section>
 </template>
 
 <script>
-import { CookieStorage } from 'cookie-storage'
+import { mapActions } from 'vuex'
 import BookListEntry from '~/components/BookListEntry.vue'
-const cookieStorage = new CookieStorage()
 export default {
   components: { BookListEntry },
   mixins: [],
@@ -30,37 +30,20 @@ export default {
           return 'list-item-avatar-two-line'
         })
         .join(','),
-      books: [],
-      skip: 0,
-      limit: 15,
-      requestThrottle: null,
-      requestPending: false,
     }
   },
   computed: {
     booksParams() {
       return { query: {} } // Step 3
     },
-    isPending() {
-      return false
+    requestPending() {
+      return this.$store.getters.getRequestPending
     },
-    searchTerm() {
-      return this.$store.state.searchTerm
-    },
-  },
-  watch: {
-    searchTerm(val) {
-      console.log('searchTerm changed', val)
-      if (this.requestThrottle) {
-        clearTimeout(this.requestThrottle)
-      }
-      this.books = []
-      this.skip = 0
-      this.requestThrottle = setTimeout(() => {
-        this.requestSearch()
-      }, 800)
+    books() {
+      return this.$store.getters.getSearchResult
     },
   },
+
   mounted() {
     // init endless scroll listener
     this.$nextTick(function () {
@@ -74,32 +57,12 @@ export default {
     window.removeEventListener('scroll', this.onScroll)
   },
   methods: {
-    async requestSearch() {
-      console.log('requestSearch', this.searchTerm)
-      const response = await this.$axios('/api/search', {
-        method: 'get',
-        headers: {
-          Authorization: `Bearer ${cookieStorage.getItem('feathers-jwt')}`,
-        },
-        params: {
-          term: this.searchTerm,
-          $skip: this.skip,
-          $limit: this.limit,
-        },
-      })
-      console.log('response length', response.data.length)
-      console.log(response)
-      if (response.data.length > 0) {
-        this.books = this.books.concat(response.data)
-        this.skip = this.skip + this.limit
-        console.log('books length', this.books.length)
-      }
-    },
+    ...mapActions(['requestSearchApi']),
     onScroll() {
       const { scrollTop, scrollHeight, clientHeight } = document.documentElement
 
       if (scrollTop + clientHeight >= scrollHeight - 5) {
-        this.requestSearch()
+        this.requestSearchApi()
       }
     },
   },
@@ -122,5 +85,8 @@ export default {
 .list-enter/* .list-leave-active below version 2.1.8 */ {
   opacity: 0;
   transform: translateY(-30px);
+}
+.spacer {
+  height: 72px;
 }
 </style>

@@ -51,6 +51,12 @@ export const modules = {
 export const state = () => ({
   fileListState: false,
   searchTerm: '',
+  searchRequestLimit: 15,
+  searchRequestSkip: 0,
+  searchResult: [],
+  searchRequestThrottle: null,
+  searchRequestPending: false,
+  searchRequestEndReached: false,
   showNavigationDrawer: false,
 })
 
@@ -65,6 +71,21 @@ export const mutations = {
     console.log('mutations', showNavigationDrawer)
     state.showNavigationDrawer = showNavigationDrawer
   },
+  SET_SEARCH_REQUEST_SKIP(state, value) {
+    state.searchRequestSkip = value
+  },
+  SET_SEARCH_REQUEST_THROTTLE(state, timer) {
+    state.searchRequestThrottle = timer
+  },
+  SET_SEARCH_REQUEST_PENDING(state, pending) {
+    state.searchRequestPending = pending
+  },
+  SET_SEARCH_RESULT(state, result) {
+    state.searchResult = result
+  },
+  SET_SEARCH_REQUEST_END_REACHED(state, status) {
+    state.searchRequestEndReached = status
+  },
 }
 
 export const actions = {
@@ -73,9 +94,51 @@ export const actions = {
     console.log('hello ', showNavigationDrawer)
     commit('SET_SHOW_NAVIGATION_DRAWER', showNavigationDrawer)
   },
-  setSearchTerm({ commit }, searchTerm) {
+  setSearchTerm({ commit, dispatch, state }, searchTerm) {
     commit('SET_SEARCH_TERM', searchTerm)
+    if (state.searchRequestThrottle) {
+      clearTimeout(state.searchRequestThrottle)
+    }
+    commit('SET_SEARCH_RESULT', [])
+    commit('SET_SEARCH_REQUEST_SKIP', 0)
+    commit('SET_SEARCH_REQUEST_END_REACHED', false)
+    commit(
+      'SET_SEARCH_REQUEST_THROTTLE',
+      setTimeout(() => {
+        dispatch('requestSearchApi', state.searchTerm)
+        commit('SET_SEARCH_REQUEST_THROTTLE', null)
+      }, 800)
+    )
   },
+  async requestSearchApi({ commit, state }) {
+    console.log('requestSearch', state.searchTerm)
+    if (!state.searchRequestEndReached) {
+      const response = await this.$axios('/api/search', {
+        method: 'get',
+        headers: {
+          Authorization: `Bearer ${state.auth.accessToken}`,
+        },
+        params: {
+          term: state.searchTerm,
+          $skip: state.searchRequestSkip,
+          $limit: state.searchRequestLimit,
+        },
+      })
+
+      console.log('response length', response.data.length)
+      console.log(response)
+      if (response.data.length > 0) {
+        commit('SET_SEARCH_RESULT', state.searchResult.concat(response.data))
+        commit(
+          'SET_SEARCH_REQUEST_SKIP',
+          state.searchRequestSkip + state.searchRequestLimit
+        )
+      } else {
+        commit('SET_SEARCH_REQUEST_END_REACHED', true)
+      }
+    }
+  },
+
   nuxtServerInit({ commit, dispatch }, { req }) {
     return initAuth({
       commit,
@@ -107,6 +170,12 @@ export const getters = {
   },
   getShowNavigationDrawer(state) {
     return state.showNavigationDrawer
+  },
+  getSearchResult(state) {
+    return state.searchResult
+  },
+  getRequestPending(state) {
+    return state.searchRequestPending
   },
 }
 
