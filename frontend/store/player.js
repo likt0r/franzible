@@ -52,6 +52,9 @@ export const actions = {
   ) {
     if (state.bookId !== bookId || state.fileIndex !== fileIndex) {
       const book = rootGetters['books/get'](bookId)
+      if (!book) {
+        throw new Error('Book not found')
+      }
       const { _id: progressId } = rootGetters['progress/find']({
         query: {
           bookId,
