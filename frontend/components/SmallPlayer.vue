@@ -129,9 +129,9 @@ export default {
   },
 
   watch: {
-    lastProgress(newval) {
+    book(newval) {
       // if player is empty load last played book into it
-      if (!this.playerBookId && this.lastProgress) {
+      if (newval && !this.playerBookId && this.lastProgress) {
         try {
           this.$store.dispatch('player/loadFile', {
             bookId: this.lastProgress.bookId,
