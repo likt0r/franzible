@@ -132,12 +132,19 @@ export default {
     lastProgress(newval) {
       // if player is empty load last played book into it
       if (!this.playerBookId && this.lastProgress) {
-        this.$store.dispatch('player/loadFile', {
-          bookId: this.lastProgress.bookId,
-          fileIndex: this.lastProgress.fileIndex,
-          filePosition: this.lastProgress.filePosition,
-          startPlaying: false,
-        })
+        try {
+          this.$store.dispatch('player/loadFile', {
+            bookId: this.lastProgress.bookId,
+            fileIndex: this.lastProgress.fileIndex,
+            filePosition: this.lastProgress.filePosition,
+            startPlaying: false,
+          })
+        } catch (error) {
+          console.log('Error', error)
+          this.$toast.error(error, {
+            icon: 'alert-circle-outline',
+          })
+        }
       }
     },
   },
