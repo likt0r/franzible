@@ -24,6 +24,7 @@
     "@vue/composition-api": "0.6.7",
     "cookie-storage": "^6.1.0",
     "core-js": "^3.9.1",
+    "dexie": "^3.0.3",
     "feathers": "^2.2.4",
     "feathers-hooks-common": "^5.0.5",
     "feathers-vuex": "^3.16.0",
