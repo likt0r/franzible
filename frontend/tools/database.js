@@ -27,13 +27,15 @@ export class Database extends Dexie {
     // auto-incrementing primary key, while the "done" field is just a regukar
     // IndexedDB index.
     this.version(1).stores({
-      books: '++id,title',
+      books: '++id,_id,title',
+      files: '++id',
     })
 
     // we can retrieve our books store with Dexie.table, and then use it as a
     // field on our Database class for convenience; we can now write code such
     // as "this.books.add(...)" rather than "this.table('books').add(...)"
     this.books = this.table('books')
+    this.files = this.table('files')
   }
 
   // getbooks retrieves all books from the books object store in a defined
@@ -70,8 +72,6 @@ export class Database extends Dexie {
     })
   }
 
-
-
   // addBook adds a Book with the text passed in to the books object store.
   // Returns a promise that resolves if the addition is successful.
   addBook(book) {
@@ -81,9 +81,19 @@ export class Database extends Dexie {
 
   // deleteBook deletes a Book with the ID passed in from the books object
   // store. Returns a promise that resolves if the deletion is successful.
-  deleteBook(BookID) {
+  deleteBook(bookId) {
     // delete a Book by passing in the ID of that Book.
-    return this.books.delete(BookID)
+    return this.books.delete(bookId)
+  }
+
+  addFile(file) {
+    // add a files by passing in an object using Table.add.
+    return this.files.add(file)
+  }
+
+  deleteFile(fileId) {
+    // delete a Book by passing in the ID of that Book.
+    return this.files.delete(fileId)
   }
 }
 
@@ -94,3 +104,11 @@ export const forwardOrder = 'forward'
 // reverseOrder is passed into getbooks to retrieve books in reverse
 // chronological order.
 export const reverseOrder = 'reverse'
+
+let database = null
+export function getDatabase() {
+  if (!database) {
+    database = new Database()
+  }
+  return database
+}

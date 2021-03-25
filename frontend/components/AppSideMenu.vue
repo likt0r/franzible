@@ -59,9 +59,14 @@ export default {
           to: '/account',
         },
         {
+          icon: 'mdi-magnify',
+          title: 'Search',
+          to: '/',
+        },
+        {
           icon: 'mdi-book-open-page-variant-outline',
           title: 'Libary',
-          to: '/',
+          to: '/libary',
         },
         {
           icon: 'mdi-exit-to-app',
