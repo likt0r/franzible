@@ -1,6 +1,7 @@
 // ~/store/index.js
 import { playerInitPlugin } from './player'
 import { timerInitPlugin } from './timer'
+import { offlineInitPlugin } from './offline'
 import {
   makeAuthPlugin,
   initAuth,
@@ -194,4 +195,5 @@ export const plugins = [
   auth,
   playerInitPlugin,
   timerInitPlugin,
+  offlineInitPlugin,
 ]

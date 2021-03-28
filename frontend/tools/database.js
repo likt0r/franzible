@@ -1,5 +1,5 @@
 import Dexie from 'dexie'
-
+import { getFullUrl } from '~/tools/url'
 // Database inherits from the Dexie class to handle all database logic for the
 // Book app.
 // NOTE: For an app like this where the database interactions are pretty
@@ -83,6 +83,7 @@ export class Database extends Dexie {
   // store. Returns a promise that resolves if the deletion is successful.
   deleteBook(bookId) {
     // delete a Book by passing in the ID of that Book.
+    console.log('deleteBook', bookId)
     return this.books.delete(bookId)
   }
 
@@ -94,6 +95,22 @@ export class Database extends Dexie {
   deleteFile(fileId) {
     // delete a Book by passing in the ID of that Book.
     return this.files.delete(fileId)
+  }
+
+  isBookInDb(bookId) {
+    console.log('isBookInDb', this.books)
+    return this.books.find((book) => book._id === bookId)
+  }
+
+  // Download and store an file
+  async downloadAndAddFile({ filepath, filename }) {
+    const res = await fetch(getFullUrl(filepath))
+    const blob = await res.blob()
+    // Store the binary data in indexedDB:
+    return await this.files.add({
+      filename,
+      file: blob,
+    })
   }
 }
 

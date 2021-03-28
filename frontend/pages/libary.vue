@@ -12,7 +12,7 @@
 </template>
 
 <script>
-import { mapActions } from 'vuex'
+import { mapActions, mapState } from 'vuex'
 import BookListEntry from '~/components/BookListEntry.vue'
 import { getDatabase } from '~/tools/database'
 export default {
@@ -21,16 +21,14 @@ export default {
   layout: 'default',
   transition: 'slide-right',
   data() {
-    return {
-      books: [],
-    }
+    return {}
   },
-  computed: {},
-
-  async mounted() {
-    this.books = await getDatabase().getBooks()
-    console.log(this.books)
+  computed: {
+    books() {
+      return this.$store.state.offline.books
+    },
   },
+  async mounted() {},
   beforeDestroy() {},
   methods: {},
 }
