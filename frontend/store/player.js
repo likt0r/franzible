@@ -70,6 +70,7 @@ export const actions = {
       })
       getInstance().loadAudioBook({
         audioUrl: getFullUrl(book.files[fileIndex].filepath),
+        audioDbId: book.files[fileIndex].dbId,
         filePosition,
         startPlaying,
       })
@@ -179,6 +180,7 @@ export const actions = {
       })
       getInstance().loadAudioBook({
         audioUrl: getFullUrl(state.book.files[state.fileIndex].filepath),
+        audioDbId: state.book.files[state.fileIndex].dbId,
         filePosition: position,
         startPlaying: true,
       })
@@ -193,6 +195,7 @@ export const actions = {
       commit('SET_FILE', { fileIndex: state.fileIndex - 1, filePosition: 0 })
       getInstance().loadAudioBook({
         audioUrl: getFullUrl(state.book.files[state.fileIndex].filepath),
+        audioDbId: state.book.files[state.fileIndex].dbId,
         filePosition: position,
         startPlaying: true,
       })

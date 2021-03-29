@@ -1,9 +1,12 @@
+import { getDatabase } from './database'
+const database = getDatabase()
 export const PLAYER_STATE_ENUM = {
   playing: 'playing',
   stopped: 'stopped',
   loading: 'loading',
   error: 'error',
 }
+
 class AudioPlayer {
   constructor(store) {
     this.store = null
@@ -56,8 +59,15 @@ class AudioPlayer {
     })
   }
 
-  loadAudioBook({ audioUrl, filePosition = 0, startPlaying }) {
-    this.elAudio.src = audioUrl
+  async loadAudioBook({ audioUrl, audioDbId, filePosition = 0, startPlaying }) {
+    if (audioDbId) {
+      if (this.elAudio.src && this.elAudio.src.startsWith('blob:')) {
+        URL.revokeObjectURL(this.elAudio.src)
+      }
+      this.elAudio.src = await database.getFileContentUrl(audioDbId)
+    } else {
+      this.elAudio.src = audioUrl
+    }
     this.elAudio.currentTime = filePosition
     if (startPlaying) {
       this.elAudio.play()
