@@ -6,8 +6,18 @@
         :src="getFullUrl(this.book.cover)"
         :dbId="this.book && book.coverDbId"
       >
-        <v-spacer />
-        <v-icon small>{{
+        <v-progress-circular
+          v-if="isBookDownloading(book._id)"
+          :rotate="-90"
+          :size="70"
+          :width="10"
+          :value="getBookDownloadProgress(book._id)"
+          color="secondary"
+        >
+          {{ getBookDownloadProgress(book._id) }}
+        </v-progress-circular>
+
+        <v-icon small v-else>{{
           isBookDownloaded(book._id) ? 'mdi-delete' : 'mdi-download'
         }}</v-icon>
       </offline-image>
@@ -59,6 +69,8 @@ export default {
     ...mapGetters({
       isBookDownloaded: 'offline/isBookDownloaded',
       getOfflineBook: 'offline/getBook',
+      getBookDownloadProgress: 'offline/getBookDownloadProgress',
+      isBookDownloading: 'offline/isBookDownloading',
     }),
   },
 
@@ -97,5 +109,10 @@ export default {
 }
 .v-list-item-content {
   cursor: pointer;
+}
+.v-icon.mdi::before {
+  position: absolute;
+  top: 2px;
+  right: 2px;
 }
 </style>

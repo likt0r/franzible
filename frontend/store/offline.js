@@ -1,6 +1,8 @@
+import Vue from 'vue'
 import { getDatabase } from '~/tools/database'
 export const state = () => ({
   books: [],
+  downloadProgress: {},
 })
 const db = getDatabase()
 
@@ -19,15 +21,27 @@ export const mutations = {
       }
     }
   },
+  SET_BOOK_DOWNLOAD_PROGRESS(state, { bookId, progress }) {
+    Vue.set(state.downloadProgress, bookId, progress)
+  },
+  DELETE_BOOK_DOWNLOAD_PROGRESS(state, bookId) {
+    Vue.set(state.downloadProgress, bookId, undefined)
+  },
 }
 
 export const actions = {
   async addBook({ commit, dispatch, state }, bookId) {
     if (!state.books.find((el) => el._id === bookId)) {
       // get Book Object
+      if (state.downloadProgress[bookId]) {
+        console.warn(`Book ${bookId} is allready downloading.`)
+        return
+      }
       const book = await dispatch('books/get', bookId, { root: true })
       // download cover
+
       console.log(book)
+      commit('SET_BOOK_DOWNLOAD_PROGRESS', { bookId, progress: 0 })
       if (book.cover[0]) {
         const id = await db.downloadAndAddFile({
           filepath: book.cover[0],
@@ -35,12 +49,17 @@ export const actions = {
         })
         book.coverDbId = id
       }
-      for (const file of book.files) {
+      for (const [index, file] of book.files.entries()) {
         file.dbId = await db.downloadAndAddFile(file)
+        commit('SET_BOOK_DOWNLOAD_PROGRESS', {
+          bookId,
+          progress: Math.round(((index + 1) / book.files.length) * 100),
+        })
       }
 
       await db.addBook(book)
       commit('ADD_BOOK', book)
+      commit('DELETE_BOOK_DOWNLOAD_PROGRESS', bookId)
     }
   },
   async deleteBook({ commit, state }, bookId) {
@@ -64,6 +83,12 @@ export const getters = {
   },
   getBook: (state) => (bookId) => {
     return state.books.find((book) => book._id === bookId)
+  },
+  getBookDownloadProgress: (state) => (bookId) => {
+    return state.downloadProgress[bookId]
+  },
+  isBookDownloading: (state) => (bookId) => {
+    return typeof state.downloadProgress[bookId] !== 'undefined'
   },
 }
 export const offlineInitPlugin = async ({ commit }) => {
