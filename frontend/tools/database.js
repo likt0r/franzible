@@ -87,9 +87,9 @@ export class Database extends Dexie {
     return this.books.delete(bookId)
   }
 
-  addFile(file) {
-    // add a files by passing in an object using Table.add.
-    return this.files.add(file)
+  isBookInDb(bookId) {
+    console.log('isBookInDb', this.books)
+    return this.books.find((book) => book._id === bookId)
   }
 
   deleteFile(fileId) {
@@ -97,20 +97,23 @@ export class Database extends Dexie {
     return this.files.delete(fileId)
   }
 
-  isBookInDb(bookId) {
-    console.log('isBookInDb', this.books)
-    return this.books.find((book) => book._id === bookId)
-  }
-
   // Download and store an file
   async downloadAndAddFile({ filepath, filename }) {
     const res = await fetch(getFullUrl(filepath))
-    const blob = await res.blob()
+    const content = await res.blob()
     // Store the binary data in indexedDB:
     return await this.files.add({
       filename,
-      file: blob,
+      content,
     })
+  }
+
+  async getFileContentUrl(fileId) {
+    const file = await this.files.get({
+      id: fileId,
+    })
+    const url = URL.createObjectURL(file.content)
+    return url
   }
 }
 

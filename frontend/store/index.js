@@ -70,7 +70,6 @@ export const mutations = {
     state.searchTerm = searchTerm
   },
   SET_SHOW_NAVIGATION_DRAWER(state, showNavigationDrawer) {
-    console.log('mutations', showNavigationDrawer)
     state.showNavigationDrawer = showNavigationDrawer
   },
   SET_SEARCH_REQUEST_SKIP(state, value) {
@@ -99,7 +98,6 @@ export const actions = {
     commit('SET_SEARCH_SCROLL_POSITION', position)
   },
   setShowNavigationDrawer({ commit }, showNavigationDrawer) {
-    console.log('hello ', showNavigationDrawer)
     commit('SET_SHOW_NAVIGATION_DRAWER', showNavigationDrawer)
   },
   setSearchTerm({ commit, dispatch, state }, searchTerm) {

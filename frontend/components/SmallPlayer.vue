@@ -9,7 +9,11 @@
     @click.stop="gotoBook()"
   >
     <v-avatar shrink>
-      <v-img :src="bookCoverUrl" contain></v-img>
+      <offline-image
+        :src="bookCoverUrl"
+        :db-id="book && book.coverDbId"
+        contain
+      ></offline-image>
     </v-avatar>
     <div class="mid-column ml-2">
       <marquee-text
@@ -45,12 +49,14 @@
 <script>
 import MarqueeText from 'vue-marquee-text-component'
 import { makeFindMixin, makeGetMixin } from 'feathers-vuex'
-import { getFullUrl } from '../tools/url'
-import { toMinutesAndSeconds } from '../tools/formatTime'
+import OfflineImage from './OfflineImage.vue'
+import { getFullUrl } from '~/tools/url'
+import { toMinutesAndSeconds } from '~/tools/formatTime'
 export default {
   name: 'SmallPlayer',
   components: {
     MarqueeText,
+    OfflineImage,
   },
   mixins: [
     makeFindMixin({ service: 'progress' }),

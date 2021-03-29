@@ -1,15 +1,16 @@
 <template>
   <v-list-item>
     <v-list-item-avatar tile @click.stop="toggleDownload">
-      <v-img
+      <offline-image
         :alt="`${book.title} cover image`"
-        :src="book.cover ? getFullUrl(book.cover) : '/icon.png'"
+        :src="getFullUrl(this.book.cover)"
+        :dbId="this.book && book.coverDbId"
       >
         <v-spacer />
         <v-icon small>{{
           isBookDownloaded(book._id) ? 'mdi-delete' : 'mdi-download'
         }}</v-icon>
-      </v-img>
+      </offline-image>
     </v-list-item-avatar>
 
     <v-list-item-content>
@@ -37,22 +38,33 @@
 </template>
 <script>
 import { mapGetters } from 'vuex'
+import OfflineImage from './OfflineImage.vue'
 import { getFullUrl } from '~/tools/url'
 import { getDatabase } from '~/tools/database'
 export default {
+  components: { OfflineImage },
   props: {
     book: {
       type: Object,
       default: () => {},
     },
   },
+  data() {
+    return {
+      coverUrl: '/icon.png',
+    }
+  },
 
   computed: {
-    ...mapGetters({ isBookDownloaded: 'offline/isBookDownloaded' }),
+    ...mapGetters({
+      isBookDownloaded: 'offline/isBookDownloaded',
+      getOfflineBook: 'offline/getBook',
+    }),
   },
 
   methods: {
     getFullUrl,
+
     toggleDownload() {
       console.log('Book clicked ', this.isBookDownloaded(this.book._id))
 

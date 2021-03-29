@@ -62,6 +62,9 @@ export const getters = {
   isBookDownloaded: (state) => (bookId) => {
     return !!state.books.find((book) => book._id === bookId)
   },
+  getBook: (state) => (bookId) => {
+    return state.books.find((book) => book._id === bookId)
+  },
 }
 export const offlineInitPlugin = async ({ commit }) => {
   const books = await db.getBooks()

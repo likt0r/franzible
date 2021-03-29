@@ -34,7 +34,15 @@ feathersClient.service(servicePath).hooks({
   before: {
     all: [],
     find: [],
-    get: [],
+    get: [
+      (context) => {
+        // if book is offline avaible use offline content
+        context.result = context.service.FeathersVuexModel.store.state.offline.books.find(
+          (book) => book._id === context.id
+        )
+        return context
+      },
+    ],
     create: [],
     update: [],
     patch: [],

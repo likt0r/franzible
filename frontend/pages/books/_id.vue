@@ -11,14 +11,15 @@
       <fragment v-else>
         <v-row justify="center" class="pa-0">
           <v-col xs="12" sm="8" md="8" lg="5" xl="4" class="pa-0">
-            <v-img
+            <offline-image
               :src="book.cover ? getFullUrl(book.cover) : '/logo.png'"
+              :db-id="book && book.coverDbId"
               contain
             >
               <v-overlay absolute :value="timerActiveState">
                 <h1>{{ timerDisplay(timerCurrentTime) }}</h1>
               </v-overlay>
-            </v-img>
+            </offline-image>
           </v-col>
         </v-row>
         <v-row justify="center" class="pa-0" align="end">
@@ -136,11 +137,13 @@ import { mapGetters, mapActions } from 'vuex'
 import { toMinutesAndSeconds } from '../../tools/formatTime'
 import { getFullUrl } from '../../tools/url'
 import PlayerBottomNavigation from '~/components/PlayerBottomNavigation.vue'
+import OfflineImage from '~/components/OfflineImage.vue'
 export default {
   name: 'Player',
   components: {
     PlayerBottomNavigation,
     Fragment,
+    OfflineImage,
   },
   mixins: [
     makeGetMixin({
