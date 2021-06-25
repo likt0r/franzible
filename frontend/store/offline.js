@@ -1,99 +1,134 @@
 import Vue from 'vue'
 import { getDatabase } from '~/tools/database'
+import { BOOK_OFFLINE_STATE } from '~/tools/consts'
 export const state = () => ({
-  books: [],
-  downloadProgress: {},
+	booksMap: {},
+	activeDownloadsMap: {},
 })
 const db = getDatabase()
 
 export const mutations = {
-  SET_BOOKS(state, books) {
-    state.books = books
-  },
-  ADD_BOOK(state, book) {
-    state.books.push(book)
-  },
-  DELETE_BOOK(state, bookId) {
-    for (let i = 0; i < state.books.length; i++) {
-      if (state.books[i]._id === bookId) {
-        state.books.splice(i, 1)
-        state.books = [...state.books]
-      }
-    }
-  },
-  SET_BOOK_DOWNLOAD_PROGRESS(state, { bookId, progress }) {
-    Vue.set(state.downloadProgress, bookId, progress)
-  },
-  DELETE_BOOK_DOWNLOAD_PROGRESS(state, bookId) {
-    Vue.set(state.downloadProgress, bookId, undefined)
-  },
+	SET_BOOKS(state, books) {
+		state.booksMap = books.reduce((acc, book) => {
+			acc[book._id] = book
+			return acc
+		}, {})
+	},
+	ADD_BOOK(state, book) {
+		Vue.set(state.booksMap, book._id, book)
+		state.booksMap = { ...state.booksMap }
+	},
+	BOOK_SET_PROGRESS(state, { bookId, progress, progressFileIndex }) {
+		const book = state.booksMap[bookId]
+		if (book) {
+			book.progressFileIndex = progressFileIndex
+			book.progress = progress
+		}
+		state.booksMap = { ...state.booksMap }
+		//TODO: throw Error
+	},
+
+	DELETE_BOOK(state, bookId) {
+		Vue.set(state.booksMap, bookId, undefined)
+	},
+	START_DOWNLOAD(state, bookId) {
+		Vue.set(state.activeDownloadsMap, bookId, true)
+	},
+	FINISH_DOWNLOAD(state, bookId) {
+		Vue.set(state.activeDownloadsMap, bookId, undefined)
+	},
 }
 
 export const actions = {
-  async addBook({ commit, dispatch, state }, bookId) {
-    if (!state.books.find((el) => el._id === bookId)) {
-      // get Book Object
-      if (state.downloadProgress[bookId]) {
-        console.warn(`Book ${bookId} is allready downloading.`)
-        return
-      }
-      const book = await dispatch('books/get', bookId, { root: true })
-      // download cover
+	async addBook({ commit, dispatch, state }, bookId) {
+		if (state.activeDownloadsMap[bookId]) {
+			console.warn(`Book ${bookId} is allready downloading.`)
+			return
+		}
+		// const book = state.booksMap[bookId]
+		const book = await dispatch('books/get', bookId, { root: true })
+		// Set start progress if not set
+		book.progress = book.progress || 0
+		book.progressFileIndex = book.progressFileIndex || 0
+		commit('START_DOWNLOAD', bookId)
+		// download cover
+		if (book.cover[0]) {
+			const id = await db.downloadAndAddFile({
+				filepath: book.cover[0],
+				filename: `${book._id}-cover`,
+			})
+			book.coverDbId = id
+		}
+		await db.addBook(book)
+		commit('ADD_BOOK', book)
+		for (
+			let index = book.progressFileIndex;
+			index < book.files.length;
+			index++
+		) {
+			const file = book.files[index]
+			file.dbId = await db.downloadAndAddFile(file)
+			book.progress = Math.round(((index + 1) / book.files.length) * 100)
+			book.progressFileIndex = index
 
-      console.log(book)
-      commit('SET_BOOK_DOWNLOAD_PROGRESS', { bookId, progress: 0 })
-      if (book.cover[0]) {
-        const id = await db.downloadAndAddFile({
-          filepath: book.cover[0],
-          filename: `${book._id}-cover`,
-        })
-        book.coverDbId = id
-      }
-      for (const [index, file] of book.files.entries()) {
-        file.dbId = await db.downloadAndAddFile(file)
-        commit('SET_BOOK_DOWNLOAD_PROGRESS', {
-          bookId,
-          progress: Math.round(((index + 1) / book.files.length) * 100),
-          progressFileIndex: index,
-        })
-      }
+			await db.updateBook(book)
+			commit('BOOK_SET_PROGRESS', {
+				bookId: book._id,
+				progress: Math.round(((index + 1) / book.files.length) * 100),
+				progressFileIndex: index,
+			})
+		}
 
-      await db.addBook(book)
-      commit('ADD_BOOK', book)
-      commit('DELETE_BOOK_DOWNLOAD_PROGRESS', bookId)
-    }
-  },
-  async deleteBook({ commit, state }, bookId) {
-    const book = state.books.find((el) => el._id === bookId)
-    if (book) {
-      if (book.cover[0]) {
-        await db.deleteFile(book.coverDbId)
-      }
-      for (const file of book.files) {
-        await db.deleteFile(file.dbId)
-      }
-      await db.deleteBook(book.id)
-      commit('DELETE_BOOK', bookId)
-    }
-  },
+		commit('FINISH_DOWNLOAD', bookId)
+	},
+	async deleteBook({ commit, state }, bookId) {
+		const book = { ...state.booksMap[bookId] }
+		if (book) {
+			for (let index = book.progressFileIndex; index >= 0; index--) {
+				const file = book.files[index]
+				await db.deleteFile(file.dbId)
+
+				await db.updateBook(book)
+				commit('BOOK_SET_PROGRESS', {
+					bookId: book._id,
+					progress: Math.round(((index + 1) / book.files.length) * 100),
+					progressFileIndex: index,
+				})
+			}
+			if (book.cover[0]) {
+				await db.deleteFile(book.coverDbId)
+			}
+			await db.deleteBook(book.id)
+			commit('DELETE_BOOK', bookId)
+		}
+	},
 }
 
 export const getters = {
-  isBookDownloaded: (state) => (bookId) => {
-    return !!state.books.find((book) => book._id === bookId)
-  },
-  getBook: (state) => (bookId) => {
-    return state.books.find((book) => book._id === bookId)
-  },
-  getBookDownloadProgress: (state) => (bookId) => {
-    return state.downloadProgress[bookId]
-  },
-  isBookDownloading: (state) => (bookId) => {
-    return typeof state.downloadProgress[bookId] !== 'undefined'
-  },
+	getBookOfflineState: (state) => (bookId) => {
+		const book = state.booksMap[bookId]
+		if (book && book.progress === 100) {
+			return BOOK_OFFLINE_STATE.complete
+		}
+		if (book) {
+			return BOOK_OFFLINE_STATE.partial
+		}
+
+		return BOOK_OFFLINE_STATE.notStarted
+	},
+	getBook: (state) => (bookId) => {
+		return state.booksMap[bookId]
+	},
+	getBookDownloadProgress: (state) => (bookId) => {
+		return state.booksMap[bookId] ? state.booksMap[bookId].progress : 0
+	},
+	isBookDownloading: (state) => (bookId) => {
+		return typeof state.activeDownloadsMap[bookId] !== 'undefined'
+	},
+	books: (state) => Object.values(state.booksMap),
 }
 export const offlineInitPlugin = async ({ commit }) => {
-  const books = await db.getBooks()
-  console.log('offlineInitPlugin:', books)
-  commit('offline/SET_BOOKS', books)
+	const books = await db.getBooks()
+	console.log('offlineInitPlugin:', books)
+	commit('offline/SET_BOOKS', books)
 }
