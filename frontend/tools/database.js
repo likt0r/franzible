@@ -74,8 +74,9 @@ export class Database extends Dexie {
 
 	// addBook adds a Book with the text passed in to the books object store.
 	// Returns a promise that resolves if the addition is successful.
-	addBook(book) {
+	async addBook(book) {
 		// add a Book by passing in an object using Table.add.
+		if (await this.isBookInDb(book._id)) return
 		return this.books.add(book)
 	}
 
@@ -91,9 +92,9 @@ export class Database extends Dexie {
 		return this.books.delete(bookId)
 	}
 
-	isBookInDb(bookId) {
+	async isBookInDb(bookId) {
 		console.log('isBookInDb', this.books)
-		return this.books.find((book) => book._id === bookId)
+		return !!(await this.books.get({ _id: bookId }))
 	}
 
 	deleteFile(fileId) {

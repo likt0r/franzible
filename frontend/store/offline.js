@@ -6,6 +6,7 @@ export const state = () => ({
 	activeDownloadsMap: {},
 })
 const db = getDatabase()
+const processMap = {}
 
 export const mutations = {
 	SET_BOOKS(state, books) {
@@ -15,14 +16,18 @@ export const mutations = {
 		}, {})
 	},
 	ADD_BOOK(state, book) {
-		Vue.set(state.booksMap, book._id, book)
+		Vue.set(state.booksMap, book._id, JSON.parse(JSON.stringify(book)))
 		state.booksMap = { ...state.booksMap }
 	},
-	BOOK_SET_PROGRESS(state, { bookId, progress, progressFileIndex }) {
+	BOOK_SET_PROGRESS(
+		state,
+		{ bookId, progress, progressFileIndex, fileIndex, dbId }
+	) {
 		const book = state.booksMap[bookId]
 		if (book) {
 			book.progressFileIndex = progressFileIndex
 			book.progress = progress
+			book.files[fileIndex].dbId = dbId
 		}
 		state.booksMap = { ...state.booksMap }
 		//TODO: throw Error
@@ -40,17 +45,21 @@ export const mutations = {
 }
 
 export const actions = {
-	async addBook({ commit, dispatch, state }, bookId) {
-		if (state.activeDownloadsMap[bookId]) {
+	async addBook({ commit, dispatch, getters }, bookId) {
+		if (getters.isBookDownloading[bookId]) {
 			console.warn(`Book ${bookId} is allready downloading.`)
 			return
 		}
 		// const book = state.booksMap[bookId]
-		const book = await dispatch('books/get', bookId, { root: true })
+		const book =
+			getters.getBook(bookId) ||
+			(await dispatch('books/get', bookId, { root: true }))
+
 		// Set start progress if not set
 		book.progress = book.progress || 0
 		book.progressFileIndex = book.progressFileIndex || 0
 		commit('START_DOWNLOAD', bookId)
+		processMap[bookId] = true
 		// download cover
 		if (book.cover[0]) {
 			const id = await db.downloadAndAddFile({
@@ -60,7 +69,7 @@ export const actions = {
 			book.coverDbId = id
 		}
 		await db.addBook(book)
-		commit('ADD_BOOK', book)
+		commit('ADD_BOOK', JSON.parse(JSON.stringify(book)))
 		for (
 			let index = book.progressFileIndex;
 			index < book.files.length;
@@ -72,13 +81,17 @@ export const actions = {
 			book.progressFileIndex = index
 
 			await db.updateBook(book)
-			commit('BOOK_SET_PROGRESS', {
-				bookId: book._id,
-				progress: Math.round(((index + 1) / book.files.length) * 100),
-				progressFileIndex: index,
-			})
+			commit('ADD_BOOK', JSON.parse(JSON.stringify(book)))
+			// check if download is still active if not stop
+			if (!processMap[bookId]) {
+				break
+			}
 		}
 
+		commit('FINISH_DOWNLOAD', bookId)
+	},
+	async pauseDownload({ commit }, bookId) {
+		processMap[bookId] = undefined
 		commit('FINISH_DOWNLOAD', bookId)
 	},
 	async deleteBook({ commit, state }, bookId) {
@@ -93,6 +106,7 @@ export const actions = {
 					bookId: book._id,
 					progress: Math.round(((index + 1) / book.files.length) * 100),
 					progressFileIndex: index,
+					fileIndex: index,
 				})
 			}
 			if (book.cover[0]) {
@@ -118,6 +132,8 @@ export const getters = {
 	},
 	getBook: (state) => (bookId) => {
 		return state.booksMap[bookId]
+			? JSON.parse(JSON.stringify(state.booksMap[bookId]))
+			: undefined
 	},
 	getBookDownloadProgress: (state) => (bookId) => {
 		return state.booksMap[bookId] ? state.booksMap[bookId].progress : 0

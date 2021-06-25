@@ -22,7 +22,13 @@
 					:value="getBookDownloadProgress(book._id)"
 					color="secondary"
 				>
-					<v-btn class="" fab small color="transparent">
+					<v-btn
+						class=""
+						fab
+						small
+						color="transparent"
+						@click.stop="toggleDownload"
+					>
 						<v-icon color="secondary">
 							{{
 								isBookDownloading(book._id) ? 'mdi-pause' : 'mdi-play'
@@ -112,7 +118,7 @@ export default {
 			console.log('Book clicked ', this.getBookOfflineState(this.book._id))
 
 			if (this.isBookDownloading(this.book._id)) {
-				console.log('offline/pauseDowload')
+				this.$store.dispatch('offline/pauseDownload', this.book._id)
 			} else {
 				console.log('offline/addBook')
 				this.$store.dispatch('offline/addBook', this.book._id)
@@ -150,6 +156,11 @@ export default {
 	width: 72px !important;
 	padding: 0;
 	display: flex;
+	pointer-events: none;
+}
+
+.layer button {
+	pointer-events: all;
 }
 /* .v-progress-circular__info .v-icon::before {
 	right: 7px !important;
