@@ -54,6 +54,7 @@ export const actions = {
         commit('SET_BOOK_DOWNLOAD_PROGRESS', {
           bookId,
           progress: Math.round(((index + 1) / book.files.length) * 100),
+          progressFileIndex: index,
         })
       }
 
