@@ -50,6 +50,7 @@ export const actions = {
 			console.warn(`Book ${bookId} is allready downloading.`)
 			return
 		}
+
 		// const book = state.booksMap[bookId]
 		const book =
 			getters.getBook(bookId) ||
@@ -58,39 +59,69 @@ export const actions = {
 		// Set start progress if not set
 		book.progress = book.progress || 0
 		book.progressFileIndex = book.progressFileIndex || 0
-		commit('START_DOWNLOAD', bookId)
-		processMap[bookId] = true
-		// download cover
-		if (book.cover[0]) {
-			const id = await db.downloadAndAddFile({
-				filepath: book.cover[0],
-				filename: `${book._id}-cover`,
-			})
-			book.coverDbId = id
-		}
-		await db.addBook(book)
-		commit('ADD_BOOK', JSON.parse(JSON.stringify(book)))
-		for (
-			let index = book.progressFileIndex;
-			index < book.files.length;
-			index++
-		) {
-			const file = book.files[index]
-			file.dbId = await db.downloadAndAddFile(file)
-			book.progress = Math.round(((index + 1) / book.files.length) * 100)
-			book.progressFileIndex = index
+		try {
+			commit('START_DOWNLOAD', bookId)
 
-			await db.updateBook(book)
+			const controller = new AbortController()
+			processMap[bookId] = controller
+			// download cover only if it is not all ready downloaded
+			if (book.cover[0] && !book.coverDbId) {
+				const id = await db.downloadAndAddFile(
+					{
+						filepath: book.cover[0],
+						filename: `${book._id}-cover`,
+					},
+					{ abortSignal: controller.signal }
+				)
+				book.coverDbId = id
+			}
+			await db.addBook(book)
 			commit('ADD_BOOK', JSON.parse(JSON.stringify(book)))
-			// check if download is still active if not stop
-			if (!processMap[bookId]) {
-				break
+			for (
+				let index = book.progressFileIndex;
+				index < book.files.length;
+				index++
+			) {
+				const file = book.files[index]
+				const controller = new AbortController()
+				processMap[bookId] = controller
+				console.log(`Download ${index}`, file.filename)
+				file.dbId = await db.downloadAndAddFile(file, {
+					abortSignal: controller.signal,
+				})
+				book.progress = Math.round(((index + 1) / book.files.length) * 100)
+				book.progressFileIndex = index
+
+				await db.updateBook(book)
+				commit('ADD_BOOK', JSON.parse(JSON.stringify(book)))
+				// check if download is still active if not stop
+				if (!processMap[bookId]) {
+					break
+				}
+			}
+		} catch (error) {
+			console.log(error.message, typeof error)
+			if (error.message === 'The user aborted a request.') {
+				// do nothing
+			} else if (error.message === 'Failed to fetch object') {
+				// do nothing
+				// TODO: Inform user connection breakdown
+			} else {
+				throw error
+			}
+		} finally {
+			commit('FINISH_DOWNLOAD', bookId)
+		}
+	},
+	pauseDownload({ commit }, bookId) {
+		// Abort controller is available call it
+		if (processMap[bookId]) {
+			try {
+				processMap[bookId].abort()
+			} catch (error) {
+				console.log(error)
 			}
 		}
-
-		commit('FINISH_DOWNLOAD', bookId)
-	},
-	async pauseDownload({ commit }, bookId) {
 		processMap[bookId] = undefined
 		commit('FINISH_DOWNLOAD', bookId)
 	},

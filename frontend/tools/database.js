@@ -103,8 +103,9 @@ export class Database extends Dexie {
 	}
 
 	// Download and store an file
-	async downloadAndAddFile({ filepath, filename }) {
-		const res = await fetch(getFullUrl(filepath))
+	async downloadAndAddFile({ filepath, filename }, { abortSignal }) {
+		const res = await fetch(getFullUrl(filepath), { signal: abortSignal })
+
 		const content = await res.blob()
 		// Store the binary data in indexedDB:
 		return await this.files.add({
