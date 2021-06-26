@@ -1,6 +1,8 @@
 import Vue from 'vue'
 import { getDatabase } from '~/tools/database'
 import { BOOK_OFFLINE_STATE, BOOK_OFFLINE_PROCESS_STATE } from '~/tools/consts'
+import { deepClone } from '~/tools/helper'
+
 export const state = () => ({
 	booksMap: {},
 	activeProcessMap: {},
@@ -16,7 +18,7 @@ export const mutations = {
 		}, {})
 	},
 	ADD_BOOK(state, book) {
-		Vue.set(state.booksMap, book._id, JSON.parse(JSON.stringify(book)))
+		Vue.set(state.booksMap, book._id, deepClone(book))
 		state.booksMap = { ...state.booksMap }
 	},
 	BOOK_SET_PROGRESS(
@@ -44,6 +46,7 @@ export const mutations = {
 		)
 	},
 	START_DELETING(state, bookId) {
+		console.log('start deletzing')
 		Vue.set(state.activeProcessMap, bookId, BOOK_OFFLINE_PROCESS_STATE.deleting)
 	},
 	FINISH_PROCESS(state, bookId) {
@@ -58,10 +61,12 @@ export const actions = {
 			return
 		}
 
-		// const book = state.booksMap[bookId]
-		const book =
+		// clone Object to prevent altering State
+
+		const book = deepClone(
 			getters.getBook(bookId) ||
-			(await dispatch('books/get', bookId, { root: true }))
+				(await dispatch('books/get', bookId, { root: true }))
+		)
 
 		// Set start progress if not set
 		book.progress = book.progress || 0
@@ -83,7 +88,7 @@ export const actions = {
 				book.coverDbId = id
 			}
 			await db.addBook(book)
-			commit('ADD_BOOK', JSON.parse(JSON.stringify(book)))
+			commit('ADD_BOOK', book)
 			for (
 				let index = book.progressFileIndex;
 				index < book.files.length;
@@ -100,7 +105,7 @@ export const actions = {
 				book.progressFileIndex = index
 
 				await db.updateBook(book)
-				commit('ADD_BOOK', JSON.parse(JSON.stringify(book)))
+				commit('ADD_BOOK', book)
 				// check if download is still active if not stop
 				if (!abortControllerMap[bookId]) {
 					break
@@ -175,9 +180,7 @@ export const getters = {
 		return BOOK_OFFLINE_STATE.notStarted
 	},
 	getBook: (state) => (bookId) => {
-		return state.booksMap[bookId]
-			? JSON.parse(JSON.stringify(state.booksMap[bookId]))
-			: undefined
+		return deepClone(state.booksMap[bookId])
 	},
 	getBookDownloadProgress: (state) => (bookId) => {
 		return state.booksMap[bookId] ? state.booksMap[bookId].progress : 0

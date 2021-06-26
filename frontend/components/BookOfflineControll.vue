@@ -22,6 +22,7 @@
 				color="secondary"
 			>
 				<v-btn
+					v-if="!isBookBeingDeleted(book._id)"
 					class=""
 					fab
 					small
@@ -48,7 +49,8 @@
 			<v-icon
 				v-if="
 					getBookOfflineState(book._id) !== BOOK_OFFLINE_STATE.notStarted &&
-					!isBookBeingDownloaded(book._id)
+					!isBookBeingDownloaded(book._id) &&
+					!isBookBeingDeleted(book._id)
 				"
 				small
 				@click.stop="deleteBook"
@@ -61,7 +63,6 @@
 import { mapGetters } from 'vuex'
 import OfflineImage from './OfflineImage.vue'
 import { getFullUrl } from '~/tools/url'
-import { getDatabase } from '~/tools/database'
 import { BOOK_OFFLINE_STATE } from '~/tools/consts'
 export default {
 	components: { OfflineImage },
@@ -84,6 +85,7 @@ export default {
 			getOfflineBook: 'offline/getBook',
 			getBookDownloadProgress: 'offline/getBookDownloadProgress',
 			isBookBeingDownloaded: 'offline/isBookBeingDownloaded',
+			isBookBeingDeleted: 'offline/isBookBeingDeleted',
 		}),
 	},
 
