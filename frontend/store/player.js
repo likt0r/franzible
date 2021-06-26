@@ -138,10 +138,12 @@ export const actions = {
 		getInstance().setSpeed(speed / 100)
 	},
 	pause() {
+		console.log('Action Pause')
 		getInstance().pause()
 	},
 
 	resume() {
+		console.log('Action REsume')
 		getInstance().resume()
 	},
 
