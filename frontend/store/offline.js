@@ -77,7 +77,7 @@ export const actions = {
 			const controller = new AbortController()
 			abortControllerMap[bookId] = controller
 			// download cover only if it is not all ready downloaded
-			if (book.cover[0] && !book.coverDbId) {
+			if (book.cover && book.cover[0] && !book.coverDbId) {
 				const id = await db.downloadAndAddFile(
 					{
 						filepath: book.cover[0],
@@ -155,7 +155,7 @@ export const actions = {
 						fileIndex: index,
 					})
 				}
-				if (book.cover[0]) {
+				if (book.cover && book.cover[0] && !book.coverDbId) {
 					await db.deleteFile(book.coverDbId)
 				}
 				await db.deleteBook(book.id)

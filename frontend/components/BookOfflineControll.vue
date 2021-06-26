@@ -3,8 +3,8 @@
 		<v-container class="layer">
 			<offline-image
 				:alt="`${book.title} cover image`"
-				:src="getFullUrl(this.book.cover)"
 				:dbId="this.book && book.coverDbId"
+				:src="this.book.cover ? getFullUrl(this.book.cover) : undefined"
 			>
 			</offline-image>
 		</v-container>
@@ -70,16 +70,47 @@
 				>{{ 'mdi-download' }}</v-icon
 			>
 
-			<v-icon
+			<v-dialog
+				v-model="dialog"
+				width="500"
 				v-if="
 					getBookOfflineState(book._id) !== BOOK_OFFLINE_STATE.notStarted &&
 					!isBookBeingDownloaded(book._id) &&
 					!isBookBeingDeleted(book._id)
 				"
-				small
-				@click.stop="deleteBook"
-				>{{ 'mdi-delete' }}</v-icon
 			>
+				<template v-slot:activator="{ on, attrs }">
+					<v-icon small v-bind="attrs" v-on="on">{{ 'mdi-delete' }}</v-icon>
+				</template>
+
+				<v-card>
+					<v-card-title> Delete {{ book.title }} </v-card-title>
+
+					<v-card-text>
+						Do you really want to delete {{ book.title }} from your offline
+						storage ?
+					</v-card-text>
+
+					<v-divider></v-divider>
+
+					<v-card-actions>
+						<v-spacer></v-spacer>
+						<v-btn color="secondary darken-1" text @click="dialog = false">
+							Close
+						</v-btn>
+						<v-btn
+							color="secondary"
+							text
+							@click="
+								dialog = false
+								deleteBook()
+							"
+						>
+							Delete
+						</v-btn>
+					</v-card-actions>
+				</v-card>
+			</v-dialog>
 		</v-container>
 	</v-list-item-avatar>
 </template>
@@ -98,6 +129,7 @@ export default {
 	},
 	data() {
 		return {
+			dialog: false,
 			coverUrl: '/icon.png',
 			BOOK_OFFLINE_STATE,
 		}
@@ -147,6 +179,7 @@ export default {
 	width: 72px !important;
 	border-radius: unset;
 	display: block !important;
+	background-color: rgb(19, 32, 42);
 }
 .layer {
 	position: absolute;
