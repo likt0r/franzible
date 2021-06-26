@@ -8,7 +8,30 @@
 			>
 			</offline-image>
 		</v-container>
-
+		<v-container class="layer">
+			<v-progress-circular
+				v-if="active"
+				class="activation_outer"
+				:rotate="-90"
+				:size="62"
+				:width="1"
+				indeterminate
+				color="accent"
+			>
+			</v-progress-circular>
+		</v-container>
+		<v-container class="layer">
+			<v-progress-circular
+				v-if="active"
+				class="activation_inner"
+				:rotate="-45"
+				:size="40"
+				:width="1"
+				indeterminate
+				color="accent"
+			>
+			</v-progress-circular>
+		</v-container>
 		<v-container class="layer">
 			<v-progress-circular
 				v-if="
@@ -16,7 +39,7 @@
 					getBookOfflineState(book._id) === BOOK_OFFLINE_STATE.partial
 				"
 				:rotate="-90"
-				:size="72"
+				:size="60"
 				:width="10"
 				:value="getBookDownloadProgress(book._id)"
 				color="secondary"
@@ -25,7 +48,7 @@
 					v-if="!isBookBeingDeleted(book._id)"
 					class=""
 					fab
-					small
+					large
 					color="transparent"
 					@click.stop="toggleDownload"
 				>
@@ -35,6 +58,7 @@
 						}}</v-icon
 					>
 				</v-btn>
+				<v-icon v-else color="primary"> mdi-delete </v-icon>
 			</v-progress-circular>
 		</v-container>
 
@@ -87,6 +111,12 @@ export default {
 			isBookBeingDownloaded: 'offline/isBookBeingDownloaded',
 			isBookBeingDeleted: 'offline/isBookBeingDeleted',
 		}),
+		active() {
+			return (
+				this.isBookBeingDownloaded(this.book._id) ||
+				this.isBookBeingDeleted(this.book._id)
+			)
+		},
 	},
 
 	methods: {
@@ -155,5 +185,17 @@ export default {
 	right: 0;
 	height: auto;
 	width: auto;
+}
+.v-progress-circular {
+	margin-top: 6px;
+	margin-left: 6px;
+}
+.v-progress-circular.activation_outer {
+	margin-top: 5px;
+	margin-left: 5px;
+}
+.v-progress-circular.activation_inner {
+	margin-top: 16px;
+	margin-left: 16px;
 }
 </style>
