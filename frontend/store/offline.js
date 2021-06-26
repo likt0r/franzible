@@ -115,9 +115,13 @@ export const actions = {
 			console.log(error.message, typeof error)
 			if (error.message === 'The user aborted a request.') {
 				// do nothing
-			} else if (error.message === 'Failed to fetch object') {
+			} else if (error.message === 'Failed to fetch') {
 				// do nothing
-				// TODO: Inform user connection breakdown
+				dispatch(
+					'messages/showError',
+					`No Internet connection abort downloading ${book.title}`,
+					{ root: true }
+				)
 			} else {
 				throw error
 			}

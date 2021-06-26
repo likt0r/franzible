@@ -30,9 +30,11 @@
 		"feathers-vuex": "^3.16.0",
 		"nuxt": "^2.15.3",
 		"nuxt-client-init-module": "^0.1.10",
+		"shortid": "^2.2.16",
 		"socket.io-client": "<3.0.0",
 		"vue-fragment": "^1.5.2",
-		"vue-marquee-text-component": "^1.2.0"
+		"vue-marquee-text-component": "^1.2.0",
+		"vuetify-snackbar-queue": "^2.3.1"
 	},
 	"devDependencies": {
 		"@nuxtjs/eslint-config": "^5.0.0",
