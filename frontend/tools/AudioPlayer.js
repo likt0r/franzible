@@ -94,14 +94,10 @@ class AudioPlayer {
 			this.elAudio.load()
 		}
 		this.elAudio.play().catch((error) => {
-			if (error.message === 'The element has no supported sources.') {
-				// update src to prevent stall on this file
-				// this.elAudio.src = `${this.currentSrc}#${Date.now()}`
-				// setTimeout(() => {
-				// 	this.elAudio.src = `${this.currentSrc}#${Date.now()}`
-				// }, 0)
+			// do nothing error is handled in media Event listeners
+			if (error) {
+				// Do nothing
 			}
-			// this.store.commit('player/SET_STATE', PLAYER_STATE_ENUM.error)
 		})
 	}
 
