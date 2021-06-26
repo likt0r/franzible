@@ -1,63 +1,6 @@
 <template>
 	<v-list-item>
-		<v-list-item-avatar tile>
-			<v-container class="layer">
-				<offline-image
-					:alt="`${book.title} cover image`"
-					:src="getFullUrl(this.book.cover)"
-					:dbId="this.book && book.coverDbId"
-				>
-				</offline-image>
-			</v-container>
-
-			<v-container class="layer">
-				<v-progress-circular
-					v-if="
-						isBookDownloading(book._id) ||
-						getBookOfflineState(book._id) === BOOK_OFFLINE_STATE.partial
-					"
-					:rotate="-90"
-					:size="72"
-					:width="10"
-					:value="getBookDownloadProgress(book._id)"
-					color="secondary"
-				>
-					<v-btn
-						class=""
-						fab
-						small
-						color="transparent"
-						@click.stop="toggleDownload"
-					>
-						<v-icon color="secondary">
-							{{
-								isBookDownloading(book._id) ? 'mdi-pause' : 'mdi-play'
-							}}</v-icon
-						>
-					</v-btn>
-				</v-progress-circular>
-			</v-container>
-
-			<v-container class="layer bar">
-				<v-icon
-					v-if="getBookOfflineState(book._id) === BOOK_OFFLINE_STATE.notStarted"
-					small
-					@click.stop="startDownload"
-					>{{ 'mdi-download' }}</v-icon
-				>
-
-				<v-icon
-					v-if="
-						getBookOfflineState(book._id) !== BOOK_OFFLINE_STATE.notStarted &&
-						!isBookDownloading(book._id)
-					"
-					small
-					@click.stop="deleteBook"
-					>{{ 'mdi-delete' }}</v-icon
-				>
-			</v-container>
-		</v-list-item-avatar>
-
+		<book-offline-controll :book="book" />
 		<v-list-item-content>
 			<v-list-item-title v-if="book.series.length > 0"
 				><v-chip
@@ -84,52 +27,24 @@
 <script>
 import { mapGetters } from 'vuex'
 import OfflineImage from './OfflineImage.vue'
+import BookOfflineControll from './BookOfflineControll.vue'
 import { getFullUrl } from '~/tools/url'
 import { getDatabase } from '~/tools/database'
 import { BOOK_OFFLINE_STATE } from '~/tools/consts'
 export default {
-	components: { OfflineImage },
+	components: { OfflineImage, BookOfflineControll },
 	props: {
 		book: {
 			type: Object,
 			default: () => {},
 		},
 	},
-	data() {
-		return {
-			coverUrl: '/icon.png',
-			BOOK_OFFLINE_STATE,
-		}
-	},
+	data() {},
 
-	computed: {
-		...mapGetters({
-			getBookOfflineState: 'offline/getBookOfflineState',
-			getOfflineBook: 'offline/getBook',
-			getBookDownloadProgress: 'offline/getBookDownloadProgress',
-			isBookDownloading: 'offline/isBookDownloading',
-		}),
-	},
+	computed: {},
 
 	methods: {
 		getFullUrl,
-
-		toggleDownload() {
-			console.log('Book clicked ', this.getBookOfflineState(this.book._id))
-
-			if (this.isBookDownloading(this.book._id)) {
-				this.$store.dispatch('offline/pauseDownload', this.book._id)
-			} else {
-				console.log('offline/addBook')
-				this.$store.dispatch('offline/addBook', this.book._id)
-			}
-		},
-		startDownload() {
-			this.$store.dispatch('offline/addBook', this.book._id)
-		},
-		deleteBook() {
-			this.$store.dispatch('offline/deleteBook', this.book._id)
-		},
 	},
 }
 </script>

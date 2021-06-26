@@ -1,12 +1,12 @@
 import Vue from 'vue'
 import { getDatabase } from '~/tools/database'
-import { BOOK_OFFLINE_STATE } from '~/tools/consts'
+import { BOOK_OFFLINE_STATE, BOOK_OFFLINE_PROCESS_STATE } from '~/tools/consts'
 export const state = () => ({
 	booksMap: {},
-	activeDownloadsMap: {},
+	activeProcessMap: {},
 })
 const db = getDatabase()
-const processMap = {}
+const abortControllerMap = {}
 
 export const mutations = {
 	SET_BOOKS(state, books) {
@@ -30,23 +30,30 @@ export const mutations = {
 			book.files[fileIndex].dbId = dbId
 		}
 		state.booksMap = { ...state.booksMap }
-		//TODO: throw Error
+		// TODO: throw Error if book is not found
 	},
 
 	DELETE_BOOK(state, bookId) {
 		Vue.set(state.booksMap, bookId, undefined)
 	},
 	START_DOWNLOAD(state, bookId) {
-		Vue.set(state.activeDownloadsMap, bookId, true)
+		Vue.set(
+			state.activeProcessMap,
+			bookId,
+			BOOK_OFFLINE_PROCESS_STATE.downloading
+		)
 	},
-	FINISH_DOWNLOAD(state, bookId) {
-		Vue.set(state.activeDownloadsMap, bookId, undefined)
+	START_DELETING(state, bookId) {
+		Vue.set(state.activeProcessMap, bookId, BOOK_OFFLINE_PROCESS_STATE.deleting)
+	},
+	FINISH_PROCESS(state, bookId) {
+		Vue.set(state.activeProcessMap, bookId, undefined)
 	},
 }
 
 export const actions = {
 	async addBook({ commit, dispatch, getters }, bookId) {
-		if (getters.isBookDownloading[bookId]) {
+		if (getters.isBookBeingDownloaded[bookId]) {
 			console.warn(`Book ${bookId} is allready downloading.`)
 			return
 		}
@@ -63,7 +70,7 @@ export const actions = {
 			commit('START_DOWNLOAD', bookId)
 
 			const controller = new AbortController()
-			processMap[bookId] = controller
+			abortControllerMap[bookId] = controller
 			// download cover only if it is not all ready downloaded
 			if (book.cover[0] && !book.coverDbId) {
 				const id = await db.downloadAndAddFile(
@@ -84,7 +91,7 @@ export const actions = {
 			) {
 				const file = book.files[index]
 				const controller = new AbortController()
-				processMap[bookId] = controller
+				abortControllerMap[bookId] = controller
 				console.log(`Download ${index}`, file.filename)
 				file.dbId = await db.downloadAndAddFile(file, {
 					abortSignal: controller.signal,
@@ -95,7 +102,7 @@ export const actions = {
 				await db.updateBook(book)
 				commit('ADD_BOOK', JSON.parse(JSON.stringify(book)))
 				// check if download is still active if not stop
-				if (!processMap[bookId]) {
+				if (!abortControllerMap[bookId]) {
 					break
 				}
 			}
@@ -110,41 +117,47 @@ export const actions = {
 				throw error
 			}
 		} finally {
-			commit('FINISH_DOWNLOAD', bookId)
+			commit('FINISH_PROCESS', bookId)
 		}
 	},
 	pauseDownload({ commit }, bookId) {
 		// Abort controller is available call it
-		if (processMap[bookId]) {
+		if (abortControllerMap[bookId]) {
 			try {
-				processMap[bookId].abort()
+				abortControllerMap[bookId].abort()
 			} catch (error) {
 				console.log(error)
 			}
 		}
-		processMap[bookId] = undefined
-		commit('FINISH_DOWNLOAD', bookId)
+		abortControllerMap[bookId] = undefined
 	},
 	async deleteBook({ commit, state }, bookId) {
 		const book = { ...state.booksMap[bookId] }
-		if (book) {
-			for (let index = book.progressFileIndex; index >= 0; index--) {
-				const file = book.files[index]
-				await db.deleteFile(file.dbId)
+		commit('START_DELETING', bookId)
+		try {
+			if (book) {
+				for (let index = book.progressFileIndex; index >= 0; index--) {
+					const file = book.files[index]
+					if (file.dbId) {
+						await db.deleteFile(file.dbId)
+					}
 
-				await db.updateBook(book)
-				commit('BOOK_SET_PROGRESS', {
-					bookId: book._id,
-					progress: Math.round(((index + 1) / book.files.length) * 100),
-					progressFileIndex: index,
-					fileIndex: index,
-				})
+					await db.updateBook(book)
+					commit('BOOK_SET_PROGRESS', {
+						bookId: book._id,
+						progress: Math.round(((index + 1) / book.files.length) * 100),
+						progressFileIndex: index,
+						fileIndex: index,
+					})
+				}
+				if (book.cover[0]) {
+					await db.deleteFile(book.coverDbId)
+				}
+				await db.deleteBook(book.id)
+				commit('DELETE_BOOK', bookId)
 			}
-			if (book.cover[0]) {
-				await db.deleteFile(book.coverDbId)
-			}
-			await db.deleteBook(book.id)
-			commit('DELETE_BOOK', bookId)
+		} finally {
+			commit('FINISH_PROCESS', bookId)
 		}
 	},
 }
@@ -169,8 +182,15 @@ export const getters = {
 	getBookDownloadProgress: (state) => (bookId) => {
 		return state.booksMap[bookId] ? state.booksMap[bookId].progress : 0
 	},
-	isBookDownloading: (state) => (bookId) => {
-		return typeof state.activeDownloadsMap[bookId] !== 'undefined'
+	isBookBeingDownloaded: (state) => (bookId) => {
+		return (
+			state.activeProcessMap[bookId] === BOOK_OFFLINE_PROCESS_STATE.downloading
+		)
+	},
+	isBookBeingDeleted: (state) => (bookId) => {
+		return (
+			state.activeProcessMap[bookId] === BOOK_OFFLINE_PROCESS_STATE.deleting
+		)
 	},
 	books: (state) => Object.values(state.booksMap),
 }

@@ -3,3 +3,8 @@ export const BOOK_OFFLINE_STATE = {
 	partial: 'partial',
 	complete: 'complete',
 }
+
+export const BOOK_OFFLINE_PROCESS_STATE = {
+	downloading: 'downloading',
+	deleting: 'deleting',
+}
