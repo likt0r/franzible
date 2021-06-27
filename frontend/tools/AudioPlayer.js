@@ -24,6 +24,7 @@ class AudioPlayer {
 		this.filePosition = 0
 		this.store = store
 		this.currentSrc = ''
+		// this state is needed for not showing loading animation if player preloading
 		this.simpleState = PLAYER_SIMPLE_STATE_ENUM.stopped
 
 		// Add all Media Listeners
@@ -142,6 +143,9 @@ class AudioPlayer {
 	}
 
 	seek(position) {
+		if (this.simpleState === PLAYER_SIMPLE_STATE_ENUM.playing) {
+			this.store.commit('player/SET_STATE', PLAYER_STATE_ENUM.loading)
+		}
 		this.elAudio.currentTime = position
 	}
 }
