@@ -1,7 +1,7 @@
 <template>
 	<v-list-item>
 		<book-offline-controll :book="book" />
-		<v-list-item-content>
+		<v-list-item-content @click.stop="gotoBook">
 			<v-list-item-title v-if="book.series.length > 0"
 				><v-chip
 					v-for="serie in book.series"
@@ -18,19 +18,16 @@
 		</v-list-item-content>
 
 		<v-list-item-action>
-			<v-btn icon :to="`/books/${book._id}`">
+			<v-btn icon @click="playBook">
 				<v-icon color="secondary">mdi-play</v-icon>
 			</v-btn>
 		</v-list-item-action>
 	</v-list-item>
 </template>
 <script>
-import { mapGetters } from 'vuex'
 import OfflineImage from './OfflineImage.vue'
 import BookOfflineControll from './BookOfflineControll.vue'
 import { getFullUrl } from '~/tools/url'
-import { getDatabase } from '~/tools/database'
-import { BOOK_OFFLINE_STATE } from '~/tools/consts'
 export default {
 	components: { OfflineImage, BookOfflineControll },
 	props: {
@@ -43,10 +40,53 @@ export default {
 		return {}
 	},
 
-	computed: {},
+	computed: {
+		activeBookId() {
+			return this.$store.getters['player/activeBookId']
+		},
+	},
 
 	methods: {
 		getFullUrl,
+		gotoBook() {
+			this.$router.push(`/books/${this.book._id}`)
+		},
+
+		async playBook() {
+			if (this.activeBookId !== this.bookId) {
+				await this.$store.dispatch('books/get', this.book._id, { root: true })
+
+				let response = await this.$store.dispatch('progress/find', {
+					query: { bookId: this.book._id },
+				})
+				console.log('#asyncData res', response)
+				if (response.length === 0) {
+					// progress does not exist create it
+					await this.$store.dispatch('progress/create', {
+						bookId: this.book._id,
+						fileIndex: 0,
+						filePosition: 0,
+					})
+					response = await this.$store.dispatch('progress/find', {
+						query: { bookId: this.book._id },
+					})
+					console.log('#asyncData res', response)
+				}
+				const progress = response[0]
+				console.log('#asyncData', progress)
+
+				await this.$store.dispatch('player/loadFile', {
+					bookId: this.book._id,
+					fileIndex: progress.fileIndex,
+					filePosition: progress.filePosition,
+					startPlaying: true,
+				})
+			} else if (this.playerIsPlaying || this.playerIsLoading) {
+				this.$store.dispatch('player/pause')
+			} else {
+				this.$store.dispatch('player/resume')
+			}
+		},
 	},
 }
 </script>
@@ -86,8 +126,9 @@ export default {
 .v-avatar .v-icon {
 	align-self: flex-end;
 }
-.v-list-item-content {
-	cursor: pointer;
+
+.v-list-item__content {
+	cursor: pointer !important;
 }
 /* .bar .v-icon.mdi::before {
 	position: absolute;

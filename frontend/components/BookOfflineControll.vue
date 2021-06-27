@@ -12,9 +12,9 @@
 			<v-progress-circular
 				v-if="active"
 				class="activation_outer"
-				:rotate="-90"
-				:size="62"
-				:width="1"
+				rotate="-90"
+				size="62"
+				width="1"
 				indeterminate
 				color="accent"
 			>
@@ -24,9 +24,9 @@
 			<v-progress-circular
 				v-if="active"
 				class="activation_inner"
-				:rotate="-45"
-				:size="40"
-				:width="1"
+				rotate="-45"
+				size="40"
+				width="1"
 				indeterminate
 				color="accent"
 			>
