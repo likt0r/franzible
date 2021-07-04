@@ -70,7 +70,7 @@ export default {
 			},
 		},
 		isSingleBookPage() {
-			return this.$nuxt.$route.name === 'books-id'
+			return this.$nuxt.$route.name.startsWith('books-id')
 		},
 	},
 	methods: {},

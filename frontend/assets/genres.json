@@ -1,0 +1,8 @@
+[
+	{ "value": "sci-fy", "label": "Science Fiction" },
+	{ "value": "fantasy", "label": "Fantasy" },
+	{ "value": "non-fiction", "label": "Non Fiction" },
+	{ "value": "children", "label": "Children Books" },
+	{ "value": "thriller", "label": "Thriller" },
+	{ "value": "classics", "label": "Classics" }
+]

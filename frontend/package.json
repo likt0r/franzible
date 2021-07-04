@@ -24,6 +24,7 @@
 		"@vue/composition-api": "0.6.7",
 		"cookie-storage": "^6.1.0",
 		"core-js": "^3.9.1",
+		"deep-equal": "^2.0.5",
 		"dexie": "^3.0.3",
 		"feathers": "^2.2.4",
 		"feathers-hooks-common": "^5.0.5",
@@ -34,6 +35,7 @@
 		"socket.io-client": "<3.0.0",
 		"vue-fragment": "^1.5.2",
 		"vue-marquee-text-component": "^1.2.0",
+		"vuedraggable": "^2.24.3",
 		"vuetify-snackbar-queue": "^2.3.1"
 	},
 	"devDependencies": {

@@ -16,9 +16,14 @@
 							:db-id="book && book.coverDbId"
 							contain
 						>
-							<v-overlay absolute :value="timerActiveState">
-								<h1>{{ timerDisplay(timerCurrentTime) }}</h1>
-							</v-overlay>
+							<fragment>
+								<v-overlay absolute :value="timerActiveState">
+									<h1>{{ timerDisplay(timerCurrentTime) }}</h1>
+								</v-overlay>
+								<v-btn class="edit" :to="`/books/${book._id}/edit`" fab>
+									<v-icon>mdi-square-edit-outline</v-icon>
+								</v-btn>
+							</fragment>
 						</offline-image>
 					</v-col>
 				</v-row>
@@ -148,8 +153,8 @@
 import { Fragment } from 'vue-fragment'
 import { makeGetMixin } from 'feathers-vuex'
 import { mapGetters, mapActions } from 'vuex'
-import { toMinutesAndSeconds } from '../../tools/formatTime'
-import { getFullUrl } from '../../tools/url'
+import { toMinutesAndSeconds } from '../../../tools/formatTime'
+import { getFullUrl } from '../../../tools/url'
 import PlayerBottomNavigation from '~/components/PlayerBottomNavigation.vue'
 import OfflineImage from '~/components/OfflineImage.vue'
 export default {
@@ -279,6 +284,9 @@ export default {
 		bookRemainingTime() {
 			return this.bookDuration - this.tillChapter - this.progress.filePosition
 		},
+		userIsAdmin() {
+			return this.$store.state.auth.user && this.$store.state.auth.user.isAdmin
+		},
 	},
 	watch: {
 		filePositionInSecs(value) {
@@ -351,5 +359,10 @@ export default {
 
 .v-btn--fab.v-size--default .v-icon {
 	font-size: 32px;
+}
+.edit {
+	position: absolute;
+	right: 0;
+	margin: 4px;
 }
 </style>

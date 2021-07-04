@@ -12,6 +12,9 @@
 		:srcset="srcset"
 		:transition="transition"
 	>
+		<template v-slot:default>
+			<slot />
+		</template>
 		<template v-slot:placeholder>
 			<v-icon large> mdi-book-open-variant</v-icon>
 		</template>
@@ -39,17 +42,17 @@ export default {
 		},
 		position: {
 			type: String,
-			default: 'center center',
+			default: () => 'center center',
 		},
 		sizes: String,
 		src: {
 			type: [String, Object],
-			default: '',
+			default: () => '',
 		},
 		srcset: String,
 		transition: {
 			type: [Boolean, String],
-			default: 'fade-transition',
+			default: () => 'fade-transition',
 		},
 	},
 	data() {
