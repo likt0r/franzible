@@ -16,29 +16,34 @@
 							v-model="bookCopy.title"
 							label="Name"
 							required
+							:error="bookCopy.title !== book.title"
 						></v-text-field>
 						<v-text-field
 							v-model="bookCopy.author"
 							label="Author"
 							required
+							:error="bookCopy.author !== book.author"
 						></v-text-field>
 						<v-select
 							v-model="bookCopy.type"
 							:items="types.map((el) => el.value)"
 							label="Type"
 							required
+							:error="bookCopy.type !== book.type"
 						></v-select>
 						<v-select
 							v-model="bookCopy.language"
 							:items="languages.map((el) => el.value)"
 							label="Language"
 							required
+							:error="bookCopy.language !== book.language"
 						></v-select>
 						<v-select
 							v-model="bookCopy.genre"
 							:items="genres.map((el) => el.value)"
 							label="Genre"
 							required
+							:error="bookCopy.genre !== book.genre"
 						></v-select>
 					</v-col>
 					<v-col class="d-flex child-flex" cols="12" sm="6">
@@ -46,6 +51,7 @@
 							v-model="bookCopy.cover"
 							label="Cover"
 							:max-height="350"
+							:error="coverChanged"
 						/>
 					</v-col>
 				</v-row>
@@ -55,10 +61,15 @@
 							v-model="bookCopy.series"
 							label="Series"
 							addLabel="Series"
+							:error="seriesChanged"
 						/>
 					</v-col>
 					<v-col class="d-flex child-flex" cols="12">
-						<FilesUploadTable v-model="bookCopy.files" label="Files" />
+						<FilesUploadTable
+							v-model="bookCopy.files"
+							label="Files"
+							:error="true"
+						/>
 					</v-col>
 				</v-row>
 			</v-form>
@@ -127,6 +138,18 @@ export default {
 		bookChanged() {
 			return !deepEqual(this.book, this.bookCopy)
 		},
+		filesChanged() {
+			return !deepEqual(
+				this.book.files,
+				this.bookCopy ? this.bookCopy.files : []
+			)
+		},
+		seriesChanged() {
+			return !deepEqual(this.book.series, this.bookCopy.series)
+		},
+		coverChanged() {
+			return !deepEqual(this.book.cover, this.bookCopy.cover)
+		},
 	},
 	watch: {
 		book(val) {
@@ -146,14 +169,31 @@ export default {
 	},
 }
 </script>
-<style scoped>
+<style>
 .bottom-spacer {
 	padding-bottom: 82px;
+	padding-top: 82px;
 }
+
 .v-toolbar {
 	position: fixed;
 	bottom: 0px;
 	left: 0;
 	right: 0;
+}
+.v-application .error--text,
+.tag-cloud.error--text .v-card__title,
+.cover-upload.v-image.error--text,
+.cover-upload.v-image.error--text .v-card__title,
+.v-application .v-input.error--text,
+.v-application .v-label.error--text,
+.v-application .v-icon.error--text {
+	color: #ffc107 !important;
+	caret-color: #ffc107 !important;
+	border-color: #ffc107 !important;
+}
+
+.cover-upload.v-image.error--text {
+	border: 2px solid !important;
 }
 </style>

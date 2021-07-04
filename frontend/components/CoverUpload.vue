@@ -1,7 +1,7 @@
 <template>
 	<v-img
 		:src="value && value.length > 0 ? getFullUrl(value[0]) : ''"
-		class="white--text align-end"
+		:class="`cover-upload white--text align-end ${error ? ' error--text' : ''}`"
 		gradient="to bottom, rgba(0,0,0,.1), rgba(0,0,0,.5)"
 		aspect-ratio="1"
 		contain
@@ -31,6 +31,9 @@ export default {
 		},
 		maxHeight: {
 			type: Number,
+		},
+		error: {
+			type: Boolean,
 		},
 	},
 	data: () => {

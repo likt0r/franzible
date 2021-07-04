@@ -1,5 +1,12 @@
 <template>
-	<v-card class="mx-auto pa-0" elevation="0" flat color="transparent">
+	<v-card
+		:class="`tag-cloud mx-auto ${error ? ' error--text pa-2' : ''}`"
+		elevation="0"
+		flat
+		tile
+		outlined
+		color="transparent"
+	>
 		<v-card-title v-if="label" class="pa-0">
 			{{ label }}
 		</v-card-title>
@@ -47,6 +54,9 @@ export default {
 			type: String,
 		},
 		addLabel: { type: String },
+		error: {
+			type: Boolean,
+		},
 	},
 	data: () => {
 		return {

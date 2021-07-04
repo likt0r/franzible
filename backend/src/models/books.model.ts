@@ -23,6 +23,10 @@ export default function (app: Application): Model<any> {
       series: [String],
       files: [{ filepath: String, filename: String, duration: Number }],
       cover: [String],
+      genre: { type: String },
+      language: { type: String },
+      type: { type: String },
+
     },
     {
       timestamps: true,
