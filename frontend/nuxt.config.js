@@ -101,7 +101,14 @@ export default {
 	],
 
 	// PWA module configuration: https://go.nuxtjs.dev/pwa
+
 	pwa: {
+		workbox: {
+			offlineStrategy: 'CacheFirst',
+			offline: true,
+
+			dev: process.env.NODE_ENV !== 'production',
+		},
 		manifest: {
 			short_name: 'Franzible',
 			name: 'Franzible',
