@@ -1,13 +1,5 @@
 <template>
 	<fragment>
-		<!-- author: { type: String },
-      title: { type: String },
-      series: [String],
-      files: [{ filepath: String, filename: String, duration: Number }],
-      cover: [String],
-      genre: { type: String },
-      language: { type: String },
-      type: { type: String }, -->
 		<v-container class="bottom-spacer">
 			<v-form v-if="bookCopy" ref="form" fill-height>
 				<v-row>
@@ -75,7 +67,12 @@
 			</v-form>
 		</v-container>
 		<v-toolbar dense fixed dark>
-			<v-btn color="success" class="mx-2" :disabled="!bookChanged">
+			<v-btn
+				color="success"
+				class="mx-2"
+				:disabled="!bookChanged"
+				@click="save"
+			>
 				Save Changes <v-icon right> mdi-cloud-upload-outline </v-icon></v-btn
 			>
 			<v-btn
@@ -160,11 +157,16 @@ export default {
 		if (this.book) {
 			this.bookCopy = JSON.parse(JSON.stringify(this.book))
 		}
+
 		console.log(this.$route.name)
 	},
 	methods: {
+		...mapActions('books', ['update']),
 		reset() {
 			this.bookCopy = JSON.parse(JSON.stringify(this.book))
+		},
+		save() {
+			this.update([this.book._id, this.bookCopy, {}])
 		},
 	},
 }

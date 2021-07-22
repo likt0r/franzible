@@ -122,9 +122,12 @@ export const actions = {
 				navigator.mediaSession.setActionHandler('pause', function () {
 					dispatch('pause')
 				})
-				navigator.mediaSession.setActionHandler('seekbackward', function () {
-					dispatch('fastRewind')
-				})
+				navigator.mediaSession.setActionHandler(
+					'seekbackward',
+					function () {
+						dispatch('fastRewind')
+					}
+				)
 				// navigator.mediaSession.setActionHandler('seekforward', function () {})
 				// navigator.mediaSession.setActionHandler('previoustrack', function () {})
 				// navigator.mediaSession.setActionHandler('nexttrack', function () {})
@@ -152,7 +155,10 @@ export const actions = {
 		if (state.filePosition + state.fastStep < file.duration) {
 			getInstance().seek(state.filePosition + state.fastStep)
 		} else {
-			dispatch('skipNext', state.filePosition + state.fastStep - file.duration)
+			dispatch(
+				'skipNext',
+				state.filePosition + state.fastStep - file.duration
+			)
 		}
 	},
 

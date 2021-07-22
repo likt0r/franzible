@@ -13,11 +13,15 @@
 				<draggable :list="value" tag="tbody">
 					<tr v-for="(file, index) in value" :key="file._id">
 						<td>
-							<v-icon small class="page__grab-icon"> mdi-arrow-all </v-icon>
+							<v-icon small class="page__grab-icon">
+								mdi-arrow-all
+							</v-icon>
 						</td>
 						<td>{{ file.filename }}</td>
 						<td>
-							<v-icon small @click="remove(file._id)"> mdi-delete </v-icon>
+							<v-icon small @click="remove(file._id)">
+								mdi-delete
+							</v-icon>
 						</td>
 					</tr>
 				</draggable>

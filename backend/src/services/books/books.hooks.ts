@@ -3,7 +3,8 @@ import { disallow } from 'feathers-hooks-common'
 import { hooks } from '@feathersjs/authentication'
 import { HookContext } from '@feathersjs/feathers'
 // import createDelay from '../../hooks/create-delay'
-
+import isAdmin from '../../hooks/is-admin'
+import saveBookToJson from '../../hooks/save-book-to-json'
 const { authenticate } = hooks
 
 export default {
@@ -11,10 +12,10 @@ export default {
     all: [authenticate('jwt')],
     find: [],
     get: [],
-    create: [disallow('external')],
-    update: [disallow('external')],
-    patch: [disallow('external')],
-    remove: [disallow('external')],
+    create: [ authenticate('jwt'),isAdmin() ],
+    update: [ authenticate('jwt'),isAdmin() ],
+    patch: [ disallow],
+    remove: [ authenticate('jwt'),isAdmin() ],
   },
 
   after: {
@@ -25,12 +26,11 @@ export default {
         delete context.result.author_fuzzy
         delete context.result.title_fuzzy
         delete context.result.series_fuzzy
-        console.log(context.result)
         return context
       },
     ],
     create: [],
-    update: [],
+    update: [saveBookToJson()],
     patch: [],
     remove: [],
   },

@@ -59,9 +59,7 @@ export class Media implements ServiceMethods<Data> {
 
         const title = splits[splits.length - 1]
         console.log('Books ', title)
-        await Books.updateOne(
-          { author, title },
-          {
+        const data = {
             author,
             title,
             series: splits.splice(0, splits.length - 1),
@@ -70,9 +68,15 @@ export class Media implements ServiceMethods<Data> {
               imageFiles.length > 0
                 ? path.join('files', author, book, imageFiles[0])
                 : null,
-          },
+            mediaPath,
+          }
+        await Books.updateOne(
+          { author, title },
+          data,
           { upsert: true }
         )
+        // add Data File
+
       }
     }
     return []

@@ -15,57 +15,58 @@ let socket
 let restClient
 // We won't use socket to comunicate from server to server
 if (process.client) {
-  socket = io(apiSocket, {
-    transports: ['websocket'],
-    path: '/api.socket.io',
-  })
+	socket = io(apiSocket, {
+		transports: ['websocket'],
+		path: '/api.socket.io',
+	})
 } else {
-  restClient = rest(apiUrl)
+	restClient = rest(apiUrl)
 }
 const transport = process.client
-  ? socketio(socket, { timeout: 60000 })
-  : restClient.axios(axios)
+	? socketio(socket, { timeout: 60000 })
+	: restClient.axios(axios)
 const storage = new CookieStorage({
-  path: '/',
-  sameSite: 'Strict',
+	path: '/',
+	sameSite: 'Strict',
 })
 
 const feathersClient = feathers()
-  .configure(transport)
-  .configure(auth({ storage }))
-  .hooks({
-    before: {
-      all: [
-        iff(
-          (context) => ['create', 'update', 'patch'].includes(context.method),
-          discard('__id', '__isTemp')
-        ),
-      ],
-    },
-  })
+	.configure(transport)
+	.configure(auth({ storage }))
+	.hooks({
+		before: {
+			all: [
+				iff(
+					(context) =>
+						['create', 'update', 'patch'].includes(context.method),
+					discard('__id', '__isTemp')
+				),
+			],
+		},
+	})
 
 export default feathersClient
 
 // Setting up feathers-vuex
 const {
-  makeServicePlugin,
-  makeAuthPlugin,
-  BaseModel,
-  models,
-  FeathersVuex,
+	makeServicePlugin,
+	makeAuthPlugin,
+	BaseModel,
+	models,
+	FeathersVuex,
 } = feathersVuex(feathersClient, {
-  serverAlias: 'api', // optional for working with multiple APIs (this is the default value)
-  idField: '_id', // Must match the id field in your database table/collection
-  whitelist: ['$regex', '$options'],
-  enableEvents: process.client, // Prevent memory leak
+	serverAlias: 'api', // optional for working with multiple APIs (this is the default value)
+	idField: '_id', // Must match the id field in your database table/collection
+	whitelist: ['$regex', '$options'],
+	enableEvents: process.client, // Prevent memory leak
 })
 
 export {
-  makeAuthPlugin,
-  makeServicePlugin,
-  BaseModel,
-  models,
-  FeathersVuex,
-  initAuth,
-  hydrateApi,
+	makeAuthPlugin,
+	makeServicePlugin,
+	BaseModel,
+	models,
+	FeathersVuex,
+	initAuth,
+	hydrateApi,
 }

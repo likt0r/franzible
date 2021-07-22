@@ -26,6 +26,7 @@ export default function (app: Application): Model<any> {
       genre: { type: String },
       language: { type: String },
       type: { type: String },
+      mediaPath: {type: String}
 
     },
     {

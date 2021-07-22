@@ -47,7 +47,11 @@ export const mutations = {
 	},
 	START_DELETING(state, bookId) {
 		console.log('start deletzing')
-		Vue.set(state.activeProcessMap, bookId, BOOK_OFFLINE_PROCESS_STATE.deleting)
+		Vue.set(
+			state.activeProcessMap,
+			bookId,
+			BOOK_OFFLINE_PROCESS_STATE.deleting
+		)
 	},
 	FINISH_PROCESS(state, bookId) {
 		Vue.set(state.activeProcessMap, bookId, undefined)
@@ -191,7 +195,8 @@ export const getters = {
 	},
 	isBookBeingDownloaded: (state) => (bookId) => {
 		return (
-			state.activeProcessMap[bookId] === BOOK_OFFLINE_PROCESS_STATE.downloading
+			state.activeProcessMap[bookId] ===
+			BOOK_OFFLINE_PROCESS_STATE.downloading
 		)
 	},
 	isBookBeingDeleted: (state) => (bookId) => {

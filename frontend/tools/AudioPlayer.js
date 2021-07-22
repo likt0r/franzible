@@ -85,7 +85,12 @@ class AudioPlayer {
 		})
 	}
 
-	async loadAudioBook({ audioUrl, audioDbId, filePosition = 0, startPlaying }) {
+	async loadAudioBook({
+		audioUrl,
+		audioDbId,
+		filePosition = 0,
+		startPlaying,
+	}) {
 		console.log('#load AudioBook')
 		if (audioDbId) {
 			if (this.elAudio.src && this.elAudio.src.startsWith('blob:')) {
