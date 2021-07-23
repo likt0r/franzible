@@ -37,7 +37,7 @@ services:
       - $FRANZIBLE_MEDIA_PATH:/mnt/media
 
   franzible_mongo-db:
-    image: mongo:latest
+    image: mongo:4.4
     restart: unless-stopped
     volumes:
       - $FRANZIBLE_DB_FOLDER:/data/db
