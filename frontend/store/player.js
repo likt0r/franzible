@@ -69,6 +69,7 @@ export const actions = {
 				filePosition,
 				progressId,
 			})
+
 			getInstance().loadAudioBook({
 				audioUrl: getFullUrl(book.files[fileIndex].filepath),
 				audioDbId: book.files[fileIndex].dbId,
@@ -83,31 +84,6 @@ export const actions = {
 					artist: `Kapitel ${fileIndex + 1}/${book.files.length}`,
 					// album:
 					artwork: [
-						// {
-						//   src: 'https://dummyimage.com/96x96',
-						//   sizes: '96x96',
-						//   type: 'image/png',
-						// },
-						// {
-						//   src: 'https://dummyimage.com/128x128',
-						//   sizes: '128x128',
-						//   type: 'image/png',
-						// },
-						// {
-						//   src: 'https://dummyimage.com/192x192',
-						//   sizes: '192x192',
-						//   type: 'image/png',
-						// },
-						// {
-						//   src: 'https://dummyimage.com/256x256',
-						//   sizes: '256x256',
-						//   type: 'image/png',
-						// },
-						// {
-						//   src: 'https://dummyimage.com/384x384',
-						//   sizes: '384x384',
-						//   type: 'image/png',
-						// },
 						{
 							src: getFullUrl(state.book.cover[0] || '/logo.png'),
 							sizes: '512x512',

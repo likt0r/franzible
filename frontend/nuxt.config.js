@@ -26,7 +26,7 @@ export default {
 		API_SOCKET: '/',
 	},
 	router: {
-		middleware: ['feathers'],
+		middleware: ['secured'],
 	},
 
 	// Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
@@ -109,19 +109,19 @@ export default {
 
 			dev: process.env.NODE_ENV !== 'production',
 		},
-		manifest: {
-			short_name: 'Franzible',
-			name: 'Franzible',
-			start_url: '/',
-			display: 'standalone',
-			orientation: 'portrait',
-			background_color: '#000',
-			description: 'Franzible Zeit für Hörbücher',
-			lang: 'de',
-			theme_color: '#189AB4',
-		},
 	},
 
+	manifest: {
+		short_name: 'Franzible',
+		name: 'Franzible',
+		start_url: '/',
+		display: 'standalone',
+		orientation: 'portrait',
+		background_color: '#000',
+		description: 'Franzible Zeit für Hörbücher',
+		lang: 'de',
+		theme_color: '#189AB4',
+	},
 	// Vuetify module configuration: https://go.nuxtjs.dev/config-vuetify
 	vuetify: {
 		customVariables: ['~/assets/variables.scss'],

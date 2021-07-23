@@ -68,6 +68,7 @@
 export default {
 	layout: 'default',
 	transition: 'slide-left',
+
 	data() {
 		return {
 			updating: false,
@@ -85,7 +86,9 @@ export default {
 			rules: {
 				required: (value) => !!value || 'Required.',
 				min: (v) =>
-					(v && (v.length >= 8 || v.length === 0)) || !v || 'Min 8 characters',
+					(v && (v.length >= 8 || v.length === 0)) ||
+					!v ||
+					'Min 8 characters',
 			},
 		}
 	},

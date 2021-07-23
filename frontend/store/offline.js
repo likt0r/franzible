@@ -46,7 +46,7 @@ export const mutations = {
 		)
 	},
 	START_DELETING(state, bookId) {
-		console.log('start deletzing')
+		console.log('start deleting')
 		Vue.set(
 			state.activeProcessMap,
 			bookId,

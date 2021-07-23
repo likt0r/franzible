@@ -11,7 +11,7 @@ import {
 const auth = makeAuthPlugin({
 	userService: 'users',
 	state: {
-		publicPages: ['login', 'signup'],
+		publicPages: ['login', 'library'],
 	},
 	actions: {
 		onInitAuth({ state, dispatch }, payload) {

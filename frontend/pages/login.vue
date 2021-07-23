@@ -30,7 +30,10 @@
 					</v-card-text>
 					<v-card-actions>
 						<v-spacer></v-spacer>
-						<v-btn color="#13202a" :loading="authenticating" @click="login"
+						<v-btn
+							color="#13202a"
+							:loading="authenticating"
+							@click="login"
 							>Login</v-btn
 						>
 					</v-card-actions>
@@ -42,7 +45,7 @@
 
 <script>
 export default {
-	layout: 'full',
+	layout: 'default',
 	data() {
 		return {
 			loginData: {
@@ -55,12 +58,11 @@ export default {
 	},
 	methods: {
 		async login() {
-			console.log('loginData', this.loginData)
 			this.authenticating = true
 			try {
 				await this.$store.dispatch('auth/authenticate', this.loginData)
 				this.authenticating = false
-				this.$router.push('/')
+				this.$router.push(this.$route.query.to || '/')
 			} catch (error) {
 				this.authenticating = false
 				console.log('Error', error)

@@ -9,7 +9,7 @@
 		<v-list>
 			<v-img contain style="background-color: #000" src="/logo.png"></v-img>
 			<v-list-item
-				v-for="item in menu"
+				v-for="item in filteredMenu"
 				:key="item.title"
 				router
 				exact
@@ -56,6 +56,12 @@
 <script>
 import { Fragment } from 'vue-fragment'
 import { version } from '~/package.json'
+
+const SHOW_IN = {
+	always: 'always',
+	loggedIn: 'loggedIn',
+	loggedOut: 'loggedOut',
+}
 export default {
 	components: { Fragment },
 	data() {
@@ -66,21 +72,31 @@ export default {
 					icon: 'mdi-account-outline',
 					title: 'Account',
 					to: '/account',
+					show: SHOW_IN.loggedIn,
 				},
 				{
 					icon: 'mdi-magnify',
 					title: 'Search',
 					to: '/',
+					show: SHOW_IN.loggedIn,
 				},
 				{
 					icon: 'mdi-book-open-page-variant-outline',
 					title: 'Libary',
 					to: '/libary',
+					show: SHOW_IN.always,
 				},
 				{
-					icon: 'mdi-exit-to-app',
+					icon: 'mdi-logout',
 					title: 'Logout',
 					click: this.logout,
+					show: SHOW_IN.loggedIn,
+				},
+				{
+					icon: 'mdi-login',
+					title: 'Login',
+					to: '/login',
+					show: SHOW_IN.loggedOut,
 				},
 			],
 			adminMenu: [
@@ -94,7 +110,9 @@ export default {
 	},
 	computed: {
 		userIsAdmin() {
-			return this.$store.state.auth.user && this.$store.state.auth.user.isAdmin
+			return (
+				this.$store.state.auth.user && this.$store.state.auth.user.isAdmin
+			)
 		},
 		showNavigationDrawer: {
 			get() {
@@ -103,6 +121,23 @@ export default {
 			set(val) {
 				this.$store.dispatch('setShowNavigationDrawer', val)
 			},
+		},
+
+		filteredMenu() {
+			if (
+				!this.$store.state.auth.payload &&
+				!this.$store.state.auth.accessToken
+			) {
+				return this.menu.filter(
+					(el) =>
+						el.show === SHOW_IN.loggedOut || el.show === SHOW_IN.always
+				)
+			} else {
+				return this.menu.filter(
+					(el) =>
+						el.show === SHOW_IN.loggedIn || el.show === SHOW_IN.always
+				)
+			}
 		},
 	},
 	methods: {
