@@ -82,8 +82,8 @@ export default {
 				},
 				{
 					icon: 'mdi-book-open-page-variant-outline',
-					title: 'Libary',
-					to: '/libary',
+					title: 'Library',
+					to: '/library',
 					show: SHOW_IN.always,
 				},
 				{

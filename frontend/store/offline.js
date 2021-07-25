@@ -21,7 +21,7 @@ export const mutations = {
 		Vue.set(state.booksMap, book._id, deepClone(book))
 		state.booksMap = { ...state.booksMap }
 	},
-	BOOK_SET_PROGRESS(
+	BOOK_SET_OFFLINE_PROGRESS(
 		state,
 		{ bookId, progress, progressFileIndex, fileIndex, dbId }
 	) {
@@ -156,7 +156,7 @@ export const actions = {
 					}
 
 					await db.updateBook(book)
-					commit('BOOK_SET_PROGRESS', {
+					commit('BOOK_SET_OFFLINE_PROGRESS', {
 						bookId: book._id,
 						progress: Math.round(((index + 1) / book.files.length) * 100),
 						progressFileIndex: index,

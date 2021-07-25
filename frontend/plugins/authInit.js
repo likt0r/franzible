@@ -3,18 +3,11 @@ import { CookieStorage } from 'cookie-storage'
 
 const cookieStorage = new CookieStorage()
 const cookie = cookieStorage.getItem('feathers-jwt') !== null
-const hashTokenAvailable = window.location.hash.indexOf('access_token' > -1)
+const hashTokenAvailable = window.location.hash.includes('access_token')
 
+// If there is a cookie set re authenticate
 export default async (context) => {
 	if ((!context.app.store.state.auth.user && cookie) || hashTokenAvailable) {
-		console.log('Authenticating', context.app.store.state.auth.user)
-		await context.app.store
-			.dispatch('auth/authenticate')
-			.then(() => {
-				console.log('Authenticated', context.app.store.state.auth.user)
-			})
-			.catch((e) => {
-				console.error(e)
-			})
+		await context.app.store.dispatch('auth/reAuthenticate')
 	}
 }
