@@ -26,7 +26,7 @@ export default {
 		API_SOCKET: '/',
 	},
 	router: {
-		middleware: ['secured'],
+		middleware: ['secured', 'fetchProgress'],
 	},
 
 	// Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins

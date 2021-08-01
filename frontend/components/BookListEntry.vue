@@ -54,26 +54,17 @@ export default {
 
 		async playBook() {
 			if (this.activeBookId !== this.bookId) {
-				await this.$store.dispatch('books/get', this.book._id, { root: true })
-
-				let response = await this.$store.dispatch('progress/find', {
-					query: { bookId: this.book._id },
+				await this.$store.dispatch('books/get', this.book._id, {
+					root: true,
 				})
-				console.log('#asyncData res', response)
-				if (response.length === 0) {
+				if (!this.$store.getters['progress/getProgress'](this.bookId)) {
 					// progress does not exist create it
-					await this.$store.dispatch('progress/create', {
-						bookId: this.book._id,
-						fileIndex: 0,
-						filePosition: 0,
-					})
-					response = await this.$store.dispatch('progress/find', {
-						query: { bookId: this.book._id },
-					})
-					console.log('#asyncData res', response)
+					await this.$store.dispatch('progress/create', this.bookId)
 				}
-				const progress = response[0]
-				console.log('#asyncData', progress)
+
+				const progress = this.$store.getters['progress/getProgress'](
+					this.bookId
+				)
 
 				await this.$store.dispatch('player/loadFile', {
 					bookId: this.book._id,

@@ -1,14 +1,7 @@
 <template>
 	<v-container class="fill-height" style="background-color: black">
 		<transition name="fade">
-			<v-row v-if="isGetBookPending && !book" justify="center" class="pa-0">
-				<v-col xs="12" sm="8" md="8" lg="5" xl="4">
-					<v-skeleton-loader
-						type="image, image, card-heading, actions, actions"
-					></v-skeleton-loader> </v-col
-			></v-row>
-
-			<fragment v-else>
+			<fragment>
 				<v-row justify="center" class="pa-0">
 					<v-col xs="12" sm="8" md="8" lg="5" xl="4" class="pa-0">
 						<offline-image
@@ -58,7 +51,9 @@
 									>
 
 									<v-col class="text-right pt-0 pb-0" :cols="3"
-										>-{{ toMinutesAndSeconds(fileRemainingTime) }}</v-col
+										>-{{
+											toMinutesAndSeconds(fileRemainingTime)
+										}}</v-col
 									>
 								</v-row>
 							</v-card-text>
@@ -84,7 +79,9 @@
 									dark
 									@click.stop="fastRewind"
 								>
-									<v-icon color="secondary" medium>mdi-rewind-30</v-icon>
+									<v-icon color="secondary" medium
+										>mdi-rewind-30</v-icon
+									>
 								</v-btn>
 
 								<v-btn
@@ -123,7 +120,9 @@
 									dark
 									@click.stop="fastForward"
 								>
-									<v-icon medium color="secondary">mdi-fast-forward-30</v-icon>
+									<v-icon medium color="secondary"
+										>mdi-fast-forward-30</v-icon
+									>
 								</v-btn>
 
 								<v-btn
@@ -151,7 +150,6 @@
 
 <script>
 import { Fragment } from 'vue-fragment'
-import { makeGetMixin } from 'feathers-vuex'
 import { mapGetters, mapActions } from 'vuex'
 import { toMinutesAndSeconds } from '../../../tools/formatTime'
 import { getFullUrl } from '../../../tools/url'
@@ -164,43 +162,22 @@ export default {
 		Fragment,
 		OfflineImage,
 	},
-	mixins: [
-		makeGetMixin({
-			service: 'books', // depending on service
-			id() {
-				return this.$route.params.id
-			},
-		}),
-		makeGetMixin({
-			service: 'progress', // depending on service
-			id() {
-				return this.rprogressId
-			},
-		}),
-	],
+	mixins: [],
 	layout: 'default',
 	transition: 'slide-left',
 
 	async asyncData({ params, store }) {
-		let response = await store.dispatch('progress/find', {
-			query: { bookId: params.id },
-		})
-		console.log('#asyncData res', response)
-		if (response.length === 0) {
+		const bookId = params.id
+		console.log(bookId)
+		console.log(store.getters['progress/getProgress'](bookId))
+		if (!store.getters['progress/getProgress'](bookId)) {
 			// progress does not exist create it
-			await store.dispatch('progress/create', {
-				bookId: params.id,
-				fileIndex: 0,
-				filePosition: 0,
-			})
-			response = await store.dispatch('progress/find', {
-				query: { bookId: params.id },
-			})
-			console.log('#asyncData res', response)
+			await store.dispatch('progress/create', params.id)
 		}
-		const progress = response[0]
-		console.log('#asyncData', progress)
-		return { rprogressId: progress._id }
+
+		await store.dispatch('book/request', bookId)
+
+		return { bookId }
 	},
 
 	data() {
@@ -211,6 +188,12 @@ export default {
 	},
 	computed: {
 		...mapGetters(['fileListState']),
+		progress() {
+			return this.$store.getters['progress/getProgress'](this.bookId)
+		},
+		book() {
+			return this.$store.getters['book/getBook'](this.bookId)
+		},
 		imageWidth() {
 			switch (this.$vuetify.breakpoint.name) {
 				case 'xs':
@@ -254,7 +237,7 @@ export default {
 		filePositionInSecs() {
 			return this.activeBookId === this.bookId
 				? this.$store.getters['player/filePositionInSecs']
-				: this.progress.filePosition
+				: 0 //his.progress.filePosition
 		},
 		fileDuration() {
 			return this.activeBookId === this.bookId
@@ -282,10 +265,15 @@ export default {
 			}
 		},
 		bookRemainingTime() {
-			return this.bookDuration - this.tillChapter - this.progress.filePosition
+			// return (
+			// 	this.bookDuration - this.tillChapter - this.progress.filePosition
+			// )
+			return 0
 		},
 		userIsAdmin() {
-			return this.$store.state.auth.user && this.$store.state.auth.user.isAdmin
+			return (
+				this.$store.state.auth.user && this.$store.state.auth.user.isAdmin
+			)
 		},
 	},
 	watch: {
@@ -314,7 +302,7 @@ export default {
 				this.$store.dispatch('player/loadFile', {
 					bookId: this.bookId,
 					fileIndex: this.progress.fileIndex,
-					filePosition: this.progress.filePosition,
+					filePosition: 0, // this.progress.filePosition,
 					startPlaying: true,
 				})
 			} else if (this.playerIsPlaying || this.playerIsLoading) {

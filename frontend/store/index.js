@@ -2,7 +2,7 @@
 import { playerInitPlugin } from './player'
 import { timerInitPlugin } from './timer'
 import { offlineInitPlugin } from './offline'
-
+import { plugin as progressPlugin } from './progress'
 export const state = () => ({
 	fileListState: false,
 	searchTerm: '',
@@ -135,4 +135,9 @@ export const getters = {
 	},
 }
 
-export const plugins = [playerInitPlugin, timerInitPlugin, offlineInitPlugin]
+export const plugins = [
+	playerInitPlugin,
+	timerInitPlugin,
+	offlineInitPlugin,
+	progressPlugin,
+]

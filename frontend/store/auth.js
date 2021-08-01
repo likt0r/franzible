@@ -4,6 +4,7 @@ export const state = () => ({
 	accessToken: null,
 	user: null,
 	publicPages: ['login', 'library'],
+	loggedIn: false,
 })
 
 export const mutations = {
@@ -11,6 +12,12 @@ export const mutations = {
 		state.payload = authentication.payload
 		state.accessToken = authentication.accessToken
 		state.user = user
+	},
+	LOGGED_IN(state) {
+		state.loggedIn = true
+	},
+	LOGGED_OUT(state) {
+		state.loggedIn = false
 	},
 }
 
@@ -22,12 +29,12 @@ export const actions = {
 			password,
 		})
 		commit('SET_AUTHENTICATION', result)
-		console.log(result)
+		commit('LOGGED_IN')
 	},
 	async reAuthenticate({ commit }) {
 		const result = await feathersClient.reAuthenticate()
 		commit('SET_AUTHENTICATION', result)
-		console.log(result)
+		commit('LOGGED_IN')
 	},
 
 	async logout({ commit }) {
@@ -36,9 +43,12 @@ export const actions = {
 			authentication: { payload: null, accessToken: null },
 			user: null,
 		})
+		commit('LOGGED_OUT')
 	},
 }
 
-export const getters = {}
+export const getters = {
+	isLoggedIn: (state) => !!state.payload,
+}
 
 export const plugins = []
