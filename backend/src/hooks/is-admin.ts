@@ -4,14 +4,14 @@ import { Hook, HookContext } from '@feathersjs/feathers'
 import { Forbidden } from '@feathersjs/errors'
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export default (options = {}): Hook => {
-  return async (context: HookContext): Promise<HookContext> => {
-    const { user, query } = context.params
-    if (user && user.isAdmin) {
-      return context
-    } else {
-      // check if query for email is set
-      if (!(query && query.email)) throw new Forbidden()
-    }
-    return context
-  }
+	return async (context: HookContext): Promise<HookContext> => {
+		const { user, query } = context.params
+		if (user && user.isAdmin) {
+			return context
+		} else {
+			// check if query for email is set
+			if (!(query && query.email)) throw new Forbidden()
+		}
+		return context
+	}
 }

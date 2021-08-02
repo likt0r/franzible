@@ -11,7 +11,7 @@ export const mutations = {
 	},
 }
 export const actions = {
-	async request({ commit, state, rootState, rootGetters }, bookId) {
+	async get({ commit, state, rootState, rootGetters }, bookId) {
 		if (state.bookMap[bookId] || rootGetters['offline/getBook'](bookId)) {
 			// update in background to improve snappinest
 			feathersClient

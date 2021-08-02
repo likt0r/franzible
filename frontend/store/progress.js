@@ -1,23 +1,42 @@
-import feathers from 'feathers'
 import Vue from 'vue'
-import { feathersClient } from '~/plugins/feathers'
 import { deepClone } from '~/tools/helper'
-
+import { feathersClient } from '~/plugins/feathers'
 export const state = () => ({
 	progressMap: {},
 	isSynced: false,
+	lastPlayed: { bookId: null, updatedAt: new Date(0).toISOString() },
 })
 
 export const mutations = {
 	SET_PROGRESS(state, progress) {
 		Vue.set(state.progressMap, progress.bookId, progress)
+		if (state.lastPlayed.updatedAt < progress.updatedAt) {
+			// silent update of last played updateAt value
+			state.lastPlayed.updatedAt = progress.updatedAt
+			if (state.lastPlayed.bookId !== progress.bookId) {
+				state.lastPlayed.bookId = progress.bookId
+				// update getters and watchers
+				state.lastPlayed = { ...state.lastPlayed }
+			}
+		}
 	},
-	PATCH_PROGRESS(state, { bookId, fileIndex, filePosition }) {
+	PATCH_PROGRESS(
+		state,
+		{ bookId, fileIndex, filePosition, updatedAt = new Date().toISOString() }
+	) {
 		if (state.progressMap[bookId]) {
 			state.progressMap[bookId].fileIndex = fileIndex
 			state.progressMap[bookId].filePosition = filePosition
-			state.progressMap[bookId].updatedAt = new Date().toISOString()
+			state.progressMap[bookId].updatedAt = updatedAt
 			// Vue.set(state.progressMap, bookId, {... state.progressMap[bookId]})
+			if (Date.parse(state.lastPlayed.updatedAt) < Date.parse(updatedAt)) {
+				state.lastPlayed.updatedAt = updatedAt
+				if (state.lastPlayed.bookId !== bookId) {
+					state.lastPlayed.bookId = bookId
+					// update getters and watchers
+					//state.lastPlayed = { ...state.lastPlayed }
+				}
+			}
 		} else {
 			throw new Error(`Could not patch progress for bookid ${bookId}`)
 		}
@@ -54,20 +73,24 @@ export const actions = {
 		})
 		commit('SET_SYNCED_STATE', true)
 	},
-	async create({ commit, state }, bookId) {
-		await feathersClient.service('progress').create({
-			bookId,
-			fileIndex: 0,
-			filePosition: 0,
-		})
+	async create({ commit }, bookId) {
+		const result = await feathersClient
+			.service('progress')
+			.create({ bookId, fileIndex: 0, filePosition: 0 })
+		commit('SET_PROGRESS', result)
+		return result
 	},
-	async patch({ commit, state }, { bookId, fileIndex, filePosition }) {
+	async patch(
+		{ commit, state },
+		{ bookId, fileIndex, filePosition, updatedAt }
+	) {
 		commit('PATCH_PROGRESS', { bookId, fileIndex, filePosition })
 		const { _id } = state.progressMap[bookId]
-		console.log('_id' + _id)
+
 		feathersClient.service('progress').patch(_id, {
 			fileIndex,
 			filePosition,
+			updatedAt,
 		})
 	},
 }
@@ -76,6 +99,7 @@ export const getters = {
 		return deepClone(state.progressMap[bookId])
 	},
 	isSynced: (state) => state.isSynced,
+	lastPlayedBookId: (state) => state.lastPlayed.bookId,
 }
 
 export const plugin = (store) => {

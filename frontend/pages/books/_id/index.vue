@@ -168,6 +168,7 @@ export default {
 
 	async asyncData({ params, store }) {
 		const bookId = params.id
+
 		console.log(bookId)
 		console.log(store.getters['progress/getProgress'](bookId))
 		if (!store.getters['progress/getProgress'](bookId)) {
@@ -175,7 +176,7 @@ export default {
 			await store.dispatch('progress/create', params.id)
 		}
 
-		await store.dispatch('book/request', bookId)
+		await store.dispatch('book/get', bookId)
 
 		return { bookId }
 	},

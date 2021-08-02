@@ -87,7 +87,8 @@
 										>User: {{ editedItem.email }}</v-card-title
 									>
 									<v-card-text class="headline"
-										>Are you sure you want to delete this user?</v-card-text
+										>Are you sure you want to delete this
+										user?</v-card-text
 									>
 									<v-card-actions>
 										<v-spacer></v-spacer>
@@ -120,11 +121,9 @@
 </template>
 
 <script>
-import { makeFindMixin } from 'feathers-vuex'
 import { getFullUrl } from '~/tools/url'
 
 export default {
-	mixins: [makeFindMixin({ service: 'users' })],
 	layout: 'default',
 	middleware: 'admin',
 	data: () => {

@@ -1,6 +1,6 @@
 <template>
 	<v-app-bar
-		v-if="!isFindProgressPending && (lastBookId || bookId)"
+		v-if="lastBookId"
 		bottom
 		fixed
 		dark
@@ -55,7 +55,6 @@
 
 <script>
 import MarqueeText from 'vue-marquee-text-component'
-import { makeFindMixin, makeGetMixin } from 'feathers-vuex'
 import OfflineImage from './OfflineImage.vue'
 import { getFullUrl } from '~/tools/url'
 import { toMinutesAndSeconds } from '~/tools/formatTime'
@@ -65,15 +64,7 @@ export default {
 		MarqueeText,
 		OfflineImage,
 	},
-	mixins: [
-		makeFindMixin({ service: 'progress' }),
-		makeGetMixin({
-			service: 'books', // depending on service
-			id() {
-				return this.playerBookId || this.lastBookId
-			},
-		}),
-	],
+	mixins: [],
 	data() {
 		return {}
 	},
@@ -86,23 +77,26 @@ export default {
 		author() {
 			return '53min 43s verbleibend'
 		},
-		progressParams() {
-			return { query: {} } // Step 3
-		},
+
 		playerBookId() {
 			return this.$store.getters['player/activeBookId']
 		},
 		lastProgress() {
-			return this.progress && this.progress.length > 0
-				? [...this.progress]
-						.filter((p) => p.played)
-						.sort((a, b) =>
-							Math.sign(Date.parse(b.updatedAt) - Date.parse(a.updatedAt))
-						)[0]
+			return this.$store.getters['progress/lastPlayedBookId']
+				? this.$store.getters['progress/getProgress'](
+						this.$store.getters['progress/lastPlayedBookId']
+				  )
 				: null
 		},
 		lastBookId() {
-			return this.lastProgress ? this.lastProgress.bookId : null
+			return this.$store.getters['progress/lastPlayedBookId']
+		},
+		book() {
+			return this.$store.getters['progress/lastPlayedBookId']
+				? this.$store.getters['book/getBook'](
+						this.$store.getters['progress/lastPlayedBookId']
+				  )
+				: null
 		},
 
 		bookCoverUrl() {
@@ -128,7 +122,9 @@ export default {
 		},
 		bookRemainingTime() {
 			return (
-				this.bookDuration - this.tillChapter - this.lastProgress.filePosition
+				this.bookDuration -
+				this.tillChapter -
+				this.lastProgress.filePosition
 			)
 		},
 		playerIsPlaying() {
@@ -138,8 +134,16 @@ export default {
 			return this.$store.getters['player/isLoading']
 		},
 	},
+	beforeMount() {
+		if (this.lastBookId) {
+			this.$store.dispatch('book/get', this.lastBookId)
+		}
+	},
 
 	watch: {
+		lastBookId(newId) {
+			this.$store.dispatch('book/get', newId)
+		},
 		book(newval) {
 			// if player is empty load last played book into it
 			if (newval && !this.playerBookId && this.lastProgress) {
@@ -161,7 +165,7 @@ export default {
 	},
 	methods: {
 		gotoBook() {
-			this.$router.push(`/books/${this.bookId}`)
+			this.$router.push(`/books/${this.playerBookId}`)
 		},
 		toMinutesAndSeconds,
 		getFullUrl,

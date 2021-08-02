@@ -69,7 +69,7 @@ export const actions = {
 
 		const book = deepClone(
 			getters.getBook(bookId) ||
-				(await dispatch('books/get', bookId, { root: true }))
+				(await dispatch('book/get', bookId, { root: true }))
 		)
 
 		// Set start progress if not set

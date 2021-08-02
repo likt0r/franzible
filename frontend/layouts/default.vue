@@ -38,7 +38,7 @@
 				</div>
 			</template>
 		</v-navigation-drawer>
-		<!-- <small-player v-if="!isSingleBookPage" /> -->
+		<small-player v-if="!isSingleBookPage" />
 	</v-app>
 </template>
 

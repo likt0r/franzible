@@ -47,7 +47,7 @@ export const actions = {
 		{ bookId, fileIndex, filePosition = 0, startPlaying = false }
 	) {
 		if (state.bookId !== bookId || state.fileIndex !== fileIndex) {
-			await dispatch('book/request', bookId, { root: true })
+			await dispatch('book/get', bookId, { root: true })
 			const book = rootGetters['book/getBook'](bookId)
 			if (!book) {
 				throw new Error('Book not found with id', bookId)
@@ -231,12 +231,19 @@ export const playerInitPlugin = (store) => {
 				'player/SET_FILE_POSTION',
 			].includes(mutation.type)
 		) {
-			console.log('update position')
-			store.dispatch('progress/patch', {
-				bookId: state.player.bookId,
-				fileIndex: state.player.fileIndex,
-				filePosition: state.player.filePosition,
-			})
+			console.log(
+				'update position',
+				!!store.getters['progress/getProgress'](state.player.bookId)
+			)
+			if (store.getters['progress/getProgress'](state.player.bookId)) {
+				store.dispatch('progress/patch', {
+					bookId: state.player.bookId,
+					fileIndex: state.player.fileIndex,
+					filePosition: state.player.filePosition,
+				})
+			} else {
+				store.dispatch('progress/create', state.player.bookId)
+			}
 		}
 	})
 }

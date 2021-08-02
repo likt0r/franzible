@@ -54,7 +54,7 @@ export default {
 
 		async playBook() {
 			if (this.activeBookId !== this.bookId) {
-				await this.$store.dispatch('books/get', this.book._id, {
+				await this.$store.dispatch('book/get', this.book._id, {
 					root: true,
 				})
 				if (!this.$store.getters['progress/getProgress'](this.bookId)) {

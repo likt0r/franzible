@@ -2,10 +2,11 @@
 //
 // See http://mongoosejs.com/docs/models.html
 // for more of what you can do here.
-import { Application, MongooseFuzzySearchingField } from '../declarations'
+import { Application } from '../declarations'
+import { MongooseFuzzySearchingField } from 'mongoose-fuzzy-searching/helpers'
 import fuzzySearching from 'mongoose-fuzzy-searching'
 import { Model, Mongoose } from 'mongoose'
-
+import { mongoosePlugin as timeStamp } from '../tools/timeStamps'
 const fields: MongooseFuzzySearchingField<any>[] = [
 	{ name: 'author' },
 	{ name: 'title' },
@@ -32,7 +33,7 @@ export default function (app: Application): Model<any> {
 		}
 	)
 	schema.plugin(fuzzySearching, { fields })
-
+	schema.plugin(timeStamp)
 	// This is necessary to avoid model compilation errors in watch mode
 	// see https://mongoosejs.com/docs/api/connection.html#connection_Connection-deleteModel
 	if (mongooseClient.modelNames().includes(modelName)) {
