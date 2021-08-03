@@ -126,6 +126,10 @@ import { getFullUrl } from '~/tools/url'
 export default {
 	layout: 'default',
 	middleware: 'admin',
+	async asyncData(context) {
+		console.log('users', context)
+		return {}
+	},
 	data: () => {
 		return {
 			loading: false,
