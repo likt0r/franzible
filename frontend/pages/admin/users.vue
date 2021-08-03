@@ -126,9 +126,9 @@ import { getFullUrl } from '~/tools/url'
 export default {
 	layout: 'default',
 	middleware: 'admin',
-	async asyncData(context) {
-		console.log('users', context)
-		return {}
+	async asyncData({ $feathers }) {
+		const users = await $feathers.service('users').find()
+		return { users }
 	},
 	data: () => {
 		return {
@@ -208,13 +208,10 @@ export default {
 			console.log('closeDelete')
 			this.loading = true
 			try {
-				await this.$store.dispatch('users/remove', this.editedItem._id)
+				await this.$feathers.service('users').remove(this.editedItem._id)
+				this.users = await this.$feathers.service('users').find()
 				this.loading = false
 				this.dialogDelete = false
-				this.$nextTick(() => {
-					this.editedItem = Object.assign({}, this.defaultItem)
-					this.editedIndex = -1
-				})
 			} catch (error) {
 				this.loading = false
 			}
@@ -227,13 +224,13 @@ export default {
 					delete this.editedItem.password
 				}
 				console.log('patch item', this.editedItem)
-				await this.$store.dispatch('users/patch', [
-					this.editedItem._id,
-					this.editedItem,
-				])
+				await this.$feathers
+					.service('users')
+					.patch(this.editedItem._id, this.editedItem)
 			} else {
-				await this.$store.dispatch('users/create', this.editedItem)
+				await this.$feathers.service('users').create(this.editedItem)
 			}
+			this.users = await this.$feathers.service('users').find()
 			this.loading = false
 			this.close()
 		},

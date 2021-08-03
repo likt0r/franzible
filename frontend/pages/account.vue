@@ -23,7 +23,7 @@
 									<v-text-field
 										v-model="user.password"
 										:append-icon="show1 ? 'mdi-eye' : 'mdi-eye-off'"
-										:rules="[rules.min]"
+										:rules="[rules.min, passwordMatch]"
 										:type="show1 ? 'text' : 'password'"
 										name="input-10-1"
 										label="Password"
@@ -89,12 +89,14 @@ export default {
 					(v && (v.length >= 8 || v.length === 0)) ||
 					!v ||
 					'Min 8 characters',
+				match: (v) => v === this.user.retyped || 'Password must match',
 			},
 		}
 	},
 	computed: {
 		passwordMatch() {
-			return () => this.password === this.verify || 'Password must match'
+			return (v) =>
+				this.user.password === this.user.retyped || 'Password must match'
 		},
 	},
 	mounted() {
@@ -117,10 +119,11 @@ export default {
 				delete this.user.password
 			}
 			this.updating = true
-			await this.$store.dispatch('users/patch', [
-				this.$store.state.auth.user._id,
-				this.user,
-			])
+			await this.$store.dispatch(
+				'auth/patchUser',
+
+				this.user
+			)
 			this.updating = false
 		},
 		reset() {

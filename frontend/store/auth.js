@@ -8,6 +8,9 @@ export const state = () => ({
 })
 
 export const mutations = {
+	SET_USER(state, user) {
+		state.user = user
+	},
 	SET_AUTHENTICATION(state, { authentication, user }) {
 		state.payload = authentication.payload
 		state.accessToken = authentication.accessToken
@@ -44,6 +47,13 @@ export const actions = {
 			user: null,
 		})
 		commit('LOGGED_OUT')
+	},
+
+	async patchUser({ commit, state }, { email, password, retyped }) {
+		const result = await feathersClient
+			.service('users')
+			.patch(state.user._id, { email, password, retyped })
+		console.log(result)
 	},
 }
 
