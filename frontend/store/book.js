@@ -16,17 +16,17 @@ export const actions = {
 			// update in background to improve snappinest
 			feathersClient
 				.service('books')
-				.get(state.bookMap[bookId])
+				.get(bookId)
 				.then((result) => commit('SET_BOOK', result))
+			return state.bookMap[bookId]
 		} else {
 			// get Book from Server
 			console.log('request book', bookId)
-			const book = await feathersClient
-				.service('books')
-				.get('' + bookId.toString())
+			const book = await feathersClient.service('books').get('' + bookId)
 
 			console.log('request book', book)
 			commit('SET_BOOK', book)
+			return book
 		}
 	},
 }

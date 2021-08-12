@@ -5,34 +5,41 @@ export default function factory(
 	serviceName,
 	moduleName,
 	feathersClient,
-	{ idField = 'id', syncAll }
+	options
 ) {
+	const { idField, syncAll } = Object.assign(
+		{ idField: '_id', syncAll: true },
+		options
+	)
 	return {
 		state: {
-			documentMap: {},
+			documentsMap: {},
 			isSynced: false,
 			operationsBuffer: [],
 		},
 		mutations: {
-			CREATE(state, doc) {
-				Vue.set(state.documentMap, doc[idField], doc)
+			CREATE(state, { id, doc }) {
+				console.log('progress/CREATE mutation', { id, doc })
+				Vue.set(state.documentsMap, id, doc)
 			},
-			PATCH(state, id, doc) {
-				if (!state.documentMap[id]) {
+			PATCH(state, { id, doc }) {
+				console.log('progress/PATCH mutation ', { id, doc })
+				if (!state.documentsMap[id]) {
 					throw new Error(
 						`Could not patch doc for id ${id} on service ${serviceName}`
 					)
 				}
 				// prevent changing id
 				delete doc[idField]
+
 				Vue.set(
-					state.documentMap,
+					state.documentsMap,
 					id,
-					Object.merge({}, state.documentMap[id], doc)
+					Object.assign({}, state.documentsMap[id], doc)
 				)
 			},
 			REMOVE(state, id) {
-				delete state.documentMap[id]
+				delete state.documentsMap[id]
 			},
 			SET_SYNCED_STATE(state, value) {
 				state.isSynced = value
@@ -90,37 +97,44 @@ export default function factory(
 		actions: {
 			async sync({ commit, state, rootState }) {
 				// TODO: optimise request only get updated progress
-				console.log('Get all user progress:')
+				console.log(`Get all: ${serviceName}`, rootState.auth.user)
 				const result = await feathersClient
-					.service('progress')
+					.service(serviceName)
 					.find({ userId: rootState.auth.user._id })
-				console.log('All user progress:', result)
+				console.log(`All : ${serviceName}`, result)
 
-				result.forEach((bookProgress) => {
-					const localProgress = state.progressMap[bookProgress.bookId]
-					if (
-						!localProgress ||
-						Date.parse(localProgress.updatedAt) <
-							Date.parse(bookProgress.updatedAt)
+				result.forEach((doc) => {
+					const id = doc[idField]
+					const localDoc = state.documentsMap[id]
+					if (!localDoc) {
+						commit('CREATE', { id, doc })
+					} else if (
+						Date.parse(localDoc.updatedAt) < Date.parse(doc.updatedAt)
 					) {
-						commit('SET_PROGRESS', bookProgress)
+						console.log(`${serviceName} sync patch theirs`, doc)
+						commit('PATCH', { id, doc })
 					} else {
-						// if check if incoming is newer
-						const { fileIndex, filePosition, played } = bookProgress
-						feathersClient.service('progress').patch(bookProgress._id, {
-							fileIndex,
-							filePosition,
-						})
+						// if ours  is newer send to them
+						console.log(`${serviceName} sync patch ours`, localDoc)
+						feathersClient
+							.service(serviceName)
+							.patch(doc[idField], localDoc)
 					}
 				})
 				commit('SET_SYNCED_STATE', true)
 			},
 			async create({ commit }, doc) {
+				console.log(`${serviceName}/create `, doc)
 				try {
+					if (!doc.createdAt) {
+						doc.createdAt = new Date().toISOString()
+						doc.updatedAt = doc.createdAt
+					}
 					const result = await feathersClient
-						.service('progress')
+						.service(serviceName)
 						.create(doc)
-					commit('SET_PROGRESS', result)
+					console.log(`${serviceName}/create result`, result)
+					commit('CREATE', { id: result[idField], doc: result })
 					return result
 				} catch (error) {
 					console.warn('create error', error)
@@ -132,16 +146,18 @@ export default function factory(
 						id: doc[idField],
 						doc,
 					})
-					commit('SET_PROGRESS', doc)
+					commit('CREATE', { id: doc[idField], doc })
 					return doc
 				}
 			},
 			async patch({ commit }, { id, doc }) {
 				try {
+					console.log(`/${moduleName}/patch action id, doc`, { id, doc })
 					const result = await feathersClient
-						.service('progress')
+						.service(serviceName)
 						.patch(id, doc)
-					commit('PATCH_PROGRESS', id, result)
+					console.log(`/${moduleName}/patch action id, result`, result)
+					commit('PATCH', { id, doc: result })
 					return result
 				} catch (error) {
 					console.warn('patch error', error)
@@ -151,14 +167,14 @@ export default function factory(
 						id,
 						doc,
 					})
-					commit('PATCH_PROGRESS', id, doc)
+					commit('PATCH', { id, doc })
 					return doc
 				}
 			},
 			async remove({ commit }, id) {
 				try {
 					const result = await feathersClient
-						.service('progress')
+						.service(serviceName)
 						.remove(id)
 					commit('REMOVE', id)
 				} catch (error) {
@@ -172,40 +188,41 @@ export default function factory(
 			},
 		},
 		getters: {
-			gets: (state) => (id) => deepClone(state.documentMap[id]),
+			get: (state) => (id) => deepClone(state.documentsMap[id]),
 			isSynced: (state) => state.isSynced,
 		},
 		plugin: (store) => {
 			feathersClient.service(serviceName).on('created', (doc) => {
-				console.log(`${moduleName} created`, doc)
-				store.commit(`${moduleName}/create`, doc)
+				console.log(`${moduleName} service event created`, doc)
+				store.commit(`${moduleName}/CREATE`, { id: doc[idField], doc })
 			})
 			feathersClient.service(serviceName).on('patched', (doc) => {
-				console.log(`${moduleName} patched`, doc)
-				store.commit(`${moduleName}/patch`, doc)
+				console.log(`${moduleName} service event patched`, doc)
+				store.commit(`${moduleName}/PATCH`, { id: doc[idField], doc })
 			})
 			feathersClient.service(serviceName).on('removed', (doc) => {
-				console.log(`${moduleName} removed`, doc)
-				store.commit(`${moduleName}/remove`, doc[idField])
+				console.log(`${moduleName} service event removed`, doc)
+				store.commit(`${moduleName}/REMOVE`, doc[idField])
 			})
 
 			feathersClient.io.on('connect', () => {
 				console.log('#socketIO: connected')
-				if (feathersClient.authentication.authenticated) {
-					store.dispatch(`${moduleName}/sync`)
-				}
+				// if (feathersClient.authentication.authenticated) {
+				// 	store.dispatch(`${moduleName}/sync`)
+				// }
 			})
 
 			feathersClient.io.on('disconnect', () => {
-				console.log('#socketIO: connected')
-				if (feathersClient.authentication.authenticated) {
-					store.dispatch(`${moduleName}/sync`)
-				}
+				console.log(
+					'#socketIO: disconnected',
+					feathersClient.authentication
+				)
 			})
 
-			feathersClient.authentication.app.on('authenticated', () =>
-				store.dispatch(`${moduleName}/sync`)
-			)
+			feathersClient.authentication.app.on('authenticated', () => {
+				// Wait for state updating
+				setImmediate(() => store.dispatch(`${moduleName}/sync`))
+			})
 			store.subscribe((mutation, state) => {
 				// called after every mutation.
 				// The mutation comes in the format of `{ type, payload }`.

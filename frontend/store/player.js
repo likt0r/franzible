@@ -233,16 +233,16 @@ export const playerInitPlugin = (store) => {
 		) {
 			console.log(
 				'update position',
-				!!store.getters['progress/getProgress'](state.player.bookId)
+				!!store.getters['progress/getByBookId'](state.player.bookId)
 			)
-			if (store.getters['progress/getProgress'](state.player.bookId)) {
-				store.dispatch('progress/patch', {
+			if (store.getters['progress/getByBookId'](state.player.bookId)) {
+				store.dispatch('progress/patchByBookId', {
 					bookId: state.player.bookId,
 					fileIndex: state.player.fileIndex,
 					filePosition: state.player.filePosition,
 				})
 			} else {
-				store.dispatch('progress/create', state.player.bookId)
+				store.dispatch('progress/createByBookId', state.player.bookId)
 			}
 		}
 	})

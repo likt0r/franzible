@@ -170,10 +170,10 @@ export default {
 		const bookId = params.id
 
 		console.log(bookId)
-		console.log(store.getters['progress/getProgress'](bookId))
-		if (!store.getters['progress/getProgress'](bookId)) {
+		console.log(store.getters['progress/getByBookId'](bookId))
+		if (!store.getters['progress/getByBookId'](bookId)) {
 			// progress does not exist create it
-			await store.dispatch('progress/create', params.id)
+			await store.dispatch('progress/createByBookId', params.id)
 		}
 
 		await store.dispatch('book/get', bookId)
@@ -190,7 +190,7 @@ export default {
 	computed: {
 		...mapGetters(['fileListState']),
 		progress() {
-			return this.$store.getters['progress/getProgress'](this.bookId)
+			return this.$store.getters['progress/getByBookId'](this.bookId)
 		},
 		book() {
 			return this.$store.getters['book/getBook'](this.bookId)

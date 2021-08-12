@@ -27,6 +27,7 @@
         "dexie": "^3.0.3",
         "feathers": "^2.2.4",
         "feathers-hooks-common": "^5.0.5",
+        "nanoid": "^3.1.23",
         "nuxt": "^2.15.3",
         "nuxt-client-init-module": "^0.1.10",
         "shortid": "^2.2.16",

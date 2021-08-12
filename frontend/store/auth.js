@@ -12,9 +12,10 @@ export const mutations = {
 		state.user = user
 	},
 	SET_AUTHENTICATION(state, { authentication, user }) {
+		console.log('SET_AUTHENTICATION ', user)
 		state.payload = authentication.payload
 		state.accessToken = authentication.accessToken
-		state.user = user
+		state.user = { ...user }
 	},
 	LOGGED_IN(state) {
 		state.loggedIn = true
@@ -31,11 +32,13 @@ export const actions = {
 			email,
 			password,
 		})
+		console.log('auth/authenticate user_id', result.user._id)
 		commit('SET_AUTHENTICATION', result)
 		commit('LOGGED_IN')
 	},
 	async reAuthenticate({ commit }) {
 		const result = await feathersClient.reAuthenticate()
+		console.log('auth/reAuthenticate user_id', result.user._id)
 		commit('SET_AUTHENTICATION', result)
 		commit('LOGGED_IN')
 	},

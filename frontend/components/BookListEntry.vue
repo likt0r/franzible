@@ -57,12 +57,15 @@ export default {
 				await this.$store.dispatch('book/get', this.book._id, {
 					root: true,
 				})
-				if (!this.$store.getters['progress/getProgress'](this.bookId)) {
+				if (!this.$store.getters['progress/getByBookId'](this.bookId)) {
 					// progress does not exist create it
-					await this.$store.dispatch('progress/create', this.bookId)
+					await this.$store.dispatch(
+						'progress/createByBookId',
+						this.bookId
+					)
 				}
 
-				const progress = this.$store.getters['progress/getProgress'](
+				const progress = this.$store.getters['progress/getByBookId'](
 					this.bookId
 				)
 

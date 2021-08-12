@@ -82,11 +82,15 @@ export default {
 			return this.$store.getters['player/activeBookId']
 		},
 		lastProgress() {
-			return this.$store.getters['progress/lastPlayedBookId']
-				? this.$store.getters['progress/getProgress'](
+			const bookId = this.$store.getters['progress/lastPlayedBookId']
+			console.log('SmallPlayer lastProgress id', bookId)
+			const book = bookId
+				? this.$store.getters['progress/getByBookId'](
 						this.$store.getters['progress/lastPlayedBookId']
 				  )
 				: null
+			console.log('SmallPlayer lastProgress book', book)
+			return book
 		},
 		lastBookId() {
 			return this.$store.getters['progress/lastPlayedBookId']
@@ -136,12 +140,14 @@ export default {
 	},
 	beforeMount() {
 		if (this.lastBookId) {
+			console.log('SamllPlayer before mount', this.lastBookId)
 			this.$store.dispatch('book/get', this.lastBookId)
 		}
 	},
 
 	watch: {
 		lastBookId(newId) {
+			console.log('SamllPlayer watch', this.lastBookId)
 			this.$store.dispatch('book/get', newId)
 		},
 		book(newval) {

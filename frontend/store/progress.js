@@ -1,117 +1,78 @@
 import Vue from 'vue'
 import { deepClone } from '~/tools/helper'
 import { feathersClient } from '~/plugins/feathers'
+import OfflineFeathersStoreFactory from '~/tools/OfflineFeathersStoreFactory'
+
+const {
+	state: pState,
+	mutations: pMutations,
+	actions: pActions,
+	getters: pGetters,
+	plugin: pPlugin,
+} = OfflineFeathersStoreFactory('progress', 'progress', feathersClient)
 export const state = () => ({
-	progressMap: {},
-	isSynced: false,
+	...pState,
 	lastPlayed: { bookId: null, updatedAt: new Date(0).toISOString() },
 })
 
 export const mutations = {
-	SET_PROGRESS(state, progress) {
-		Vue.set(state.progressMap, progress.bookId, progress)
-		if (state.lastPlayed.updatedAt < progress.updatedAt) {
-			// silent update of last played updateAt value
-			state.lastPlayed.updatedAt = progress.updatedAt
-			if (state.lastPlayed.bookId !== progress.bookId) {
-				state.lastPlayed.bookId = progress.bookId
-				// update getters and watchers
-				state.lastPlayed = { ...state.lastPlayed }
-			}
-		}
-	},
-	PATCH_PROGRESS(
-		state,
-		{ bookId, fileIndex, filePosition, updatedAt = new Date().toISOString() }
-	) {
-		if (state.progressMap[bookId]) {
-			state.progressMap[bookId].fileIndex = fileIndex
-			state.progressMap[bookId].filePosition = filePosition
-			state.progressMap[bookId].updatedAt = updatedAt
-			// Vue.set(state.progressMap, bookId, {... state.progressMap[bookId]})
-			if (Date.parse(state.lastPlayed.updatedAt) < Date.parse(updatedAt)) {
-				state.lastPlayed.updatedAt = updatedAt
-				if (state.lastPlayed.bookId !== bookId) {
-					state.lastPlayed.bookId = bookId
-					// update getters and watchers
-					//state.lastPlayed = { ...state.lastPlayed }
-				}
-			}
-		} else {
-			throw new Error(`Could not patch progress for bookid ${bookId}`)
-		}
-	},
-	SET_SYNCED_STATE(state, value) {
-		state.isSynced = value
+	...pMutations,
+	SET_LAST_PLAYED(store, { bookId, updatedAt }) {
+		store.lastPlayed = { bookId, updatedAt }
 	},
 }
 export const actions = {
-	async syncProgress({ commit, state, rootState }) {
-		// TODO: optimise request only get updated progress
-		console.log('Get all user progress:')
-		const result = await feathersClient
-			.service('progress')
-			.find({ userId: rootState.auth.user._id })
-		console.log('All user progress:', result)
-
-		result.forEach((bookProgress) => {
-			const localProgress = state.progressMap[bookProgress.bookId]
-			if (
-				!localProgress ||
-				Date.parse(localProgress.updatedAt) <
-					Date.parse(bookProgress.updatedAt)
-			) {
-				commit('SET_PROGRESS', bookProgress)
-			} else {
-				// if check if incomming is newer
-				const { fileIndex, filePosition, played } = bookProgress
-				feathersClient.service('progress').patch(bookProgress._id, {
-					fileIndex,
-					filePosition,
-				})
-			}
+	...pActions,
+	createByBookId({ dispatch }, bookId) {
+		dispatch('create', {
+			bookId,
+			fileIndex: 0,
+			filePosition: 0,
+			played: false,
 		})
-		commit('SET_SYNCED_STATE', true)
 	},
-	async create({ commit }, bookId) {
-		const result = await feathersClient
-			.service('progress')
-			.create({ bookId, fileIndex: 0, filePosition: 0 })
-		commit('SET_PROGRESS', result)
-		return result
-	},
-	async patch(
-		{ commit, state },
-		{ bookId, fileIndex, filePosition, updatedAt }
-	) {
-		commit('PATCH_PROGRESS', { bookId, fileIndex, filePosition })
-		const { _id } = state.progressMap[bookId]
-
-		feathersClient.service('progress').patch(_id, {
-			fileIndex,
-			filePosition,
-			updatedAt,
+	patchByBookId({ dispatch, getters }, { bookId, fileIndex, filePosition }) {
+		dispatch('patch', {
+			id: getters.bookMap[bookId]._id,
+			doc: { fileIndex, filePosition },
 		})
 	},
 }
 export const getters = {
-	getProgress: (state) => (bookId) => {
-		return deepClone(state.progressMap[bookId])
-	},
-	isSynced: (state) => state.isSynced,
+	...pGetters,
 	lastPlayedBookId: (state) => state.lastPlayed.bookId,
+	bookMap: (state) => {
+		console.log('progress/getters bookMap', state.documentsMap)
+		return Object.values(state.documentsMap).reduce((acc, doc) => {
+			acc[doc.bookId] = doc
+			return acc
+		}, {})
+	},
+
+	getByBookId: (_, getters) => (id) => {
+		console.log('progress/getters/getBookId', id)
+		return getters.bookMap[id]
+	},
 }
 
 export const plugin = (store) => {
-	feathersClient.service('progress').on('created', (progress) => {
-		console.log('New progress created', progress)
-		store.commit('progress/SET_PROGRESS', progress)
-	})
-	feathersClient.service('progress').on('patched', (progress) => {
-		console.log(' progress patched', progress)
-		store.commit('progress/SET_PROGRESS', progress)
-	})
+	pPlugin(store)
+	const { dispatch, commit } = store
 	store.subscribe((mutation, state) => {
+		if (
+			mutation.type === 'progress/PATCH' ||
+			mutation.type === 'progress/CREATE'
+		) {
+			console.log('progress/plugin', mutation.payload)
+			const { bookId, updatedAt } = mutation.payload.doc
+
+			if (
+				Date.parse(state.progress.lastPlayed.updatedAt) <=
+				Date.parse(updatedAt)
+			) {
+				commit('progress/SET_LAST_PLAYED', { bookId, updatedAt })
+			}
+		}
 		// called after every mutation.
 		// The mutation comes in the format of `{ type, payload }`.
 	})
