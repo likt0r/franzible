@@ -7,32 +7,33 @@ import hooks from './users.hooks'
 
 // Add this service to the service type index
 declare module '../../declarations' {
-  interface ServiceTypes {
-    users: Users & ServiceAddons<any>
-  }
+	interface ServiceTypes {
+		users: Users & ServiceAddons<any>
+	}
 }
 
 export default function (app: Application): void {
-  const options = {
-    Model: createModel(app),
-    paginate: undefined, // app.get('paginate'),
-  }
+	const options = {
+		Model: createModel(app),
+		paginate: undefined, // app.get('paginate'),
+	}
 
-  // Initialize our service with any options it requires
-  app.use('/users', new Users(options, app))
-  // Get our initialized service so that we can register hooks
-  const service = app.service('users')
+	// Initialize our service with any options it requires
+	app.use('/users', new Users(options, app))
+	// Get our initialized service so that we can register hooks
+	const service = app.service('users')
 
-  service.hooks(hooks)
-  app.service('users').publish((data, context) => {
-    return [
-      app.channel('admins'),
-      app.channel('app.channels').filter((connection) => {
-        console.log(connection)
-        const result = connection.user._id.toString() === data._id.toString()
-        console.log()
-        return result
-      }),
-    ]
-  })
+	service.hooks(hooks)
+	app.service('users').publish((data, context) => {
+		console.log('Letz add admin')
+		return [
+			app.channel('admins'),
+			app.channel('app.channels').filter((connection) => {
+				console.log(connection)
+				const result = connection.user._id.toString() === data._id.toString()
+				console.log()
+				return result
+			}),
+		]
+	})
 }

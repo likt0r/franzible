@@ -39,12 +39,10 @@ export default {
 
 	// Modules: https://go.nuxtjs.dev/config-modules
 	modules: [
+		'nuxt-client-init-module',
 		'@nuxtjs/axios',
-		'@nuxtjs/pwa',
 		'@nuxtjs/toast',
 		'@nuxtjs/proxy',
-		'@nuxtjs/vuetify',
-		'nuxt-client-init-module',
 	],
 
 	// Modules for dev and build (recommended): https://go.nuxtjs.dev/config-modules

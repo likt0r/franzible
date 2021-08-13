@@ -97,15 +97,25 @@ export default function factory(
 		actions: {
 			async sync({ commit, state, rootState }) {
 				// TODO: optimise request only get updated progress
-				console.log(`Get all: ${serviceName}`, rootState.auth.user)
+				console.log(`Sync: ${serviceName}`, rootState.auth.user)
 				const result = await feathersClient
 					.service(serviceName)
 					.find({ userId: rootState.auth.user._id })
 				console.log(`All : ${serviceName}`, result)
+				console.log('docMap', state.documentsMap)
+				const newDocs = Object.values(state.documentsMap).filter(
+					({ [idField]: id }) => id.startsWith('temp-')
+				)
+				const docsToDelete = Object(result).filter(
+					({ [idField]: id }) => state.documentsMap[id]
+				)
+				console.log('new Docs ', newDocs)
+				console.log('docs to delete', docsToDelete)
 
 				result.forEach((doc) => {
 					const id = doc[idField]
 					const localDoc = state.documentsMap[id]
+
 					if (!localDoc) {
 						commit('CREATE', { id, doc })
 					} else if (
@@ -125,7 +135,7 @@ export default function factory(
 			},
 			async create({ commit }, doc) {
 				console.log(`${serviceName}/create `, doc)
-				try {
+				if (feathersClient.io.connected) {
 					if (!doc.createdAt) {
 						doc.createdAt = new Date().toISOString()
 						doc.updatedAt = doc.createdAt
@@ -136,8 +146,7 @@ export default function factory(
 					console.log(`${serviceName}/create result`, result)
 					commit('CREATE', { id: result[idField], doc: result })
 					return result
-				} catch (error) {
-					console.warn('create error', error)
+				} else {
 					doc[idField] = `temp-${nanoid()}`
 					doc.createdAt = new Date().toISOString()
 					doc.updatedAt = doc.createdAt
@@ -151,7 +160,9 @@ export default function factory(
 				}
 			},
 			async patch({ commit }, { id, doc }) {
-				try {
+				console.log('Patch', feathersClient)
+
+				if (feathersClient.io.connected) {
 					console.log(`/${moduleName}/patch action id, doc`, { id, doc })
 					const result = await feathersClient
 						.service(serviceName)
@@ -159,8 +170,7 @@ export default function factory(
 					console.log(`/${moduleName}/patch action id, result`, result)
 					commit('PATCH', { id, doc: result })
 					return result
-				} catch (error) {
-					console.warn('patch error', error)
+				} else {
 					doc.updatedAt = new Date().toISOString()
 					commit('ADD_OPERATION', {
 						operationType: 'patch',
@@ -172,13 +182,12 @@ export default function factory(
 				}
 			},
 			async remove({ commit }, id) {
-				try {
+				if (feathersClient.io.connected) {
 					const result = await feathersClient
 						.service(serviceName)
 						.remove(id)
 					commit('REMOVE', id)
-				} catch (error) {
-					console.warn('remove error', error)
+				} else {
 					commit('ADD_OPERATION', {
 						operationType: 'remove',
 						id,
