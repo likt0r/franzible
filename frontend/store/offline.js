@@ -211,3 +211,10 @@ export const offlineInitPlugin = async ({ commit }) => {
 	console.log('offlineInitPlugin:', books)
 	commit('offline/SET_BOOKS', books)
 }
+
+export default {
+	state,
+	mutations,
+	actions,
+	getters,
+}

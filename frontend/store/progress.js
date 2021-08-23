@@ -42,7 +42,7 @@ export const getters = {
 	...pGetters,
 	lastPlayedBookId: (state) => state.lastPlayed.bookId,
 	bookMap: (state) => {
-		console.log('progress/getters bookMap', state.documentsMap)
+		// console.log('progress/getters bookMap', state.documentsMap)
 		return Object.values(state.documentsMap).reduce((acc, doc) => {
 			acc[doc.bookId] = doc
 			return acc
@@ -50,7 +50,7 @@ export const getters = {
 	},
 
 	getByBookId: (_, getters) => (id) => {
-		console.log('progress/getters/getBookId', id)
+		// console.log('progress/getters/getBookId', id)
 		return getters.bookMap[id]
 	},
 }
@@ -70,10 +70,18 @@ export const plugin = (store) => {
 				Date.parse(state.progress.lastPlayed.updatedAt) <=
 				Date.parse(updatedAt)
 			) {
+				console.log('progress/plugin update last played ', bookId)
 				commit('progress/SET_LAST_PLAYED', { bookId, updatedAt })
 			}
 		}
 		// called after every mutation.
 		// The mutation comes in the format of `{ type, payload }`.
 	})
+}
+
+export default {
+	state,
+	mutations,
+	actions,
+	getters,
 }

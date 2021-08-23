@@ -221,6 +221,7 @@ export const playerInitPlugin = (store) => {
 	if (process.client) {
 		init(store)
 	}
+	let lastTimeUpdate = 0
 	store.subscribe((mutation, state) => {
 		// called after every mutation.
 		// The mutation comes in the format of `{ type, payload }`.
@@ -231,16 +232,20 @@ export const playerInitPlugin = (store) => {
 				'player/SET_FILE_POSTION',
 			].includes(mutation.type)
 		) {
-			console.log(
-				'update position',
-				!!store.getters['progress/getByBookId'](state.player.bookId)
-			)
+			// console.log(
+			// 	'update position',
+			// 	!!store.getters['progress/getByBookId'](state.player.bookId)
+			// )
 			if (store.getters['progress/getByBookId'](state.player.bookId)) {
-				store.dispatch('progress/patchByBookId', {
-					bookId: state.player.bookId,
-					fileIndex: state.player.fileIndex,
-					filePosition: state.player.filePosition,
-				})
+				// update store progress only every second
+				if (Date.now() - lastTimeUpdate > 1000) {
+					store.dispatch('progress/patchByBookId', {
+						bookId: state.player.bookId,
+						fileIndex: state.player.fileIndex,
+						filePosition: state.player.filePosition,
+					})
+					lastTimeUpdate = Date.now()
+				}
 			} else {
 				store.dispatch('progress/createByBookId', state.player.bookId)
 			}

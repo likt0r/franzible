@@ -1,6 +1,7 @@
 import VuexPersistence from 'vuex-persist'
 
 export default ({ store }) => {
+	window.$store = store
 	// new VuexPersistence({
 	// 	storage: window.localStorage,
 	// 	reducer: (state) => ({
