@@ -155,6 +155,7 @@ import { toMinutesAndSeconds } from '../../../tools/formatTime'
 import { getFullUrl } from '../../../tools/url'
 import PlayerBottomNavigation from '~/components/PlayerBottomNavigation.vue'
 import OfflineImage from '~/components/OfflineImage.vue'
+import { waitSyncEnded } from '~/tools/helper'
 export default {
 	name: 'Player',
 	components: {
@@ -169,15 +170,21 @@ export default {
 	async asyncData({ params, store }) {
 		const bookId = params.id
 
-		console.log(bookId)
-		console.log(store.getters['progress/getByBookId'](bookId))
+		if (store.getters['progress/isSyncing']) {
+			await waitSyncEnded(store, 'progress')
+		}
+
 		if (!store.getters['progress/getByBookId'](bookId)) {
 			// progress does not exist create it
 			await store.dispatch('progress/createByBookId', params.id)
 		}
 
 		await store.dispatch('book/get', bookId)
-
+		console.log(
+			'all there progress',
+			store.getters['progress/getByBookId'](bookId)
+		)
+		console.log('all there book', store.getters['book/getBook'](bookId))
 		return { bookId }
 	},
 
@@ -221,9 +228,7 @@ export default {
 			return this.$store.getters['player/activeBookId']
 		},
 		activeFileIndex() {
-			return this.activeBookId === this.bookId
-				? this.$store.getters['player/activeFileIndex']
-				: this.progress.fileIndex
+			return this.progress.fileIndex
 		},
 		playerIsLoading() {
 			return this.activeBookId === this.bookId
@@ -236,24 +241,19 @@ export default {
 				: false
 		},
 		filePositionInSecs() {
-			return this.activeBookId === this.bookId
-				? this.$store.getters['player/filePositionInSecs']
-				: 0 //his.progress.filePosition
+			return this.progress.filePosition
 		},
 		fileDuration() {
-			return this.activeBookId === this.bookId
-				? this.$store.getters['player/fileDuration']
-				: this.book.files[this.progress.fileIndex].duration
+			return this.book.files[this.progress.fileIndex].duration
 		},
 		fileRemainingTime() {
-			return this.activeBookId === this.bookId
-				? this.$store.getters['player/fileRemainingTime']
-				: this.fileDuration
+			return (
+				this.book.files[this.progress.fileIndex].duration -
+				this.progress.filePosition
+			)
 		},
 		bookDuration() {
-			return this.book
-				? this.book.files.reduce((acc, file) => acc + file.duration, 0)
-				: 0
+			return this.book.files.reduce((acc, file) => acc + file.duration, 0)
 		},
 		tillChapter() {
 			if (this.progress) {

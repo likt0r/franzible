@@ -5,7 +5,7 @@
 		:eager="eager"
 		:gradient="gradient"
 		:lazy-src="lazySrc"
-		:src="src"
+		:src="objectUrl || src"
 		:options="options"
 		:position="position"
 		:sizes="sizes"

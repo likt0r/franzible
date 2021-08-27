@@ -16,6 +16,7 @@ export default function factory(
 		state: {
 			documentsMap: {},
 			isSynced: false,
+			isSyncing: false,
 			operationsBuffer: [],
 			removedDocIds: [],
 		},
@@ -51,6 +52,9 @@ export default function factory(
 			SET_SYNCED_STATE(state, value) {
 				state.isSynced = value
 			},
+			SET_SYNCING_STATE(state, value) {
+				state.isSyncing = value
+			},
 			REMOVE_REMOVED_DOC_ID(state, id) {
 				state.removedDocIds = state.removedDocIds.filter((el) => el !== id)
 			},
@@ -62,98 +66,112 @@ export default function factory(
 			async sync({ commit, state, rootState }) {
 				// TODO: optimise request only get updated progress
 				// console.log(`Sync: ${serviceName}`, rootState.auth.user)
-				const result = await feathersClient
-					.service(serviceName)
-					.find({ userId: rootState.auth.user._id })
-				// console.log(`All : ${serviceName}`, result)
-				// console.log('docMap', state.documentsMap)
+				if (state.isSyncing) {
+					return
+				}
+				try {
+					commit('SET_SYNCING_STATE', true)
+					const result = await feathersClient
+						.service(serviceName)
+						.find({ userId: rootState.auth.user._id })
+					// console.log(`All : ${serviceName}`, result)
+					// console.log('docMap', state.documentsMap)
 
-				const serverDocsIds = result.map((doc) => doc[idField])
-				const { docsToRemoveServer, docsToUpdate, newServerDocs } =
-					result.reduce(
-						(acc, doc) => {
-							if (state.removedDocIds.includes(doc[idField])) {
-								acc.docsToRemoveServer.push(doc)
-							} else if (state.documentsMap[doc[idField]]) {
-								acc.docsToUpdate.push(doc)
-							} else {
-								acc.newServerDocs.push(doc)
+					const serverDocsIds = result.map((doc) => doc[idField])
+					const { docsToRemoveServer, docsToUpdate, newServerDocs } =
+						result.reduce(
+							(acc, doc) => {
+								if (state.removedDocIds.includes(doc[idField])) {
+									acc.docsToRemoveServer.push(doc)
+								} else if (state.documentsMap[doc[idField]]) {
+									acc.docsToUpdate.push(doc)
+								} else {
+									acc.newServerDocs.push(doc)
+								}
+								return acc
+							},
+							{
+								docsToRemoveServer: [],
+								docsToUpdate: [],
+								newServerDocs: [],
 							}
+						)
+					const { newLocalDocs, docsToRemoveLocal } = Object.values(
+						state.documentsMap
+					).reduce(
+						(acc, doc) => {
+							if (doc[idField].startsWith('temp-')) {
+								acc.newLocalDocs.push(doc)
+							} else if (!serverDocsIds.includes(doc[idField])) {
+								acc.docsToRemoveLocal.push(doc)
+							}
+
 							return acc
 						},
-						{
-							docsToRemoveServer: [],
-							docsToUpdate: [],
-							newServerDocs: [],
-						}
+						{ newLocalDocs: [], docsToRemoveLocal: [] }
 					)
-				const { newLocalDocs, docsToRemoveLocal } = Object.values(
-					state.documentsMap
-				).reduce(
-					(acc, doc) => {
-						if (doc[idField].startsWith('temp-')) {
-							acc.newLocalDocs.push(doc)
-						} else if (!serverDocsIds.includes(doc[idField])) {
-							acc.docsToRemoveLocal.push(doc)
+
+					// console.log('sync new Docs ', newLocalDocs)
+					// console.log('sync docs to remove', docsToRemoveLocal)
+
+					await Promise.all(
+						docsToRemoveServer.map(async (doc) => {
+							await feathersClient
+								.service(serviceName)
+								.remove(doc[idField])
+							commit('REMOVE_REMOVED_DOC_ID', doc[idField])
+						})
+					)
+
+					await Promise.all(
+						newLocalDocs.map(async (doc) => {
+							// create new local docs on server
+							const tempId = doc[idField]
+							const tmpDoc = deepClone(doc)
+							delete tmpDoc[idField]
+							const result = await feathersClient
+								.service(serviceName)
+								.create(tmpDoc)
+							commit('CHANGE_TEMP_ID', { tempId, newDoc: result })
+						})
+					)
+
+					docsToRemoveLocal.forEach((doc) =>
+						commit('REMOVE', doc[idField])
+					)
+
+					newServerDocs.forEach((doc) => {
+						// console.log(`${serviceName} sync create theirs`, localDoc)
+						commit('CREATE', { id: doc[idField], doc })
+					})
+
+					docsToUpdate.forEach((doc) => {
+						const id = doc[idField]
+						const localDoc = state.documentsMap[id]
+						if (
+							Date.parse(localDoc.updatedAt) ===
+							Date.parse(doc.updatedAt)
+						) {
+							// do nothing
+						} else if (
+							Date.parse(localDoc.updatedAt) < Date.parse(doc.updatedAt)
+						) {
+							// console.log(`${serviceName} sync patch theirs`, doc)
+							commit('PATCH', { id, doc })
+						} else {
+							// if ours  is newer send to them
+							// console.log(`${serviceName} sync patch ours`, localDoc)
+							feathersClient
+								.service(serviceName)
+								.patch(doc[idField], localDoc)
 						}
-
-						return acc
-					},
-					{ newLocalDocs: [], docsToRemoveLocal: [] }
-				)
-
-				// console.log('sync new Docs ', newLocalDocs)
-				// console.log('sync docs to remove', docsToRemoveLocal)
-
-				await Promise.all(
-					docsToRemoveServer.map(async (doc) => {
-						await feathersClient.service(serviceName).remove(doc[idField])
-						commit('REMOVE_REMOVED_DOC_ID', doc[idField])
 					})
-				)
-
-				await Promise.all(
-					newLocalDocs.map(async (doc) => {
-						// create new local docs on server
-						const tempId = doc[idField]
-						const tmpDoc = deepClone(doc)
-						delete tmpDoc[idField]
-						const result = await feathersClient
-							.service(serviceName)
-							.create(tmpDoc)
-						commit('CHANGE_TEMP_ID', { tempId, newDoc: result })
-					})
-				)
-
-				docsToRemoveLocal.forEach((doc) => commit('REMOVE', doc[idField]))
-
-				newServerDocs.forEach((doc) => {
-					// console.log(`${serviceName} sync create theirs`, localDoc)
-					commit('CREATE', { id: doc[idField], doc })
-				})
-
-				docsToUpdate.forEach((doc) => {
-					const id = doc[idField]
-					const localDoc = state.documentsMap[id]
-					if (
-						Date.parse(localDoc.updatedAt) === Date.parse(doc.updatedAt)
-					) {
-						return
-					} else if (
-						Date.parse(localDoc.updatedAt) < Date.parse(doc.updatedAt)
-					) {
-						// console.log(`${serviceName} sync patch theirs`, doc)
-						commit('PATCH', { id, doc })
-					} else {
-						// if ours  is newer send to them
-						// console.log(`${serviceName} sync patch ours`, localDoc)
-						feathersClient
-							.service(serviceName)
-							.patch(doc[idField], localDoc)
-					}
-				})
-
-				commit('SET_SYNCED_STATE', true)
+					commit('SET_SYNCING_STATE', false)
+					commit('SET_SYNCED_STATE', true)
+				} catch (error) {
+					commit('SET_SYNCING_STATE', false)
+					throw error
+				}
 			},
 			async create({ commit }, doc) {
 				// console.log(`${serviceName}/create `, doc)
@@ -215,6 +233,7 @@ export default function factory(
 		getters: {
 			get: (state) => (id) => deepClone(state.documentsMap[id]),
 			isSynced: (state) => state.isSynced,
+			isSyncing: (state) => state.isSyncing,
 		},
 		plugin: (store) => {
 			feathersClient.service(serviceName).on('created', (doc) => {
@@ -226,10 +245,14 @@ export default function factory(
 			})
 			feathersClient.service(serviceName).on('patched', (doc) => {
 				// console.log(`${moduleName} service event patched`, doc)
-				store.commit(moduleName ? `${moduleName}/PATCH` : 'PATCH', {
-					id: doc[idField],
-					doc,
-				})
+				if (
+					store.state.documentsMap[doc[idField]].updatedAt < doc.updatedAt
+				) {
+					store.commit(moduleName ? `${moduleName}/PATCH` : 'PATCH', {
+						id: doc[idField],
+						doc,
+					})
+				}
 			})
 			feathersClient.service(serviceName).on('removed', (doc) => {
 				// console.log(`${moduleName} service event removed`, doc)
@@ -253,10 +276,6 @@ export default function factory(
 			feathersClient.authentication.app.on('authenticated', () => {
 				// Wait for state updating
 				setImmediate(() => store.dispatch(`${moduleName}/sync`))
-			})
-			store.subscribe((mutation, state) => {
-				// called after every mutation.
-				// The mutation comes in the format of `{ type, payload }`.
 			})
 		},
 	}
