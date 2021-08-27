@@ -10,6 +10,7 @@
         "lint:js": "eslint --ext \".js,.vue\" --ignore-path .gitignore .",
         "lint": "npm run lint:js",
         "test": "jest",
+        "test:watch": "jest --watch",
         "docker": "docker build -t bewr42/franzible_nuxt-app . && docker push bewr42/franzible_nuxt-app"
     },
     "dependencies": {
@@ -40,6 +41,7 @@
         "vuex-persist": "^3.1.3"
     },
     "devDependencies": {
+        "@babel/preset-env": "^7.15.0",
         "@nuxt/builder": "^2.15.7",
         "@nuxtjs/eslint-config": "^5.0.0",
         "@nuxtjs/eslint-module": "^3.0.2",
