@@ -104,9 +104,12 @@ export default {
 		},
 
 		bookCoverUrl() {
-			return this.book && this.book.cover && this.book.cover[0]
-				? getFullUrl(this.book.cover[0])
-				: '/icon.png'
+			return (
+				this.book &&
+				this.book.cover &&
+				this.book.cover[0] &&
+				getFullUrl(this.book.cover[0])
+			)
 		},
 
 		bookDuration() {

@@ -75,7 +75,9 @@ export const actions = {
 					// album:
 					artwork: [
 						{
-							src: getFullUrl(state.book.cover[0] || '/logo.png'),
+							src: getFullUrl(
+								(state.book.cover && state.book.cover[0]) || '/logo.png'
+							),
 							sizes: '512x512',
 							type: 'image/png',
 						},

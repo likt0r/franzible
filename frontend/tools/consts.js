@@ -9,5 +9,5 @@ export const BOOK_OFFLINE_PROCESS_STATE = {
 	deleting: 'deleting',
 }
 
-export const OFFLINE_PAGES = ['library', 'login']
+export const OFFLINE_PAGES = ['library', 'login', 'books-id']
 export const PUBLIC_PAGES = ['login']

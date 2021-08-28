@@ -4,6 +4,8 @@ import { timerInitPlugin } from './timer'
 import { offlineInitPlugin } from './offline'
 import { plugin as progressPlugin } from './progress'
 import { plugin as connectionPlugin } from './connection'
+import { plugin as authPlugin } from './auth'
+
 export const state = () => ({
 	fileListState: false,
 	searchTerm: '',
@@ -139,6 +141,7 @@ export const getters = {
 
 export const plugins = [
 	connectionPlugin,
+	authPlugin,
 	playerInitPlugin,
 	timerInitPlugin,
 	offlineInitPlugin,

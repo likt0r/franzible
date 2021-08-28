@@ -1,10 +1,10 @@
 <template>
 	<v-container>
-		<v-card class="mx-auto my-12" max-width="374">
+		<v-card class="mx-auto my-12" max-width="374" elevation="0">
 			<v-img
 				height="250"
 				contain
-				src="offline-internet.svg"
+				src="/offline-internet.svg"
 				class="offline-hint"
 			></v-img>
 

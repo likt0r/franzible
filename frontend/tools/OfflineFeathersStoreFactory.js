@@ -65,10 +65,11 @@ export default function factory(
 		actions: {
 			async sync({ commit, state, rootState }) {
 				// TODO: optimise request only get updated progress
-				// console.log(`Sync: ${serviceName}`, rootState.auth.user)
+
 				if (state.isSyncing) {
 					return
 				}
+				console.log(`Sync start: ${serviceName}`)
 				try {
 					commit('SET_SYNCING_STATE', true)
 					const result = await feathersClient
@@ -156,7 +157,7 @@ export default function factory(
 						} else if (
 							Date.parse(localDoc.updatedAt) < Date.parse(doc.updatedAt)
 						) {
-							// console.log(`${serviceName} sync patch theirs`, doc)
+							//console.log(`${serviceName} sync patch theirs`, doc)
 							commit('PATCH', { id, doc })
 						} else {
 							// if ours  is newer send to them
@@ -168,6 +169,7 @@ export default function factory(
 					})
 					commit('SET_SYNCING_STATE', false)
 					commit('SET_SYNCED_STATE', true)
+					console.log(`Sync ended: ${serviceName}`)
 				} catch (error) {
 					commit('SET_SYNCING_STATE', false)
 					throw error
@@ -246,7 +248,8 @@ export default function factory(
 			feathersClient.service(serviceName).on('patched', (doc) => {
 				// console.log(`${moduleName} service event patched`, doc)
 				if (
-					store.state.documentsMap[doc[idField]].updatedAt < doc.updatedAt
+					store.state[moduleName].documentsMap[doc[idField]].updatedAt <
+					doc.updatedAt
 				) {
 					store.commit(moduleName ? `${moduleName}/PATCH` : 'PATCH', {
 						id: doc[idField],
@@ -261,18 +264,6 @@ export default function factory(
 					doc[idField]
 				)
 			})
-
-			feathersClient.io.on('connect', () => {
-				// console.log('#socketIO: connected')
-				// if (feathersClient.authentication.authenticated) {
-				// 	store.dispatch(`${moduleName}/sync`)
-				// }
-			})
-
-			feathersClient.io.on('disconnect', () => {
-				// console.log('#socketIO: disconnected',feathersClient.authentication)
-			})
-
 			feathersClient.authentication.app.on('authenticated', () => {
 				// Wait for state updating
 				setImmediate(() => store.dispatch(`${moduleName}/sync`))

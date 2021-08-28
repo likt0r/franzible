@@ -20,6 +20,9 @@ export const mutations = {
 		state.loggedIn = true
 	},
 	LOGGED_OUT(state) {
+		state.payload = null
+		state.accessToken = null
+		state.user = null
 		state.loggedIn = false
 	},
 }
@@ -39,21 +42,25 @@ export const actions = {
 	},
 	async reAuthenticate({ commit }) {
 		if (feathersClient.io.connected) {
-			const result = await feathersClient.reAuthenticate()
-			console.log('auth/reAuthenticate user_id', result.user._id)
-			commit('SET_AUTHENTICATION', result)
-			commit('LOGGED_IN')
+			try {
+				const result = await feathersClient.reAuthenticate()
+				commit('SET_AUTHENTICATION', result)
+				commit('LOGGED_IN')
+			} catch (error) {
+				if (
+					error.type === 'FeathersError' &&
+					error.message === 'No accessToken found in storage'
+				) {
+					console.warn(error.message)
+				} else throw error
+			}
 		}
 	},
 
 	async logout({ commit }) {
-		await feathersClient.logout()
-
-		commit('SET_AUTHENTICATION', {
-			authentication: { payload: null, accessToken: null },
-			user: null,
-		})
 		commit('LOGGED_OUT')
+		await feathersClient.logout()
+		window.localStorage.removeItem('vuex')
 	},
 
 	async patchUser({ commit, state }, { email, password, retyped }) {
@@ -68,10 +75,8 @@ export const getters = {
 	isLoggedIn: (state) => !!state.payload,
 }
 
-export const plugins = [
-	(store) => {
-		feathersClient.io.on('connect', async () => {
-			await store.dispatch('auth/reAuthenticate')
-		})
-	},
-]
+export const plugin = (store) => {
+	feathersClient.io.on('connect', () => {
+		store.dispatch('auth/reAuthenticate')
+	})
+}

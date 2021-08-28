@@ -24,7 +24,7 @@
 				</v-list-item-content>
 			</v-list-item>
 
-			<fragment v-if="userIsAdmin">
+			<div v-if="loggedIn && userIsAdmin">
 				<v-divider></v-divider>
 				<v-list-item
 					v-for="item in adminMenu"
@@ -41,7 +41,7 @@
 						<v-list-item-title v-text="item.title" />
 					</v-list-item-content>
 				</v-list-item>
-			</fragment>
+			</div>
 		</v-list>
 		<v-footer dark padless>
 			<v-card class="flex" flat tile>
@@ -84,7 +84,7 @@ export default {
 					icon: 'mdi-book-open-page-variant-outline',
 					title: 'Library',
 					to: '/library',
-					show: SHOW_IN.always,
+					show: SHOW_IN.loggedIn,
 				},
 				{
 					icon: 'mdi-logout',
@@ -122,6 +122,9 @@ export default {
 				this.$store.dispatch('setShowNavigationDrawer', val)
 			},
 		},
+		loggedIn() {
+			return this.$store.state.auth.loggedIn
+		},
 
 		filteredMenu() {
 			if (
@@ -143,9 +146,11 @@ export default {
 	methods: {
 		noOp() {},
 		async logout() {
-			console.log('logout')
 			await this.$store.dispatch('auth/logout')
-			location.reload()
+			this.showNavigationDrawer = false
+			this.$nextTick(() => {
+				location.reload()
+			})
 		},
 	},
 }

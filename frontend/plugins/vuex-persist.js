@@ -17,13 +17,18 @@ export default ({ store }) => {
 				documentMap: state.progress.documentMap,
 				removedDocIds: state.progress.removedDocIds,
 			},
-			auth: state.auth,
+			auth: {
+				payload: state.auth.payload,
+				accessToken: state.auth.accessToken,
+				user: state.auth.user,
+				loggedIn: state.auth.loggedIn,
+			},
 		}),
 		filter: (mutation) =>
-			mutation.type === 'SET_USER' ||
-			mutation.type === 'SET_AUTHENTICATION' ||
-			mutation.type === 'LOGGED_IN' ||
-			mutation.type === 'LOGGED_OUT' ||
+			mutation.type === 'auth/LOGGED_OUT' ||
+			mutation.type === 'auth/SET_USER' ||
+			mutation.type === 'auth/SET_AUTHENTICATION' ||
+			mutation.type === 'auth/LOGGED_IN' ||
 			featherRegExp.test(mutation.type),
 	}).plugin(store)
 }

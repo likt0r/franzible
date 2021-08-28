@@ -14,19 +14,23 @@ export const actions = {
 	async get({ commit, state, rootState, rootGetters }, bookId) {
 		if (state.bookMap[bookId] || rootGetters['offline/getBook'](bookId)) {
 			// update in background to improve snappinest
-			feathersClient
-				.service('books')
-				.get(bookId)
-				.then((result) => commit('SET_BOOK', result))
+			if (feathersClient.io.connected) {
+				feathersClient
+					.service('books')
+					.get(bookId)
+					.then((result) => commit('SET_BOOK', result))
+			}
 			return state.bookMap[bookId]
 		} else {
 			// get Book from Server
 			console.log('request book', bookId)
-			const book = await feathersClient.service('books').get('' + bookId)
+			if (feathersClient.io.connected) {
+				const book = await feathersClient.service('books').get('' + bookId)
+				console.log('request book', book)
+				commit('SET_BOOK', book)
+			}
 
-			console.log('request book', book)
-			commit('SET_BOOK', book)
-			return book
+			return null
 		}
 	},
 }
