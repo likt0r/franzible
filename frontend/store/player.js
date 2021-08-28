@@ -29,7 +29,7 @@ export const mutations = {
 			console.log('#Player state is: ', playerState)
 			state.playerState = playerState
 		} else {
-			throw new Error(`Unkown Player state: ${playerState}`)
+			throw new Error(`Unknown Player state: ${playerState}`)
 		}
 	},
 

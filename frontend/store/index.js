@@ -140,10 +140,10 @@ export const getters = {
 }
 
 export const plugins = [
+	offlineInitPlugin,
 	connectionPlugin,
 	authPlugin,
 	playerInitPlugin,
 	timerInitPlugin,
-	offlineInitPlugin,
 	progressPlugin,
 ]

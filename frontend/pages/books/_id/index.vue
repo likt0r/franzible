@@ -9,14 +9,19 @@
 							:db-id="book && book.coverDbId"
 							contain
 						>
-							<fragment>
+							<div>
 								<v-overlay absolute :value="timerActiveState">
 									<h1>{{ timerDisplay(timerCurrentTime) }}</h1>
 								</v-overlay>
-								<v-btn class="edit" :to="`/books/${book._id}/edit`" fab>
+								<v-btn
+									v-if="connected"
+									class="edit"
+									:to="`/books/${book._id}/edit`"
+									fab
+								>
 									<v-icon>mdi-square-edit-outline</v-icon>
 								</v-btn>
-							</fragment>
+							</div>
 						</offline-image>
 					</v-col>
 				</v-row>
@@ -196,6 +201,10 @@ export default {
 	},
 	computed: {
 		...mapGetters(['fileListState']),
+
+		connected() {
+			return this.$store.getters['connection/connected']
+		},
 		progress() {
 			return this.$store.getters['progress/getByBookId'](this.bookId)
 		},

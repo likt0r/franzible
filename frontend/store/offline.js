@@ -6,6 +6,7 @@ import { deepClone } from '~/tools/helper'
 export const state = () => ({
 	booksMap: {},
 	activeProcessMap: {},
+	loading: true,
 })
 const db = getDatabase()
 const abortControllerMap = {}
@@ -55,6 +56,9 @@ export const mutations = {
 	},
 	FINISH_PROCESS(state, bookId) {
 		Vue.set(state.activeProcessMap, bookId, undefined)
+	},
+	SET_LOADING(state, loading) {
+		state.loading = loading
 	},
 }
 
@@ -210,6 +214,7 @@ export const offlineInitPlugin = async ({ commit }) => {
 	const books = await db.getBooks()
 	console.log('offlineInitPlugin:', books)
 	commit('offline/SET_BOOKS', books)
+	commit('offline/SET_LOADING', false)
 }
 
 export default {

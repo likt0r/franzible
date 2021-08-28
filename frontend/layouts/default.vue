@@ -20,7 +20,7 @@
 				fab
 				color="#13202a"
 				fixed
-				to="/"
+				@click="back"
 			>
 				<v-icon dark> mdi-arrow-left </v-icon>
 			</v-btn>
@@ -86,13 +86,23 @@ export default {
 			return this.$nuxt.$route.name.startsWith('books-id')
 		},
 		showOfflineHint() {
-			return (
-				!OFFLINE_PAGES.includes(this.$nuxt.$route.name) &&
-				!this.$store.getters['connection/connected']
-			)
+			if (!this.$store.getters['connection/connected']) {
+				if (this.$nuxt.$route.name === 'books-id') {
+					return !this.$store.getters['book/getBook'](
+						this.$nuxt.$route.params.id
+					)
+				} else {
+					return !OFFLINE_PAGES.includes(this.$nuxt.$route.name)
+				}
+			} else return false
 		},
 	},
-	methods: {},
+	methods: {
+		back() {
+			console.log(this.$router)
+			this.$router.go(-1)
+		},
+	},
 }
 </script>
 <style scoped>
