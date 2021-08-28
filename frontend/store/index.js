@@ -3,6 +3,7 @@ import { playerInitPlugin } from './player'
 import { timerInitPlugin } from './timer'
 import { offlineInitPlugin } from './offline'
 import { plugin as progressPlugin } from './progress'
+import { plugin as connectionPlugin } from './connection'
 export const state = () => ({
 	fileListState: false,
 	searchTerm: '',
@@ -14,6 +15,7 @@ export const state = () => ({
 	searchRequestEndReached: false,
 	showNavigationDrawer: false,
 	searchScrollPosition: 0,
+	connected: false,
 })
 
 export const mutations = {
@@ -136,6 +138,7 @@ export const getters = {
 }
 
 export const plugins = [
+	connectionPlugin,
 	playerInitPlugin,
 	timerInitPlugin,
 	offlineInitPlugin,

@@ -3,7 +3,6 @@ export const state = () => ({
 	payload: null,
 	accessToken: null,
 	user: null,
-	publicPages: ['login', 'library'],
 	loggedIn: false,
 })
 

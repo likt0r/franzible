@@ -6,7 +6,12 @@
 			<app-bar :hide-bar="!isSingleBookPage"> </app-bar>
 		</transition>
 		<app-side-menu></app-side-menu>
-		<v-main> <nuxt /> </v-main>
+		<v-main>
+			<transition name="fade">
+				<offline-hint v-if="showOfflineHint"></offline-hint>
+				<nuxt v-else />
+			</transition>
+		</v-main>
 		<transition name="fade">
 			<v-btn
 				v-if="isSingleBookPage"
@@ -48,9 +53,17 @@ import SmallPlayer from '~/components/SmallPlayer.vue'
 import AppBar from '~/components/AppBar.vue'
 import AppSideMenu from '~/components/AppSideMenu.vue'
 import Messages from '~/components/Messages.vue'
-
+import OfflineHint from '~/components/OfflineHint.vue'
+import { OFFLINE_PAGES } from '~/tools/consts'
 export default {
-	components: { Playlist, SmallPlayer, AppBar, AppSideMenu, Messages },
+	components: {
+		Playlist,
+		SmallPlayer,
+		AppBar,
+		AppSideMenu,
+		Messages,
+		OfflineHint,
+	},
 
 	data() {
 		return {
@@ -71,6 +84,12 @@ export default {
 		},
 		isSingleBookPage() {
 			return this.$nuxt.$route.name.startsWith('books-id')
+		},
+		showOfflineHint() {
+			return (
+				!OFFLINE_PAGES.includes(this.$nuxt.$route.name) &&
+				!this.$store.getters['connection/connected']
+			)
 		},
 	},
 	methods: {},

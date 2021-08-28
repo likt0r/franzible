@@ -18,8 +18,9 @@
 <script>
 import { mapActions } from 'vuex'
 import BookListEntry from '~/components/BookListEntry.vue'
+import OfflineHint from '~/components/OfflineHint.vue'
 export default {
-	components: { BookListEntry },
+	components: { BookListEntry, OfflineHint },
 	mixins: [],
 	layout: 'default',
 	transition: 'slide-right',
@@ -49,6 +50,7 @@ export default {
 
 	mounted() {
 		// init endless scroll listener
+
 		this.$nextTick(function () {
 			window.addEventListener('scroll', this.onScroll, {
 				passive: true,
@@ -72,7 +74,9 @@ export default {
 				document.documentElement
 			this.setSearchScrollPosition(scrollTop)
 			if (scrollTop + clientHeight >= scrollHeight - 5) {
-				this.requestSearchApi()
+				if (!this.$store.getters['connection/connected']) {
+					this.requestSearchApi()
+				}
 			}
 		},
 	},
