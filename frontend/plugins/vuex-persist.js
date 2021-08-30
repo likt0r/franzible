@@ -7,15 +7,16 @@ const FEATHER_MUTATIONS = [
 	'REMOVE_REMOVED_DOC_ID',
 	'ADD_REMOVED_DOC_ID',
 ]
-const featherRegExp = new RegExp(`/${FEATHER_MUTATIONS.join('|')}$`)
+const featherRegExp = new RegExp(`${FEATHER_MUTATIONS.join('|')}$`)
 export default ({ store }) => {
 	window.$store = store
 	new VuexPersistence({
 		storage: window.localStorage,
 		reducer: (state) => ({
 			progress: {
-				documentMap: state.progress.documentMap,
+				documentsMap: state.progress.documentsMap,
 				removedDocIds: state.progress.removedDocIds,
+				lastPlayed: state.progress.lastPlayed,
 			},
 			auth: {
 				payload: state.auth.payload,
@@ -24,11 +25,15 @@ export default ({ store }) => {
 				loggedIn: state.auth.loggedIn,
 			},
 		}),
-		filter: (mutation) =>
-			mutation.type === 'auth/LOGGED_OUT' ||
-			mutation.type === 'auth/SET_USER' ||
-			mutation.type === 'auth/SET_AUTHENTICATION' ||
-			mutation.type === 'auth/LOGGED_IN' ||
-			featherRegExp.test(mutation.type),
+		filter: (mutation) => {
+			return (
+				mutation.type === 'auth/LOGGED_OUT' ||
+				mutation.type === 'auth/SET_USER' ||
+				mutation.type === 'auth/SET_AUTHENTICATION' ||
+				mutation.type === 'auth/LOGGED_IN' ||
+				mutation.type === 'progress/SET_LAST_PLAYED' ||
+				featherRegExp.test(mutation.type)
+			)
+		},
 	}).plugin(store)
 }

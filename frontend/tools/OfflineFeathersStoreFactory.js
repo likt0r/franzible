@@ -65,7 +65,7 @@ export default function factory(
 		actions: {
 			async sync({ commit, state, rootState }) {
 				// TODO: optimise request only get updated progress
-
+				console.log('sync now')
 				if (state.isSyncing) {
 					return
 				}

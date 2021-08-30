@@ -70,11 +70,13 @@ export default {
 	methods: {
 		...mapActions(['requestSearchApi', 'setSearchScrollPosition']),
 		onScroll() {
+			console.log('onScroll')
 			const { scrollTop, scrollHeight, clientHeight } =
 				document.documentElement
 			this.setSearchScrollPosition(scrollTop)
 			if (scrollTop + clientHeight >= scrollHeight - 5) {
-				if (!this.$store.getters['connection/connected']) {
+				if (this.$store.getters['connection/connected']) {
+					console.log('onscroll request search api')
 					this.requestSearchApi()
 				}
 			}

@@ -4,8 +4,8 @@ services:
   mongo-db-dev:
     image: mongo:4.4
     restart: unless-stopped
-    volumes:
-      - ../mongodb-data:/data/db
+    # volumes:
+    #   - ../mongodb-data:/data/db
     restart: always
     # Uncomment to change startup options
     ports:

@@ -9,7 +9,7 @@ const writeFile = util.promisify(fs.writeFile);
 export default (options = {}): Hook => {
   return async (context: HookContext): Promise<HookContext> => {
     console.log(JSON.stringify(context.data))
-   //  writeFile
+    //  writeFile
     return context
   }
 }

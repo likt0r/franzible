@@ -21,3 +21,11 @@ export function waitSyncEnded(store, moduleName) {
 		})
 	})
 }
+
+export function uniqBy(a, key) {
+	const seen = {}
+	return a.filter(function (item) {
+		const k = key(item)
+		return seen.hasOwnProperty(k) ? false : (seen[k] = true)
+	})
+}

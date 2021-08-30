@@ -6,7 +6,7 @@ import { deepClone } from '~/tools/helper'
 export const state = () => ({
 	booksMap: {},
 	activeProcessMap: {},
-	loading: true,
+	initialized: false,
 })
 const db = getDatabase()
 const abortControllerMap = {}
@@ -57,15 +57,15 @@ export const mutations = {
 	FINISH_PROCESS(state, bookId) {
 		Vue.set(state.activeProcessMap, bookId, undefined)
 	},
-	SET_LOADING(state, loading) {
-		state.loading = loading
+	INITIALIZED(state) {
+		state.initialized = true
 	},
 }
 
 export const actions = {
 	async addBook({ commit, dispatch, getters }, bookId) {
 		if (getters.isBookBeingDownloaded[bookId]) {
-			console.warn(`Book ${bookId} is allready downloading.`)
+			console.warn(`Book ${bookId} is already downloading.`)
 			return
 		}
 
@@ -177,6 +177,11 @@ export const actions = {
 			commit('FINISH_PROCESS', bookId)
 		}
 	},
+	async initialize({ commit }) {
+		const books = await db.getBooks()
+		console.log('offlineInit:', books)
+		commit('SET_BOOKS', books)
+	},
 }
 
 export const getters = {
@@ -209,12 +214,7 @@ export const getters = {
 		)
 	},
 	books: (state) => Object.values(state.booksMap),
-}
-export const offlineInitPlugin = async ({ commit }) => {
-	const books = await db.getBooks()
-	console.log('offlineInitPlugin:', books)
-	commit('offline/SET_BOOKS', books)
-	commit('offline/SET_LOADING', false)
+	initialized: (state) => state.initialized,
 }
 
 export default {

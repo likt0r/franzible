@@ -7,33 +7,33 @@ import { preFeathersHook as handleTimestamp } from '../../tools/timeStamps'
 const { authenticate } = authentication.hooks
 
 export default {
-	before: {
-		all: [authenticate('jwt'), restrictToUser(), handleTimestamp],
-		find: [],
-		get: [],
-		create: [],
-		update: [],
-		patch: [],
-		remove: [],
-	},
+  before: {
+    all: [authenticate('jwt'), restrictToUser(), handleTimestamp],
+    find: [],
+    get: [],
+    create: [],
+    update: [],
+    patch: [],
+    remove: [],
+  },
 
-	after: {
-		all: [],
-		find: [],
-		get: [],
-		create: [],
-		update: [],
-		patch: [],
-		remove: [],
-	},
+  after: {
+    all: [],
+    find: [],
+    get: [],
+    create: [],
+    update: [],
+    patch: [],
+    remove: [],
+  },
 
-	error: {
-		all: [],
-		find: [],
-		get: [],
-		create: [],
-		update: [],
-		patch: [],
-		remove: [],
-	},
+  error: {
+    all: [],
+    find: [],
+    get: [],
+    create: [],
+    update: [],
+    patch: [],
+    remove: [],
+  },
 }

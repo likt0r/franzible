@@ -33,7 +33,7 @@ export const mutations = {
 		}
 	},
 
-	SET_FILE_POSTION(state, filePosition) {
+	SET_FILE_POSITION(state, filePosition) {
 		state.filePosition = filePosition
 	},
 	SET_SPEED(state, speed) {
@@ -60,7 +60,7 @@ export const actions = {
 				filePosition,
 			})
 
-			getInstance().loadAudioBook({
+			await getInstance().loadAudioBook({
 				audioUrl: getFullUrl(book.files[fileIndex].filepath),
 				audioDbId: book.files[fileIndex].dbId,
 				filePosition,
@@ -231,7 +231,7 @@ export const playerInitPlugin = (store) => {
 			[
 				'player/SET_BOOK_FILE',
 				'player/SET_FILE',
-				'player/SET_FILE_POSTION',
+				'player/SET_FILE_POSITION',
 			].includes(mutation.type)
 		) {
 			// console.log(

@@ -176,11 +176,13 @@ export default {
 		const bookId = params.id
 
 		if (store.getters['progress/isSyncing']) {
+			console.log('Wait till sync ended')
 			await waitSyncEnded(store, 'progress')
 		}
 
 		if (!store.getters['progress/getByBookId'](bookId)) {
 			// progress does not exist create it
+			console.log('Create progress book id', params.id)
 			await store.dispatch('progress/createByBookId', params.id)
 		}
 

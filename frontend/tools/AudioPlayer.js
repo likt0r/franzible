@@ -75,7 +75,7 @@ class AudioPlayer {
 		this.elAudio.addEventListener('timeupdate', (event) => {
 			// Fires when the audio/video has been paused
 			// console.log('#player: timeupdate', event)
-			this.store.commit('player/SET_FILE_POSTION', this.elAudio.currentTime)
+			this.store.commit('player/SET_FILE_POSITION', this.elAudio.currentTime)
 		})
 		this.elAudio.addEventListener('ended', (event) => {
 			// Fires when the audio/video has been paused
@@ -109,7 +109,7 @@ class AudioPlayer {
 		this.currentSrc = this.elAudio.src
 		this.elAudio.currentTime = filePosition
 		if (startPlaying) {
-			this.__play()
+			await this.__play()
 		}
 	}
 

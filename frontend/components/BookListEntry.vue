@@ -44,6 +44,9 @@ export default {
 		activeBookId() {
 			return this.$store.getters['player/activeBookId']
 		},
+		bookId() {
+			return this.book._id
+		},
 	},
 
 	methods: {

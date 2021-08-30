@@ -141,12 +141,6 @@ export default {
 			return this.$store.getters['player/isLoading']
 		},
 	},
-	beforeMount() {
-		if (this.lastBookId) {
-			console.log('SamllPlayer before mount', this.lastBookId)
-			this.$store.dispatch('book/get', this.lastBookId)
-		}
-	},
 
 	watch: {
 		lastBookId(newId) {
@@ -172,21 +166,44 @@ export default {
 			}
 		},
 	},
+	async beforeMount() {
+		if (this.lastBookId) {
+			console.log('SamllPlayer before mount', this.lastBookId)
+			this.$store.dispatch('book/get', this.lastBookId)
+			if (!this.$store.getters['player/activeBookId']) {
+				await this.$store.dispatch('player/loadFile', {
+					bookId: this.lastProgress.bookId,
+					fileIndex: this.lastProgress.fileIndex,
+					filePosition: this.lastProgress.filePosition,
+					startPlaying: false,
+				})
+			}
+		}
+	},
 	methods: {
 		gotoBook() {
 			this.$router.push(`/books/${this.playerBookId}`)
 		},
 		toMinutesAndSeconds,
 		getFullUrl,
-		playButtonClick() {
+		async playButtonClick() {
 			// if no bookId in player is set
 			if (this.playerIsPlaying || this.playerIsLoading) {
 				this.$store.dispatch('player/pause')
+			} else if (this.$store.getters['player/activeBookId']) {
+				this.$store.dispatch('player/resume')
 			} else {
+				// special case on load player is still empty
+				await this.$store.dispatch('player/loadFile', {
+					bookId: this.lastProgress.bookId,
+					fileIndex: this.lastProgress.fileIndex,
+					filePosition: this.lastProgress.filePosition,
+					startPlaying: false,
+				})
 				this.$store.dispatch('player/resume')
 			}
 		},
-		fastRewind() {
+		async fastRewind() {
 			this.$store.dispatch('player/fastRewind')
 		},
 	},

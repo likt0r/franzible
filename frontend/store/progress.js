@@ -23,8 +23,9 @@ export const mutations = {
 }
 export const actions = {
 	...pActions,
-	createByBookId({ dispatch }, bookId) {
-		dispatch('create', {
+	async createByBookId({ dispatch }, bookId) {
+		if (!bookId) throw new Error('Progress for books need bookId')
+		await dispatch('create', {
 			bookId,
 			fileIndex: 0,
 			filePosition: 0,
@@ -36,6 +37,21 @@ export const actions = {
 			id: getters.bookMap[bookId]._id,
 			doc: { fileIndex, filePosition },
 		})
+	},
+	inferLastPlayed({ commit, state }) {
+		console.log('sync set last PLayed')
+		let lastProgress = null
+		Object.values(state.documentsMap).forEach((doc) => {
+			if (!lastProgress) {
+				lastProgress = doc
+			} else if (Date.parse(doc.lastProgress) < Date.parse(doc.updatedAt)) {
+				lastProgress = doc
+			}
+		})
+		if (lastProgress) {
+			const { bookId, updatedAt } = lastProgress
+			commit('SET_LAST_PLAYED', { bookId, updatedAt })
+		}
 	},
 }
 export const getters = {
@@ -63,19 +79,22 @@ export const plugin = (store) => {
 			mutation.type === 'progress/PATCH' ||
 			mutation.type === 'progress/CREATE'
 		) {
-			console.log('progress/plugin', mutation.payload)
 			const { bookId, updatedAt } = mutation.payload.doc
 
 			if (
 				Date.parse(state.progress.lastPlayed.updatedAt) <=
 				Date.parse(updatedAt)
 			) {
-				console.log('progress/plugin update last played ', bookId)
 				commit('progress/SET_LAST_PLAYED', { bookId, updatedAt })
 			}
 		}
-		// called after every mutation.
-		// The mutation comes in the format of `{ type, payload }`.
+
+		if (
+			mutation.type === 'progress/SET_SYNCED_STATE' &&
+			mutation.payload === true
+		) {
+			dispatch('progress/inferLastPlayed')
+		}
 	})
 }
 
