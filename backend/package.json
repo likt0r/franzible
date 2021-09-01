@@ -30,7 +30,7 @@
         "start": "node lib/",
         "jest": "jest  --forceExit",
         "build": "shx rm -rf lib/ && tsc",
-        "docker": "docker build -t bewr42/franzible_feather-app . && docker push bewr42/franzible_feather-app"
+        "docker": "../buildDockerTaggedImage.sh -u bewr42 && docker push bewr42/franzible_feather-app -a"
     },
     "standard": {
         "env": [

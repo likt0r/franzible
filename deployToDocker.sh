@@ -1,6 +1,6 @@
 #/bin/bash
-cd backend
+pushd backend
 npm run docker
-cd ..
-cd frontend
+popd
+pushd frontend
 npm run docker

@@ -11,7 +11,7 @@
         "lint": "npm run lint:js",
         "test": "jest",
         "test:watch": "jest --watch",
-        "docker": "docker build -t bewr42/franzible_nuxt-app . && docker push bewr42/franzible_nuxt-app"
+        "docker": "../buildDockerTaggedImage.sh -u bewr42 && docker push bewr42/franzible_nuxt-app -a"
     },
     "dependencies": {
         "@feathersjs/authentication-client": "^4.5.11",
