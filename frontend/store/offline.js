@@ -63,18 +63,18 @@ export const mutations = {
 }
 
 export const actions = {
-	async addBook({ commit, dispatch, getters }, bookId) {
+	async addBook(
+		{ commit, dispatch, getters, rootGetters, rootState, root },
+		bookId
+	) {
 		if (getters.isBookBeingDownloaded[bookId]) {
 			console.warn(`Book ${bookId} is already downloading.`)
 			return
 		}
 
 		// clone Object to prevent altering State
-
-		const book = deepClone(
-			getters.getBook(bookId) ||
-				(await dispatch('book/get', bookId, { root: true }))
-		)
+		await dispatch('book/get', bookId, { root: true })
+		const book = deepClone(await rootGetters['book/getBook'](bookId))
 
 		// Set start progress if not set
 		book.progress = book.progress || 0
