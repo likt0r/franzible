@@ -1,5 +1,6 @@
 // Initializes the `progress` service on path `/progress`
 import { ServiceAddons } from '@feathersjs/feathers'
+
 import { Application } from '../../declarations'
 import { Progress } from './progress.class'
 import createModel from '../../models/progress.model'
@@ -7,9 +8,9 @@ import hooks from './progress.hooks'
 
 // Add this service to the service type index
 declare module '../../declarations' {
-  interface ServiceTypes {
-    progress: Progress & ServiceAddons<any>
-  }
+	interface ServiceTypes {
+		progress: Progress & ServiceAddons<any>
+	}
 }
 
 export default function (app: Application): void {

@@ -73,7 +73,8 @@
 				:disabled="!bookChanged"
 				@click="save"
 			>
-				Save Changes <v-icon right> mdi-cloud-upload-outline </v-icon></v-btn
+				Save Changes
+				<v-icon right> mdi-cloud-upload-outline </v-icon></v-btn
 			>
 			<v-btn
 				color="warning"
@@ -93,7 +94,6 @@
 
 <script>
 import { Fragment } from 'vue-fragment'
-import { makeGetMixin } from 'feathers-vuex'
 import { mapGetters, mapActions } from 'vuex'
 import deepEqual from 'deep-equal'
 import CoverUpload from '~/components/CoverUpload.vue'
@@ -109,14 +109,7 @@ export default {
 		CoverUpload,
 		TagCloud,
 	},
-	mixins: [
-		makeGetMixin({
-			service: 'books', // depending on service
-			id() {
-				return this.$route.params.id
-			},
-		}),
-	],
+
 	layout: 'default',
 	transition: 'slide-left',
 

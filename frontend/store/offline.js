@@ -6,6 +6,7 @@ import { deepClone } from '~/tools/helper'
 export const state = () => ({
 	booksMap: {},
 	activeProcessMap: {},
+	initialized: false,
 })
 const db = getDatabase()
 const abortControllerMap = {}
@@ -21,7 +22,7 @@ export const mutations = {
 		Vue.set(state.booksMap, book._id, deepClone(book))
 		state.booksMap = { ...state.booksMap }
 	},
-	BOOK_SET_PROGRESS(
+	BOOK_SET_OFFLINE_PROGRESS(
 		state,
 		{ bookId, progress, progressFileIndex, fileIndex, dbId }
 	) {
@@ -56,21 +57,24 @@ export const mutations = {
 	FINISH_PROCESS(state, bookId) {
 		Vue.set(state.activeProcessMap, bookId, undefined)
 	},
+	INITIALIZED(state) {
+		state.initialized = true
+	},
 }
 
 export const actions = {
-	async addBook({ commit, dispatch, getters }, bookId) {
+	async addBook(
+		{ commit, dispatch, getters, rootGetters, rootState, root },
+		bookId
+	) {
 		if (getters.isBookBeingDownloaded[bookId]) {
-			console.warn(`Book ${bookId} is allready downloading.`)
+			console.warn(`Book ${bookId} is already downloading.`)
 			return
 		}
 
 		// clone Object to prevent altering State
-
-		const book = deepClone(
-			getters.getBook(bookId) ||
-				(await dispatch('books/get', bookId, { root: true }))
-		)
+		await dispatch('book/get', bookId, { root: true })
+		const book = deepClone(await rootGetters['book/getBook'](bookId))
 
 		// Set start progress if not set
 		book.progress = book.progress || 0
@@ -156,7 +160,7 @@ export const actions = {
 					}
 
 					await db.updateBook(book)
-					commit('BOOK_SET_PROGRESS', {
+					commit('BOOK_SET_OFFLINE_PROGRESS', {
 						bookId: book._id,
 						progress: Math.round(((index + 1) / book.files.length) * 100),
 						progressFileIndex: index,
@@ -172,6 +176,11 @@ export const actions = {
 		} finally {
 			commit('FINISH_PROCESS', bookId)
 		}
+	},
+	async initialize({ commit }) {
+		const books = await db.getBooks()
+		console.log('offlineInit:', books)
+		commit('SET_BOOKS', books)
 	},
 }
 
@@ -205,9 +214,12 @@ export const getters = {
 		)
 	},
 	books: (state) => Object.values(state.booksMap),
+	initialized: (state) => state.initialized,
 }
-export const offlineInitPlugin = async ({ commit }) => {
-	const books = await db.getBooks()
-	console.log('offlineInitPlugin:', books)
-	commit('offline/SET_BOOKS', books)
+
+export default {
+	state,
+	mutations,
+	actions,
+	getters,
 }

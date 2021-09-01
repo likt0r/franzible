@@ -6,7 +6,7 @@
         "default": 10,
         "max": 50
     },
-    "mediaPath": "/media/apollon/media/Audiobooks/",
+    "mediaPath": "/home/bewr/Dokumente/_Audiobooks/",
     "authentication": {
         "entity": "user",
         "service": "users",

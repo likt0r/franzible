@@ -1,6 +1,6 @@
 <template>
 	<v-app-bar
-		v-if="!isFindProgressPending && (lastBookId || bookId)"
+		v-if="lastBookId"
 		bottom
 		fixed
 		dark
@@ -55,7 +55,6 @@
 
 <script>
 import MarqueeText from 'vue-marquee-text-component'
-import { makeFindMixin, makeGetMixin } from 'feathers-vuex'
 import OfflineImage from './OfflineImage.vue'
 import { getFullUrl } from '~/tools/url'
 import { toMinutesAndSeconds } from '~/tools/formatTime'
@@ -65,15 +64,7 @@ export default {
 		MarqueeText,
 		OfflineImage,
 	},
-	mixins: [
-		makeFindMixin({ service: 'progress' }),
-		makeGetMixin({
-			service: 'books', // depending on service
-			id() {
-				return this.playerBookId || this.lastBookId
-			},
-		}),
-	],
+	mixins: [],
 	data() {
 		return {}
 	},
@@ -86,29 +77,39 @@ export default {
 		author() {
 			return '53min 43s verbleibend'
 		},
-		progressParams() {
-			return { query: {} } // Step 3
-		},
+
 		playerBookId() {
 			return this.$store.getters['player/activeBookId']
 		},
 		lastProgress() {
-			return this.progress && this.progress.length > 0
-				? [...this.progress]
-						.filter((p) => p.played)
-						.sort((a, b) =>
-							Math.sign(Date.parse(b.updatedAt) - Date.parse(a.updatedAt))
-						)[0]
+			const bookId = this.$store.getters['progress/lastPlayedBookId']
+			console.log('SmallPlayer lastProgress id', bookId)
+			const book = bookId
+				? this.$store.getters['progress/getByBookId'](
+						this.$store.getters['progress/lastPlayedBookId']
+				  )
 				: null
+			console.log('SmallPlayer lastProgress book', book)
+			return book
 		},
 		lastBookId() {
-			return this.lastProgress ? this.lastProgress.bookId : null
+			return this.$store.getters['progress/lastPlayedBookId']
+		},
+		book() {
+			return this.$store.getters['progress/lastPlayedBookId']
+				? this.$store.getters['book/getBook'](
+						this.$store.getters['progress/lastPlayedBookId']
+				  )
+				: null
 		},
 
 		bookCoverUrl() {
-			return this.book && this.book.cover && this.book.cover[0]
-				? getFullUrl(this.book.cover[0])
-				: '/icon.png'
+			return (
+				this.book &&
+				this.book.cover &&
+				this.book.cover[0] &&
+				getFullUrl(this.book.cover[0])
+			)
 		},
 
 		bookDuration() {
@@ -128,7 +129,9 @@ export default {
 		},
 		bookRemainingTime() {
 			return (
-				this.bookDuration - this.tillChapter - this.lastProgress.filePosition
+				this.bookDuration -
+				this.tillChapter -
+				this.lastProgress.filePosition
 			)
 		},
 		playerIsPlaying() {
@@ -140,6 +143,10 @@ export default {
 	},
 
 	watch: {
+		lastBookId(newId) {
+			console.log('SamllPlayer watch', this.lastBookId)
+			this.$store.dispatch('book/get', newId)
+		},
 		book(newval) {
 			// if player is empty load last played book into it
 			if (newval && !this.playerBookId && this.lastProgress) {
@@ -159,21 +166,44 @@ export default {
 			}
 		},
 	},
+	async beforeMount() {
+		if (this.lastBookId) {
+			console.log('SamllPlayer before mount', this.lastBookId)
+			this.$store.dispatch('book/get', this.lastBookId)
+			if (!this.$store.getters['player/activeBookId']) {
+				await this.$store.dispatch('player/loadFile', {
+					bookId: this.lastProgress.bookId,
+					fileIndex: this.lastProgress.fileIndex,
+					filePosition: this.lastProgress.filePosition,
+					startPlaying: false,
+				})
+			}
+		}
+	},
 	methods: {
 		gotoBook() {
-			this.$router.push(`/books/${this.bookId}`)
+			this.$router.push(`/books/${this.playerBookId}`)
 		},
 		toMinutesAndSeconds,
 		getFullUrl,
-		playButtonClick() {
+		async playButtonClick() {
 			// if no bookId in player is set
 			if (this.playerIsPlaying || this.playerIsLoading) {
 				this.$store.dispatch('player/pause')
+			} else if (this.$store.getters['player/activeBookId']) {
+				this.$store.dispatch('player/resume')
 			} else {
+				// special case on load player is still empty
+				await this.$store.dispatch('player/loadFile', {
+					bookId: this.lastProgress.bookId,
+					fileIndex: this.lastProgress.fileIndex,
+					filePosition: this.lastProgress.filePosition,
+					startPlaying: false,
+				})
 				this.$store.dispatch('player/resume')
 			}
 		},
-		fastRewind() {
+		async fastRewind() {
 			this.$store.dispatch('player/fastRewind')
 		},
 	},

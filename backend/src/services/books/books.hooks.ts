@@ -5,17 +5,18 @@ import { HookContext } from '@feathersjs/feathers'
 // import createDelay from '../../hooks/create-delay'
 import isAdmin from '../../hooks/is-admin'
 import saveBookToJson from '../../hooks/save-book-to-json'
+import { preFeathersHook as handleTimestamp } from '../../tools/timeStamps'
 const { authenticate } = hooks
 
 export default {
   before: {
-    all: [authenticate('jwt')],
+    all: [authenticate('jwt'), handleTimestamp],
     find: [],
     get: [],
-    create: [ authenticate('jwt'),isAdmin() ],
-    update: [ authenticate('jwt'),isAdmin() ],
-    patch: [ disallow],
-    remove: [ authenticate('jwt'),isAdmin() ],
+    create: [isAdmin()],
+    update: [isAdmin()],
+    patch: [disallow],
+    remove: [isAdmin()],
   },
 
   after: {

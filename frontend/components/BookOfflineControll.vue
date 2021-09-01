@@ -64,7 +64,9 @@
 
 		<v-container class="layer bar">
 			<v-icon
-				v-if="getBookOfflineState(book._id) === BOOK_OFFLINE_STATE.notStarted"
+				v-if="
+					getBookOfflineState(book._id) === BOOK_OFFLINE_STATE.notStarted
+				"
 				small
 				@click.stop="startDownload"
 				>{{ 'mdi-download' }}</v-icon
@@ -74,28 +76,35 @@
 				v-model="dialog"
 				width="500"
 				v-if="
-					getBookOfflineState(book._id) !== BOOK_OFFLINE_STATE.notStarted &&
+					getBookOfflineState(book._id) !==
+						BOOK_OFFLINE_STATE.notStarted &&
 					!isBookBeingDownloaded(book._id) &&
 					!isBookBeingDeleted(book._id)
 				"
 			>
 				<template v-slot:activator="{ on, attrs }">
-					<v-icon small v-bind="attrs" v-on="on">{{ 'mdi-delete' }}</v-icon>
+					<v-icon small v-bind="attrs" v-on="on">{{
+						'mdi-delete'
+					}}</v-icon>
 				</template>
 
 				<v-card>
 					<v-card-title> Delete {{ book.title }} </v-card-title>
 
 					<v-card-text>
-						Do you really want to delete {{ book.title }} from your offline
-						storage ?
+						Do you really want to delete {{ book.title }} from your
+						offline storage ?
 					</v-card-text>
 
 					<v-divider></v-divider>
 
 					<v-card-actions>
 						<v-spacer></v-spacer>
-						<v-btn color="secondary darken-1" text @click="dialog = false">
+						<v-btn
+							color="secondary darken-1"
+							text
+							@click="dialog = false"
+						>
 							Close
 						</v-btn>
 						<v-btn

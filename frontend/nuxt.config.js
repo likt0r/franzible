@@ -26,23 +26,32 @@ export default {
 		API_SOCKET: '/',
 	},
 	router: {
-		middleware: ['secured'],
+		middleware: ['initOffline', 'secured'],
 	},
 
 	// Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
 	plugins: [
-		{ src: '~/plugins/feathers-vuex.js' },
+		{ src: '~/plugins/feathers.js' },
 		{ src: '~/plugins/authInit.js' },
 		{ src: '~/plugins/vSnackbarQueue.js' },
+		{ src: '~/plugins/vuex-persist', ssr: false },
 	],
 
 	// Modules: https://go.nuxtjs.dev/config-modules
 	modules: [
+		'nuxt-client-init-module',
 		'@nuxtjs/axios',
-		'@nuxtjs/pwa',
 		'@nuxtjs/toast',
 		'@nuxtjs/proxy',
-		'nuxt-client-init-module',
+	],
+
+	// Modules for dev and build (recommended): https://go.nuxtjs.dev/config-modules
+	buildModules: [
+		// https://go.nuxtjs.dev/eslint
+		'@nuxtjs/eslint-module',
+		// https://go.nuxtjs.dev/vuetify
+		'@nuxtjs/vuetify',
+		'@nuxtjs/pwa',
 	],
 	axios: {
 		baseURL: '/',
@@ -86,19 +95,7 @@ export default {
 	},
 
 	// Build Configuration: https://go.nuxtjs.dev/config-build
-	build: {
-		transpile: ['feathers-vuex'],
-	},
-
-	// Modules for dev and build (recommended): https://go.nuxtjs.dev/config-modules
-	buildModules: [
-		// https://go.nuxtjs.dev/eslint
-		'@nuxtjs/eslint-module',
-		// https://go.nuxtjs.dev/vuetify
-
-		'@nuxtjs/vuetify',
-		'@nuxtjs/pwa',
-	],
+	build: {},
 
 	// PWA module configuration: https://go.nuxtjs.dev/pwa
 

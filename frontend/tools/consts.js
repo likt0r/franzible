@@ -8,3 +8,6 @@ export const BOOK_OFFLINE_PROCESS_STATE = {
 	downloading: 'downloading',
 	deleting: 'deleting',
 }
+
+export const OFFLINE_PAGES = ['library', 'login']
+export const PUBLIC_PAGES = ['login']

@@ -7,9 +7,9 @@ import hooks from './users.hooks'
 
 // Add this service to the service type index
 declare module '../../declarations' {
-  interface ServiceTypes {
-    users: Users & ServiceAddons<any>
-  }
+	interface ServiceTypes {
+		users: Users & ServiceAddons<any>
+	}
 }
 
 export default function (app: Application): void {
@@ -25,6 +25,7 @@ export default function (app: Application): void {
 
   service.hooks(hooks)
   app.service('users').publish((data, context) => {
+    console.log('Letz add admin')
     return [
       app.channel('admins'),
       app.channel('app.channels').filter((connection) => {

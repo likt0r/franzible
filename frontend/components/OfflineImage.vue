@@ -5,7 +5,7 @@
 		:eager="eager"
 		:gradient="gradient"
 		:lazy-src="lazySrc"
-		:src="src"
+		:src="objectUrl || src"
 		:options="options"
 		:position="position"
 		:sizes="sizes"
@@ -62,7 +62,8 @@ export default {
 		}
 	},
 	watch: {
-		dbId() {
+		dbId(val) {
+			console.log('dbID changed', val)
 			this.setDatabaseImage()
 		},
 	},
@@ -83,6 +84,8 @@ export default {
 			if (this.dbId) {
 				this.dbImageCreated = true
 				this.objectUrl = await getDatabase().getFileContentUrl(this.dbId)
+			} else {
+				this.objectUrl = undefined
 			}
 		},
 	},

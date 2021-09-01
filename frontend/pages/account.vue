@@ -94,7 +94,8 @@ export default {
 	},
 	computed: {
 		passwordMatch() {
-			return () => this.password === this.verify || 'Password must match'
+			return (v) =>
+				this.user.password === this.user.retyped || 'Password must match'
 		},
 	},
 	mounted() {
@@ -117,10 +118,13 @@ export default {
 				delete this.user.password
 			}
 			this.updating = true
-			await this.$store.dispatch('users/patch', [
-				this.$store.state.auth.user._id,
-				this.user,
-			])
+			await this.$store.dispatch(
+				'auth/patchUser',
+
+				this.user
+			)
+			this.user.password = ''
+			this.user.retyped = ''
 			this.updating = false
 		},
 		reset() {

@@ -87,7 +87,8 @@
 										>User: {{ editedItem.email }}</v-card-title
 									>
 									<v-card-text class="headline"
-										>Are you sure you want to delete this user?</v-card-text
+										>Are you sure you want to delete this
+										user?</v-card-text
 									>
 									<v-card-actions>
 										<v-spacer></v-spacer>
@@ -120,13 +121,15 @@
 </template>
 
 <script>
-import { makeFindMixin } from 'feathers-vuex'
 import { getFullUrl } from '~/tools/url'
 
 export default {
-	mixins: [makeFindMixin({ service: 'users' })],
 	layout: 'default',
 	middleware: 'admin',
+	async asyncData({ $feathers }) {
+		const users = await $feathers.service('users').find()
+		return { users }
+	},
 	data: () => {
 		return {
 			loading: false,
@@ -205,13 +208,10 @@ export default {
 			console.log('closeDelete')
 			this.loading = true
 			try {
-				await this.$store.dispatch('users/remove', this.editedItem._id)
+				await this.$feathers.service('users').remove(this.editedItem._id)
+				this.users = await this.$feathers.service('users').find()
 				this.loading = false
 				this.dialogDelete = false
-				this.$nextTick(() => {
-					this.editedItem = Object.assign({}, this.defaultItem)
-					this.editedIndex = -1
-				})
 			} catch (error) {
 				this.loading = false
 			}
@@ -224,13 +224,13 @@ export default {
 					delete this.editedItem.password
 				}
 				console.log('patch item', this.editedItem)
-				await this.$store.dispatch('users/patch', [
-					this.editedItem._id,
-					this.editedItem,
-				])
+				await this.$feathers
+					.service('users')
+					.patch(this.editedItem._id, this.editedItem)
 			} else {
-				await this.$store.dispatch('users/create', this.editedItem)
+				await this.$feathers.service('users').create(this.editedItem)
 			}
+			this.users = await this.$feathers.service('users').find()
 			this.loading = false
 			this.close()
 		},

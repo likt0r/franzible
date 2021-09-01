@@ -9,20 +9,15 @@ export const state = () => ({
 	filePosition: 0,
 	playerState: PLAYER_STATE_ENUM.stopped,
 	fastStep: 30,
-	progressId: null,
 	speed: 100,
 })
 
 export const mutations = {
-	SET_BOOK_FILE(
-		state,
-		{ bookId, book, fileIndex, filePosition = 0, progressId }
-	) {
+	SET_BOOK_FILE(state, { bookId, book, fileIndex, filePosition = 0 }) {
 		state.bookId = bookId
 		state.fileIndex = fileIndex
 		state.book = book
 		state.filePosition = filePosition
-		state.progressId = progressId
 	},
 	SET_FILE(state, { fileIndex, filePosition = 0 }) {
 		state.fileIndex = fileIndex
@@ -34,11 +29,11 @@ export const mutations = {
 			console.log('#Player state is: ', playerState)
 			state.playerState = playerState
 		} else {
-			throw new Error(`Unkown Player state: ${playerState}`)
+			throw new Error(`Unknown Player state: ${playerState}`)
 		}
 	},
 
-	SET_FILE_POSTION(state, filePosition) {
+	SET_FILE_POSITION(state, filePosition) {
 		state.filePosition = filePosition
 	},
 	SET_SPEED(state, speed) {
@@ -47,30 +42,25 @@ export const mutations = {
 }
 
 export const actions = {
-	loadFile(
+	async loadFile(
 		{ dispatch, commit, getters, state, rootGetters },
 		{ bookId, fileIndex, filePosition = 0, startPlaying = false }
 	) {
 		if (state.bookId !== bookId || state.fileIndex !== fileIndex) {
-			const book = rootGetters['books/get'](bookId)
+			await dispatch('book/get', bookId, { root: true })
+			const book = rootGetters['book/getBook'](bookId)
 			if (!book) {
 				throw new Error('Book not found with id', bookId)
 			}
-			const { _id: progressId } = rootGetters['progress/find']({
-				query: {
-					bookId,
-				},
-			}).data[0]
 
 			commit('SET_BOOK_FILE', {
 				bookId,
 				book,
 				fileIndex,
 				filePosition,
-				progressId,
 			})
 
-			getInstance().loadAudioBook({
+			await getInstance().loadAudioBook({
 				audioUrl: getFullUrl(book.files[fileIndex].filepath),
 				audioDbId: book.files[fileIndex].dbId,
 				filePosition,
@@ -85,7 +75,9 @@ export const actions = {
 					// album:
 					artwork: [
 						{
-							src: getFullUrl(state.book.cover[0] || '/logo.png'),
+							src: getFullUrl(
+								(state.book.cover && state.book.cover[0]) || '/logo.png'
+							),
 							sizes: '512x512',
 							type: 'image/png',
 						},
@@ -231,6 +223,7 @@ export const playerInitPlugin = (store) => {
 	if (process.client) {
 		init(store)
 	}
+	let lastTimeUpdate = 0
 	store.subscribe((mutation, state) => {
 		// called after every mutation.
 		// The mutation comes in the format of `{ type, payload }`.
@@ -238,18 +231,26 @@ export const playerInitPlugin = (store) => {
 			[
 				'player/SET_BOOK_FILE',
 				'player/SET_FILE',
-				'player/SET_FILE_POSTION',
+				'player/SET_FILE_POSITION',
 			].includes(mutation.type)
 		) {
-			console.log('update position')
-			store.dispatch('progress/patch', [
-				state.player.progressId,
-				{
-					fileIndex: state.player.fileIndex,
-					filePosition: state.player.filePosition,
-					played: true,
-				},
-			])
+			// console.log(
+			// 	'update position',
+			// 	!!store.getters['progress/getByBookId'](state.player.bookId)
+			// )
+			if (store.getters['progress/getByBookId'](state.player.bookId)) {
+				// update store progress only every second
+				if (Date.now() - lastTimeUpdate > 1000) {
+					store.dispatch('progress/patchByBookId', {
+						bookId: state.player.bookId,
+						fileIndex: state.player.fileIndex,
+						filePosition: state.player.filePosition,
+					})
+					lastTimeUpdate = Date.now()
+				}
+			} else {
+				store.dispatch('progress/createByBookId', state.player.bookId)
+			}
 		}
 	})
 }
