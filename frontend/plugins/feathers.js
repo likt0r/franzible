@@ -32,8 +32,22 @@ export const feathersClient = feathers()
 	.configure(transport)
 	.configure(auth({ storage }))
 
-export default ({ app }, inject) => {
+export default (pluginContext, inject) => {
 	// Inject $hello(msg) in Vue, context and store.
-
+	feathersClient.hooks({
+		async error(context) {
+			if (context.error.name === 'NotAuthenticated') {
+				console.warn(
+					`Error in '${context.path}' service method '${context.method}'`,
+					context.error.stack
+				)
+				return await pluginContext.store.dispatch('auth/logout', true)
+			}
+			console.error(
+				`Error in '${context.path}' service method '${context.method}'`,
+				context.error.stack
+			)
+		},
+	})
 	inject('feathers', feathersClient)
 }

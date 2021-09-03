@@ -57,10 +57,11 @@ export const actions = {
 		}
 	},
 
-	async logout({ commit }) {
+	async logout({ commit }, ignoreFeathers) {
 		commit('LOGGED_OUT')
-		await feathersClient.logout()
+		if (!ignoreFeathers) await feathersClient.logout()
 		window.localStorage.removeItem('vuex')
+		window.location.reload()
 	},
 
 	async patchUser({ commit, state }, { email, password, retyped }) {
