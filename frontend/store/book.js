@@ -12,6 +12,9 @@ export const mutations = {
 }
 export const actions = {
 	async get({ commit, state, rootState, rootGetters }, bookId) {
+		if (!bookId) {
+			return null
+		}
 		if (state.bookMap[bookId] || rootGetters['offline/getBook'](bookId)) {
 			// update in background to improve snappinest
 			if (feathersClient.io.connected) {
