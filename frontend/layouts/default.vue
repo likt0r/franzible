@@ -106,6 +106,10 @@ export default {
 }
 </script>
 <style scoped>
+.theme--dark.v-application {
+	background: #000000;
+	color: #ffffff;
+}
 .slide-left-enter-active,
 .slide-left-leave-active {
 	transition: opacity 0.25s ease-in-out, transform 0.25s ease-in-out;
