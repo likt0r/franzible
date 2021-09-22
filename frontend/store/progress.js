@@ -39,12 +39,14 @@ export const actions = {
 		})
 	},
 	inferLastPlayed({ commit, state }) {
-		console.log('sync set last PLayed')
+		console.log('sync set last Played')
 		let lastProgress = null
 		Object.values(state.documentsMap).forEach((doc) => {
 			if (!lastProgress) {
 				lastProgress = doc
-			} else if (Date.parse(doc.lastProgress) < Date.parse(doc.updatedAt)) {
+			} else if (
+				Date.parse(lastProgress.updatedAt) < Date.parse(doc.updatedAt)
+			) {
 				lastProgress = doc
 			}
 		})
