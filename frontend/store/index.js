@@ -4,6 +4,7 @@ import { timerInitPlugin } from './timer'
 import { plugin as progressPlugin } from './progress'
 import { plugin as connectionPlugin } from './connection'
 import { plugin as authPlugin } from './auth'
+import { plugin as mediaPlugin } from './media'
 import { uniqBy } from '~/tools/helper'
 
 export const state = () => ({
@@ -148,4 +149,5 @@ export const plugins = [
 	playerInitPlugin,
 	timerInitPlugin,
 	progressPlugin,
+	mediaPlugin,
 ]

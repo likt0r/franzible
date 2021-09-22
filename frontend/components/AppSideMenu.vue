@@ -105,6 +105,11 @@ export default {
 					title: 'Users',
 					to: '/admin/users',
 				},
+				{
+					icon: 'mdi-music-box-multiple-outline',
+					title: 'Media',
+					to: '/admin/media',
+				},
 			],
 		}
 	},
