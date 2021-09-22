@@ -1,4 +1,5 @@
 #/bin/bash
+# requirement jq package
 show_help()
 {
 echo "
@@ -28,5 +29,5 @@ VERSION=$(cat package.json | jq -r '.version')
 IMAGE_NAME=${HUB_USER}/${PROJECT_NAME}
 TAG_LATEST=${IMAGE_NAME}:latest
 TAG_VERSION=${IMAGE_NAME}:${VERSION}
-
+echo ${PROJECT_NAME}
 docker build -t ${TAG_LATEST} -t ${TAG_VERSION} . 
