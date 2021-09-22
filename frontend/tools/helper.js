@@ -26,6 +26,16 @@ export function uniqBy(a, key) {
 	const seen = {}
 	return a.filter(function (item) {
 		const k = key(item)
+		// eslint-disable-next-line
 		return seen.hasOwnProperty(k) ? false : (seen[k] = true)
 	})
+}
+
+export async function unlockAudio() {
+	console.log('unlock audio')
+	const elAudio = new Audio()
+	elAudio.play()
+	elAudio.src = 'test.mp3'
+	await elAudio.play()
+	console.log('unlock done Playing')
 }

@@ -14,8 +14,8 @@ class AudioPlayer {
 	constructor(store) {
 		this.reloadSrcFlag = false
 		this.store = null
-		this.elAudio = document.createElement('AUDIO')
-		this.elPreloader = document.createElement('AUDIO')
+		this.elAudio = new Audio()
+		this.elPreloader = new Audio()
 		this.playing = false
 		this.loading = false
 		this.fileIndex = null
@@ -23,6 +23,7 @@ class AudioPlayer {
 		this.fileIndex = 0
 		this.filePosition = 0
 		this.store = store
+		this.isIOsInitialized = false
 		this.currentSrc = ''
 		// this state is needed for not showing loading animation if player preloading
 		this.simpleState = PLAYER_SIMPLE_STATE_ENUM.stopped
@@ -125,10 +126,10 @@ class AudioPlayer {
 		}
 		try {
 			await this.elAudio.play()
-
 			console.log('#player: __play')
 			this.store.commit('player/SET_STATE', PLAYER_STATE_ENUM.playing)
 		} catch (error) {
+			console.error(error)
 			if (
 				error.message ===
 				'The play() request was interrupted by a call to pause().'
@@ -158,6 +159,20 @@ class AudioPlayer {
 			this.store.commit('player/SET_STATE', PLAYER_STATE_ENUM.loading)
 		}
 		this.elAudio.currentTime = position
+	}
+
+	async initAudioElement() {
+		if (!this.isIOsInitialized) {
+			console.log('Start initin Element for ios')
+			const oldSrc = this.elAudio.src
+			this.elAudio.src =
+				'data:audio/mpeg;base64,SUQzBAAAAAABEVRYWFgAAAAtAAADY29tbWVudABCaWdTb3VuZEJhbmsuY29tIC8gTGFTb25vdGhlcXVlLm9yZwBURU5DAAAAHQAAA1N3aXRjaCBQbHVzIMKpIE5DSCBTb2Z0d2FyZQBUSVQyAAAABgAAAzIyMzUAVFNTRQAAAA8AAANMYXZmNTcuODMuMTAwAAAAAAAAAAAAAAD/80DEAAAAA0gAAAAATEFNRTMuMTAwVVVVVVVVVVVVVUxBTUUzLjEwMFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/zQsRbAAADSAAAAABVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/zQMSkAAADSAAAAABVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV'
+			await this.elAudio.play()
+			this.elAudio.pause()
+			this.elAudio.src = oldSrc
+			console.log('ended')
+			this.isIOsInitialized = true
+		}
 	}
 }
 

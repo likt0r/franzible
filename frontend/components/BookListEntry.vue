@@ -27,7 +27,9 @@
 <script>
 import OfflineImage from './OfflineImage.vue'
 import BookOfflineControll from './BookOfflineControll.vue'
+import { getInstance } from '~/tools/AudioPlayer'
 import { getFullUrl } from '~/tools/url'
+import { unlockAudio } from '~/tools/helper'
 export default {
 	components: { OfflineImage, BookOfflineControll },
 	props: {
@@ -57,6 +59,8 @@ export default {
 
 		async playBook() {
 			if (this.activeBookId !== this.bookId) {
+				const instance = await getInstance()
+				await instance.initAudioElement()
 				await this.$store.dispatch('book/get', this.book._id, {
 					root: true,
 				})

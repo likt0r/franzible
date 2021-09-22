@@ -130,10 +130,23 @@ export default function factory(
 							const tempId = doc[idField]
 							const tmpDoc = deepClone(doc)
 							delete tmpDoc[idField]
-							const result = await feathersClient
-								.service(serviceName)
-								.create(tmpDoc)
-							commit('CHANGE_TEMP_ID', { tempId, newDoc: result })
+							try {
+								const result = await feathersClient
+									.service(serviceName)
+									.create(tmpDoc)
+								commit('CHANGE_TEMP_ID', { tempId, newDoc: result })
+							} catch (error) {
+								const { data } = error
+								if (error.name === 'document-already-exists') {
+									// TODO: User notification
+									commit('CREATE', { id: data[idField], doc: data })
+									console.warn(
+										'Progress already exists on Server taking server state',
+										data
+									)
+									commit('CHANGE_TEMP_ID', { tempId, newDoc: data })
+								} else throw error
+							}
 						})
 					)
 
@@ -162,6 +175,7 @@ export default function factory(
 						} else {
 							// if ours  is newer send to them
 							// console.log(`${serviceName} sync patch ours`, localDoc)
+
 							feathersClient
 								.service(serviceName)
 								.patch(doc[idField], localDoc)
@@ -182,12 +196,25 @@ export default function factory(
 						doc.createdAt = new Date().toISOString()
 						doc.updatedAt = doc.createdAt
 					}
-					const result = await feathersClient
-						.service(serviceName)
-						.create(doc)
-					// console.log(`${serviceName}/create result`, result)
-					commit('CREATE', { id: result[idField], doc: result })
-					return result
+					try {
+						const result = await feathersClient
+							.service(serviceName)
+							.create(doc)
+						// console.log(`${serviceName}/create result`, result)
+						commit('CREATE', { id: result[idField], doc: result })
+						return result
+					} catch (error) {
+						const { data } = error
+						if (error.name === 'document-already-exists') {
+							commit('CREATE', { id: data[idField], doc: data })
+							// TODO: User notification
+							console.warn(
+								'Progress already exists on Server, taking server state',
+								data
+							)
+							return error.data
+						} else throw error
+					}
 				} else {
 					doc[idField] = `temp-${nanoid()}`
 					doc.createdAt = new Date().toISOString()
@@ -202,9 +229,11 @@ export default function factory(
 
 				if (feathersClient.io.connected) {
 					// console.log(`/${moduleName}/patch action id, doc`, { id, doc })
+
 					const result = await feathersClient
 						.service(serviceName)
 						.patch(id, doc)
+
 					// console.log(`/${moduleName}/patch action id, result`, result)
 					commit('PATCH', { id, doc: result })
 					return result
