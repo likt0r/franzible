@@ -314,7 +314,7 @@ export default {
 				this.$store.dispatch('player/loadFile', {
 					bookId: this.bookId,
 					fileIndex: this.progress.fileIndex,
-					filePosition: 0, // this.progress.filePosition,
+					filePosition: this.progress.filePosition,
 					startPlaying: true,
 				})
 			} else if (this.playerIsPlaying || this.playerIsLoading) {
