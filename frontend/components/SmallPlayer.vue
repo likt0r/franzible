@@ -190,18 +190,7 @@ export default {
 			// if no bookId in player is set
 			if (this.playerIsPlaying || this.playerIsLoading) {
 				this.$store.dispatch('player/pause')
-			} else if (this.$store.getters['player/activeBookId']) {
-				this.$store.dispatch('player/resume')
-			} else {
-				// special case on load player is still empty
-				await this.$store.dispatch('player/loadFile', {
-					bookId: this.lastProgress.bookId,
-					fileIndex: this.lastProgress.fileIndex,
-					filePosition: this.lastProgress.filePosition,
-					startPlaying: false,
-				})
-				this.$store.dispatch('player/resume')
-			}
+			} else this.$store.dispatch('player/resume')
 		},
 		async fastRewind() {
 			this.$store.dispatch('player/fastRewind')

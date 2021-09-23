@@ -113,9 +113,26 @@ export const actions = {
 		getInstance().pause()
 	},
 
-	resume() {
-		console.log('Action REsume')
-		getInstance().resume()
+	async resume({ dispatch, rootGetters }) {
+		if (rootGetters['player/activeBookId']) {
+			getInstance().resume()
+		} else {
+			const bookId = rootGetters['progress/lastPlayedBookId']
+			console.log('SmallPlayer lastProgress id', bookId)
+			const progress = bookId
+				? rootGetters['progress/getByBookId'](
+						rootGetters['progress/lastPlayedBookId']
+				  )
+				: null
+			console.log('SmallPlayer lastProgress book', progress)
+
+			await dispatch('loadFile', {
+				bookId: progress.bookId,
+				fileIndex: progress.fileIndex,
+				filePosition: progress.filePosition,
+				startPlaying: true,
+			})
+		}
 	},
 
 	fastForward({ state, dispatch }) {
@@ -219,10 +236,29 @@ export const getters = {
 
 export const playerInitPlugin = (store) => {
 	// called when the store is initialized
-	console.log('#player: Init Player')
+	console.log('#player: Init Player', store)
 	if (process.client) {
 		init(store)
 	}
+	// add Key pressed listeners
+	window.addEventListener('keydown', (event) => {
+		if (event.code === 'Space' && event.target === document.body) {
+			event.preventDefault()
+		}
+	})
+	window.addEventListener('keyup', (event) => {
+		console.log('#player', event)
+		if (event.code === 'Space' && event.target === document.body) {
+			event.preventDefault()
+			if (store.getters['player/isPlaying']) {
+				store.dispatch('player/pause')
+				return false
+			} else {
+				store.dispatch('player/resume')
+			}
+		}
+	})
+
 	let lastTimeUpdate = 0
 	store.subscribe((mutation, state) => {
 		// called after every mutation.
