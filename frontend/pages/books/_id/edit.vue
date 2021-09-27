@@ -1,5 +1,5 @@
 <template>
-	<fragment>
+	<div>
 		<v-container class="bottom-spacer">
 			<v-form v-if="bookCopy" ref="form" fill-height>
 				<v-row>
@@ -89,11 +89,10 @@
 				Delete <v-icon right> mdi-trash-can-outline </v-icon></v-btn
 			></v-toolbar
 		>
-	</fragment>
+	</div>
 </template>
 
 <script>
-import { Fragment } from 'vue-fragment'
 import { mapGetters, mapActions } from 'vuex'
 import deepEqual from 'deep-equal'
 import CoverUpload from '~/components/CoverUpload.vue'
@@ -105,13 +104,20 @@ import TagCloud from '~/components/TagCloud.vue'
 export default {
 	name: 'edit',
 	components: {
-		Fragment,
 		CoverUpload,
 		TagCloud,
 	},
 
 	layout: 'default',
 	transition: 'slide-left',
+
+	async asyncData({ params, store }) {
+		const bookId = params.id
+
+		const book = await store.dispatch('book/get', bookId)
+
+		return { book, bookId }
+	},
 
 	data() {
 		return {
@@ -159,7 +165,10 @@ export default {
 			this.bookCopy = JSON.parse(JSON.stringify(this.book))
 		},
 		save() {
-			this.update([this.book._id, this.bookCopy, {}])
+			this.$store.dispatch('book/patch', {
+				id: this.bookId,
+				doc: this.bookCopy,
+			})
 		},
 	},
 }

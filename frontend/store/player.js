@@ -50,7 +50,7 @@ export const actions = {
 			await dispatch('book/get', bookId, { root: true })
 			const book = rootGetters['book/getBook'](bookId)
 			if (!book) {
-				throw new Error('Book not found with id', bookId)
+				return console.warn('Book not found with id', bookId)
 			}
 
 			commit('SET_BOOK_FILE', {

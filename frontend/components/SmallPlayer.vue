@@ -1,6 +1,6 @@
 <template>
 	<v-app-bar
-		v-if="lastBookId"
+		v-if="book"
 		bottom
 		fixed
 		dark
@@ -168,8 +168,7 @@ export default {
 	},
 	async beforeMount() {
 		if (this.lastBookId) {
-			console.log('SamllPlayer before mount', this.lastBookId)
-			this.$store.dispatch('book/get', this.lastBookId)
+			await this.$store.dispatch('book/get', this.lastBookId)
 			if (!this.$store.getters['player/activeBookId']) {
 				await this.$store.dispatch('player/loadFile', {
 					bookId: this.lastProgress.bookId,

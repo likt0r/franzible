@@ -17,7 +17,7 @@ export default function factory(
 			documentsMap: {},
 			isSynced: false,
 			isSyncing: false,
-			operationsBuffer: [],
+			getDocIds: [],
 			removedDocIds: [],
 		},
 		mutations: {
@@ -61,6 +61,12 @@ export default function factory(
 			ADD_REMOVED_DOC_ID(state, id) {
 				state.removedDocIds.push(id)
 			},
+			REMOVE_GET_DOC_ID(state, id) {
+				state.getDocIds = state.removedDocIds.filter((el) => el !== id)
+			},
+			ADD_GET_DOC_ID(state, id) {
+				state.getDocIds.push(id)
+			},
 		},
 		actions: {
 			async sync({ commit, state, rootState }) {
@@ -72,9 +78,20 @@ export default function factory(
 				console.log(`Sync start: ${serviceName}`)
 				try {
 					commit('SET_SYNCING_STATE', true)
+					// if not sync all get only already requested documents
+					const query = syncAll
+						? {}
+						: {
+								_id: {
+									$in: Object.keys(state.documentsMap).concat(
+										state.getDocIds
+									),
+								},
+						  }
+
 					const result = await feathersClient
 						.service(serviceName)
-						.find({ userId: rootState.auth.user._id })
+						.find(query)
 					// console.log(`All : ${serviceName}`, result)
 					// console.log('docMap', state.documentsMap)
 
@@ -229,14 +246,18 @@ export default function factory(
 
 				if (feathersClient.io.connected) {
 					// console.log(`/${moduleName}/patch action id, doc`, { id, doc })
+					try {
+						const result = await feathersClient
+							.service(serviceName)
+							.patch(id, doc)
 
-					const result = await feathersClient
-						.service(serviceName)
-						.patch(id, doc)
-
-					// console.log(`/${moduleName}/patch action id, result`, result)
-					commit('PATCH', { id, doc: result })
-					return result
+						// console.log(`/${moduleName}/patch action id, result`, result)
+						commit('PATCH', { id, doc: result })
+						return result
+					} catch (e) {
+						console.error(e)
+						return null
+					}
 				} else {
 					delete doc[idField]
 
@@ -258,6 +279,21 @@ export default function factory(
 				} else {
 					commit('REMOVE', id)
 					commit('ADD_REMOVED_DOC_ID', id)
+				}
+			},
+			async get({ commit, state }, id) {
+				if (feathersClient.io.connected) {
+					console.log(`get doc for id ${id} on service ${serviceName}`)
+					const doc = await feathersClient.service(serviceName).get(id)
+					if (state.documentsMap[id]) {
+						commit('PATCH', { id, doc })
+					} else {
+						commit('CREATE', { id, doc })
+					}
+					return doc
+				} else {
+					commit('ADD_GET_DOC_ID', id)
+					return state.documentsMap[id]
 				}
 			},
 		},
