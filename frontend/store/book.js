@@ -9,7 +9,7 @@ const {
 	actions: pActions,
 	getters: pGetters,
 	plugin: pPlugin,
-} = OfflineFeathersStoreFactory('books', 'books', feathersClient, {
+} = OfflineFeathersStoreFactory('books', 'book', feathersClient, {
 	idField: '_id',
 	syncAll: false,
 })
@@ -28,9 +28,7 @@ export const getters = {
 	getBook: (state, getters, rootState, rootGetters) => {
 		return (bookId) => {
 			const offlineBook = rootGetters['offline/getBook'](bookId)
-			console.log('search vbook ' + bookId, offlineBook)
 			if (offlineBook) return offlineBook
-			console.log('Found book', state.documentsMap[bookId])
 			return deepClone(state.documentsMap[bookId])
 		}
 	},

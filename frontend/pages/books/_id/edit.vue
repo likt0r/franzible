@@ -149,6 +149,7 @@ export default {
 	},
 	watch: {
 		book(val) {
+			console.log('Book changed')
 			this.bookCopy = JSON.parse(JSON.stringify(val))
 		},
 	},
@@ -164,8 +165,8 @@ export default {
 		reset() {
 			this.bookCopy = JSON.parse(JSON.stringify(this.book))
 		},
-		save() {
-			this.$store.dispatch('book/patch', {
+		async save() {
+			this.book = await this.$store.dispatch('book/patch', {
 				id: this.bookId,
 				doc: this.bookCopy,
 			})

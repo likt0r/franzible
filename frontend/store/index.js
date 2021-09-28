@@ -5,6 +5,7 @@ import { plugin as progressPlugin } from './progress'
 import { plugin as connectionPlugin } from './connection'
 import { plugin as authPlugin } from './auth'
 import { plugin as mediaPlugin } from './media'
+import { plugin as bookPlugin } from './book'
 import { uniqBy } from '~/tools/helper'
 
 export const state = () => ({
@@ -150,4 +151,5 @@ export const plugins = [
 	timerInitPlugin,
 	progressPlugin,
 	mediaPlugin,
+	bookPlugin,
 ]
