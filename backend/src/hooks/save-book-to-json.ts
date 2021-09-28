@@ -4,12 +4,13 @@ import { Hook, HookContext } from '@feathersjs/feathers'
 import fs from 'fs'
 import util from 'util'
 
-const writeFile = util.promisify(fs.writeFile);
+const writeFile = util.promisify(fs.writeFile)
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export default (options = {}): Hook => {
-  return async (context: HookContext): Promise<HookContext> => {
-    console.log(JSON.stringify(context.data))
-    //  writeFile
-    return context
-  }
+	return async (context: HookContext): Promise<HookContext> => {
+		console.log(context)
+		console.log(JSON.stringify(context.data))
+		//  writeFile
+		return context
+	}
 }
