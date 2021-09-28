@@ -91,7 +91,7 @@ export default function factory(
 
 					const result = await feathersClient
 						.service(serviceName)
-						.find(query)
+						.find({ query })
 					// console.log(`All : ${serviceName}`, result)
 					// console.log('docMap', state.documentsMap)
 
@@ -226,7 +226,7 @@ export default function factory(
 							commit('CREATE', { id: data[idField], doc: data })
 							// TODO: User notification
 							console.warn(
-								'Progress already exists on Server, taking server state',
+								`Document ${moduleName} already exists on Server, taking server state`,
 								data
 							)
 							return error.data
@@ -311,7 +311,7 @@ export default function factory(
 				})
 			})
 			feathersClient.service(serviceName).on('patched', (doc) => {
-				// console.log(`${moduleName} service event patched`, doc)
+				console.log(`${moduleName} service event patched`, doc)
 				if (
 					store.state[moduleName].documentsMap[doc[idField]].updatedAt <
 					doc.updatedAt
