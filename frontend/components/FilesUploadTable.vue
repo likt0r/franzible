@@ -19,6 +19,12 @@
 						</td>
 						<td>{{ file.filename }}</td>
 						<td>
+							<v-icon small @click="moveUp(file._id)" class="mr-2">
+								mdi-transfer-up
+							</v-icon>
+							<v-icon small @click="moveDown(file._id)" class="mr-2">
+								mdi-transfer-down
+							</v-icon>
 							<v-icon small @click="remove(file._id)">
 								mdi-delete
 							</v-icon>
@@ -52,15 +58,33 @@ export default  {
 		return { tableHeaders: [
         { text: '', sortable: false },
 		{ text: 'File name', sortable: false },
-
+        { text: 'Actions', value: 'actions', sortable: false },
 	]}
 	},
 	computed: {},
 
 	methods: {
-        remove(index) {
+        remove(id) {
+            /*eslint-disable */
 
-    }},
+
+            const index = this.value.findIndex((el) => el._id === id)
+
+
+        },
+        moveUp(id){
+             const index = this.value.findIndex((el) => el._id === id)
+             const el = this.value[index]
+             this.value.splice(index,1)
+             this.value.unshift(el)
+        },
+        moveDown(id){
+             const index = this.value.findIndex((el) => el._id === id)
+             const el = this.value[index]
+             this.value.splice(index,1)
+             this.value.push(el)
+        }
+    },
 }
 </script>
 
