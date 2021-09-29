@@ -7,25 +7,25 @@ import hooks from './books.hooks'
 
 // Add this service to the service type index
 declare module '../../declarations' {
-  interface ServiceTypes {
-    books: Books & ServiceAddons<any>
-  }
+	interface ServiceTypes {
+		books: Books & ServiceAddons<any>
+	}
 }
 
 export default function (app: Application): void {
-  const options = {
-    Model: createModel(app),
-    paginate: undefined, // app.get('paginate'),
-  }
+	const options = {
+		Model: createModel(app),
+		paginate: undefined, // app.get('paginate'),
+	}
 
-  // Initialize our service with any options it requires
-  app.use('/books', new Books(options, app))
+	// Initialize our service with any options it requires
+	app.use('/books', new Books(options, app))
 
-  // Get our initialized service so that we can register hooks
-  const service: any = app.service('books')
-  service.options.timeout = 50000
-  service.hooks(hooks)
-  service.publish(() => {
-    return app.channel('public')
-  })
+	// Get our initialized service so that we can register hooks
+	const service: any = app.service('books')
+
+	service.hooks(hooks)
+	service.publish(() => {
+		return app.channel('public')
+	})
 }

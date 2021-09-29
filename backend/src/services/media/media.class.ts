@@ -7,7 +7,12 @@ import {
 } from '@feathersjs/feathers'
 import { Application } from '../../declarations'
 import * as path from 'path'
-import { getAudioFiles, getImageFiles, getDirectories } from '../../tools/files'
+import {
+	getAudioFiles,
+	getImageFiles,
+	getDirectories,
+	readInfoJson,
+} from '../../tools/files'
 import * as mongoose from 'mongoose'
 import * as mm from 'music-metadata'
 
@@ -58,6 +63,7 @@ export class Media implements ServiceMethods<Data> {
 		const authors = await getDirectories(mediaPath)
 		const service = this.app.service('media-update')
 		service.patch('updating', { value: true })
+		let foundBooks = []
 		try {
 			let library: Array<any> = []
 			for (const author of authors) {
@@ -70,44 +76,52 @@ export class Media implements ServiceMethods<Data> {
 			}
 
 			for (const [index, { author, book }] of library.entries()) {
-				const splits = book.split(';').map((entry: string) => entry.trim())
+				const bookPath = path.join(mediaPath, author, book)
 
-				const audioFiles = await getAudioFiles(
-					path.join(mediaPath, author, book)
-				)
-				audioFiles.sort() //alphabetical sort
-				const imageFiles = await getImageFiles(
-					path.join(mediaPath, author, book)
-				)
-				// read metadata from files
-				const files = []
-				for (const file of audioFiles) {
-					const filepath = path.join(mediaPath, author, book, file)
-					const metadata = await mm.parseFile(filepath, {
-						duration: true,
-						skipCovers: true,
-					})
-					files.push({
-						filename: file,
-						filepath: path.join('files', author, book, file),
-						duration: metadata.format.duration,
-					})
-				}
+				const fileInfo = await readInfoJson(bookPath)
+				let data
+				if (fileInfo) {
+					data = fileInfo
+				} else {
+					const audioFiles = await getAudioFiles(bookPath)
+					audioFiles.sort() //alphabetical sort
+					const splits = book.split(';').map((entry: string) => entry.trim())
+					const imageFiles = await getImageFiles(bookPath)
+					// read metadata from files
+					const files = []
+					for (const file of audioFiles) {
+						const filepath = path.join(bookPath, file)
+						const metadata = await mm.parseFile(filepath, {
+							duration: true,
+							skipCovers: true,
+						})
+						files.push({
+							filename: file,
+							filepath: path.join('files', author, book, file),
+							duration: metadata.format.duration,
+						})
+					}
 
-				const title = splits[splits.length - 1]
-				console.log('Books ', title)
-				const data = {
-					author,
-					title,
-					series: splits.splice(0, splits.length - 1),
-					files,
-					cover:
-						imageFiles.length > 0
-							? path.join('files', author, book, imageFiles[0])
-							: null,
-					mediaPath,
+					const title = splits[splits.length - 1]
+					console.log('Books ', title)
+					data = {
+						author: author as string,
+						title: title as string,
+						series: splits.splice(0, splits.length - 1),
+						files,
+						cover:
+							imageFiles.length > 0
+								? path.join('files', author, book, imageFiles[0])
+								: null,
+						mediaPath: bookPath,
+					}
 				}
-				await Books.updateOne({ author, title }, data, { upsert: true })
+				await Books.updateOne(
+					{ author: data.author, title: data.title },
+					data,
+					{ upsert: true }
+				)
+				foundBooks.push(bookPath)
 				service.patch('progress', { value: (index / library.length) * 100 })
 				// add Data File
 			}

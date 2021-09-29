@@ -30,9 +30,9 @@ export default {
 				return context
 			},
 		],
-		create: [],
-		update: [saveBookToJson()],
-		patch: [],
+		create: [saveBookToJson()],
+		update: [],
+		patch: [saveBookToJson()],
 		remove: [],
 	},
 

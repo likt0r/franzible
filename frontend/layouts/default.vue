@@ -83,7 +83,10 @@ export default {
 			},
 		},
 		isSingleBookPage() {
-			return this.$nuxt.$route.name.startsWith('books-id')
+			return (
+				this.$nuxt.$route.name.startsWith('books-id') ||
+				this.$nuxt.$route.name.startsWith('admin')
+			)
 		},
 		showOfflineHint() {
 			if (!this.$store.getters['connection/connected']) {

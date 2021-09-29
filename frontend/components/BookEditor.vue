@@ -73,7 +73,7 @@
 				:disabled="!bookChanged"
 				@click="save"
 			>
-				Save Changes
+				{{ verify ? 'Verify ' : 'Save Changes' }}
 				<v-icon right> mdi-cloud-upload-outline </v-icon></v-btn
 			>
 			<v-btn
@@ -112,6 +112,10 @@ export default {
 			type: String,
 			default: () => null,
 		},
+		verify: {
+			type: Boolean,
+			default: () => false,
+		},
 	},
 
 	data() {
@@ -148,26 +152,36 @@ export default {
 			console.log('BookId changed')
 			this.book = await this.$store.dispatch('book/get', id)
 			this.bookCopy = JSON.parse(JSON.stringify(this.book))
+			if (this.verify) {
+				this.bookCopy.verified = true
+			}
 		},
 	},
 	async mounted() {
 		if (this.bookId) {
 			this.book = await this.$store.dispatch('book/get', this.bookId)
 			this.bookCopy = JSON.parse(JSON.stringify(this.book))
+			if (this.verify) {
+				this.bookCopy.verified = true
+			}
 		}
 	},
 	methods: {
 		...mapActions('books', ['update']),
 		reset() {
 			this.bookCopy = JSON.parse(JSON.stringify(this.book))
+			if (this.verify) {
+				this.bookCopy.verified = true
+			}
 		},
 		async save() {
+			this.bookCopy.verified = true
 			this.book = await this.$store.dispatch('book/patch', {
 				id: this.bookId,
 				doc: this.bookCopy,
 			})
+			this.$emit('verified', this.bookId)
 			this.bookCopy = JSON.parse(JSON.stringify(this.book))
-			console.log('book saved')
 		},
 	},
 }

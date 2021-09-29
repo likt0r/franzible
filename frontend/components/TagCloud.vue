@@ -6,6 +6,7 @@
 		tile
 		outlined
 		color="transparent"
+		style="z-index: 0"
 	>
 		<v-card-title v-if="label" class="pa-0">
 			{{ label }}
@@ -87,6 +88,7 @@ export default {
 	color: rgb(133, 133, 133);
 	font-size: 16px;
 	line-height: 20px;
+
 	font-family: 'Roboto', sans-serif;
 }
 </style>
