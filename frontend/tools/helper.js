@@ -39,3 +39,28 @@ export async function unlockAudio() {
 	await elAudio.play()
 	console.log('unlock done Playing')
 }
+
+export function createObjectURL(object) {
+	return window.URL
+		? window.URL.createObjectURL(object)
+		: window.webkitURL.createObjectURL(object)
+}
+
+export function revokeObjectURL(url) {
+	return window.URL
+		? window.URL.revokeObjectURL(url)
+		: window.webkitURL.revokeObjectURL(url)
+}
+
+export function readLocalImage(file) {
+	return new Promise((resolve, reject) => {
+		const reader = new FileReader()
+		reader.onload = () => {
+			resolve(reader.result)
+		}
+		reader.onerror = (error) => {
+			reject(error)
+		}
+		reader.readAsDataURL(file)
+	})
+}
