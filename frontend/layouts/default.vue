@@ -108,6 +108,11 @@ export default {
 	},
 }
 </script>
+<style>
+body {
+	background-color: #000000;
+}
+</style>
 <style scoped>
 .theme--dark.v-application {
 	background: #000000;

@@ -34,7 +34,11 @@ export default {
 	},
 }
 </script>
-
+<style>
+body {
+	background-color: #000000;
+}
+</style>
 <style scoped>
 h1 {
 	font-size: 20px;
