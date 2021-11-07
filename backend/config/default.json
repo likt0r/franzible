@@ -1,34 +1,32 @@
 {
-    "host": "localhost",
-    "port": 3030,
-    "public": "../public/",
-    "paginate": {
-        "default": 10,
-        "max": 50
-    },
-    "mediaPath": "/media/apollon/media/Audiobooks/",
-    "authentication": {
-        "entity": "user",
-        "service": "users",
-        "secret": "yourSecret",
-        "maximumSessionLength": "60d",
-        "authStrategies": [
-            "jwt",
-            "local"
-        ],
-        "jwtOptions": {
-            "header": {
-                "typ": "access"
-            },
-            "audience": "http://http://localhost:3000/",
-            "issuer": "franzible",
-            "algorithm": "HS256",
-            "expiresIn": "5d"
-        },
-        "local": {
-            "usernameField": "email",
-            "passwordField": "password"
-        }
-    },
-    "mongodb": "mongodb://localhost:27017/franzible"
+	"host": "localhost",
+	"port": 3030,
+	"public": "../public/",
+	"paginate": {
+		"default": 10,
+		"max": 50
+	},
+	"mediaPath": "/media/bewr/apollon/Audiobooks/",
+	"uploadFolder": "../uploads",
+	"authentication": {
+		"entity": "user",
+		"service": "users",
+		"secret": "yourSecret",
+		"maximumSessionLength": "60d",
+		"authStrategies": ["jwt", "local"],
+		"jwtOptions": {
+			"header": {
+				"typ": "access"
+			},
+			"audience": "http://http://localhost:3000/",
+			"issuer": "franzible",
+			"algorithm": "HS256",
+			"expiresIn": "5d"
+		},
+		"local": {
+			"usernameField": "email",
+			"passwordField": "password"
+		}
+	},
+	"mongodb": "mongodb://localhost:27017/franzible"
 }

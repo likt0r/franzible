@@ -1,6 +1,5 @@
 import { ServiceAddons } from '@feathersjs/feathers'
 import { LocalStrategy } from '@feathersjs/authentication-local'
-import { expressOauth } from '@feathersjs/authentication-oauth'
 
 import CustomAuthenticationService from './CustomAuthenticationService'
 import CustomJWTStrategy from './CustomJWTStrategy'
@@ -14,11 +13,10 @@ declare module '../declarations' {
 }
 
 export default function (app: Application): void {
-  const authentication = new CustomAuthenticationService(app)
+	const authentication = new CustomAuthenticationService(app)
 
-  authentication.register('jwt', new CustomJWTStrategy())
-  authentication.register('local', new LocalStrategy())
+	authentication.register('jwt', new CustomJWTStrategy())
+	authentication.register('local', new LocalStrategy())
 
-  app.use('/authentication', authentication)
-  app.configure(expressOauth())
+	app.use('/authentication', authentication)
 }
