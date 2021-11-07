@@ -247,7 +247,6 @@ export const playerInitPlugin = (store) => {
 		}
 	})
 	window.addEventListener('keyup', (event) => {
-		console.log('#player', event)
 		if (event.code === 'Space' && event.target === document.body) {
 			event.preventDefault()
 			if (store.getters['player/isPlaying']) {

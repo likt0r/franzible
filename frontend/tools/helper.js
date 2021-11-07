@@ -44,6 +44,14 @@ export function createObjectURL(object) {
 	return window.URL
 		? window.URL.createObjectURL(object)
 		: window.webkitURL.createObjectURL(object)
+	// const blob = new Blob(blobPieces, { type: 'audio/mp3' })
+	// if (window.webkitURL) {
+	// 	return window.webkitURL.createObjectURL(blob)
+	// } else if (window.URL && window.URL.createObjectURL) {
+	// 	return window.URL.createObjectURL(blob)
+	// } else {
+	// 	return null
+	// }
 }
 
 export function revokeObjectURL(url) {

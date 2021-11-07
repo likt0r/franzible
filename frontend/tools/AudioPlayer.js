@@ -102,7 +102,7 @@ class AudioPlayer {
 			if (this.elAudio.src && this.elAudio.src.startsWith('blob:')) {
 				URL.revokeObjectURL(this.elAudio.src)
 			}
-			console.log('GEfile from dataBaseID')
+			console.log('GET file from dataBaseID')
 			this.elAudio.src = await database.getFileContentUrl(audioDbId)
 		} else {
 			this.elAudio.src = audioUrl

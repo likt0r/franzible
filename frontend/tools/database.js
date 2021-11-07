@@ -1,5 +1,6 @@
 import Dexie from 'dexie'
 import { getFullUrl } from '~/tools/url'
+import { createObjectURL } from '~/tools/helper'
 // Database inherits from the Dexie class to handle all database logic for the
 // Book app.
 // NOTE: For an app like this where the database interactions are pretty
@@ -115,10 +116,12 @@ export class Database extends Dexie {
 	}
 
 	async getFileContentUrl(fileId) {
+        console.log('getFileContentUrl fileId',fileId)
 		const file = await this.files.get({
 			id: fileId,
 		})
-		const url = URL.createObjectURL(file.content)
+		const url = createObjectURL(file.content)
+        console.log('getFileContentUrl object url',url)
 		return url
 	}
 }
